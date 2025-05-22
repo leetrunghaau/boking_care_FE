@@ -1,6 +1,8 @@
 "use client"
 
+import http from "@/helper/axios"
 import { CheckCircle, BookOpen, Award } from "lucide-react"
+import { useEffect, useState } from "react"
 
 type Doctor = {
   about: string
@@ -11,23 +13,44 @@ type Doctor = {
 }
 
 interface DoctorAboutProps {
-  doctor: Doctor
+  slug: string
 }
+// 
+export default function ({ slug }: DoctorAboutProps) {
 
-const DoctorAbout: React.FC<DoctorAboutProps> = ({ doctor }) => {
+
+  const [doctor, setDoctor] = useState<Doctor | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<Doctor >(`/doctor-site/doctor/${slug}/about`)
+        setDoctor(res);
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [])
+
   return (
     <div className="space-y-8">
       {/* Giới thiệu về bác sĩ */}
       <div>
         <h2 className="text-xl font-bold mb-4">Giới thiệu về bác sĩ</h2>
-        <p className="text-muted-foreground">{doctor.about}</p>
+        <p className="text-muted-foreground">{doctor?.about}</p>
       </div>
 
       {/* Chuyên môn */}
       <div>
         <h3 className="text-lg font-bold mb-3">Chuyên môn</h3>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {doctor.specializations.map((spec, index) => (
+          {doctor?.specializations.map((spec, index) => (
             <li key={index} className="flex items-start gap-2">
               <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
               <span>{spec}</span>
@@ -40,7 +63,7 @@ const DoctorAbout: React.FC<DoctorAboutProps> = ({ doctor }) => {
       <div>
         <h3 className="text-lg font-bold mb-3">Học vấn</h3>
         <ul className="space-y-4">
-          {doctor.education.map((edu, index) => (
+          {doctor?.education.map((edu, index) => (
             <li key={index} className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
                 <BookOpen className="h-5 w-5 text-teal-600" />
@@ -60,7 +83,7 @@ const DoctorAbout: React.FC<DoctorAboutProps> = ({ doctor }) => {
       <div>
         <h3 className="text-lg font-bold mb-3">Giải thưởng</h3>
         <ul className="space-y-4">
-          {doctor.awards.map((award, index) => (
+          {doctor?.awards.map((award, index) => (
             <li key={index} className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                 <Award className="h-5 w-5 text-amber-600" />
@@ -78,7 +101,7 @@ const DoctorAbout: React.FC<DoctorAboutProps> = ({ doctor }) => {
       <div>
         <h3 className="text-lg font-bold mb-3">Nghiên cứu & Xuất bản</h3>
         <ul className="space-y-4">
-          {doctor.publications.map((pub, index) => (
+          {doctor?.publications.map((pub, index) => (
             <li key={index} className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <BookOpen className="h-5 w-5 text-blue-600" />
@@ -96,4 +119,4 @@ const DoctorAbout: React.FC<DoctorAboutProps> = ({ doctor }) => {
     </div>
   )
 }
-export default DoctorAbout
+

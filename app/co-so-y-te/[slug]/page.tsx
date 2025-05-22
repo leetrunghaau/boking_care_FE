@@ -39,7 +39,7 @@ export default function HealthFacilityDetailPage() {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const res = await http.get<MedicalFacility>("/specialties")
+                const res = await http.get<MedicalFacility>(`/hospital/${slug}`)
                 setFacility(res);
             } catch (err) {
                 console.error("Failed to fetch doctors:", err);

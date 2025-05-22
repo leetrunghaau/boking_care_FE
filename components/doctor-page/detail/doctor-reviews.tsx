@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Star, ThumbsUp, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
+import http from "@/helper/axios"
 
 interface DoctorReviewsProps {
   doctorId: string
@@ -13,44 +14,44 @@ interface DoctorReviewsProps {
   reviewCount: number
 }
 
-export default function DoctorReviews({ doctorId, rating, reviewCount }: DoctorReviewsProps) {
+interface Review {
+  id: string;
+  name: string;
+  date: string;
+  rating: number;
+  comment: string;
+  likes: number;
+  replies: number;
+}
+
+interface Pops {
+  slug: string
+}
+export default function DoctorReviews({ slug }: Pops) {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [reviewText, setReviewText] = useState("")
   const [userRating, setUserRating] = useState(0)
   const [hoveredRating, setHoveredRating] = useState(0)
 
-  // Dữ liệu mẫu cho đánh giá
-  const reviews = [
-    {
-      id: "1",
-      name: "Nguyễn Thị B",
-      date: "15/04/2023",
-      rating: 5,
-      comment:
-        "Bác sĩ rất tận tâm và chuyên nghiệp. Tôi đã được tư vấn rất chi tiết về tình trạng bệnh và phương pháp điều trị. Cảm ơn bác sĩ rất nhiều!",
-      likes: 12,
-      replies: 1,
-    },
-    {
-      id: "2",
-      name: "Trần Văn C",
-      date: "03/03/2023",
-      rating: 4,
-      comment: "Bác sĩ khám rất kỹ và giải thích rõ ràng. Tuy nhiên thời gian chờ đợi hơi lâu.",
-      likes: 5,
-      replies: 0,
-    },
-    {
-      id: "3",
-      name: "Lê Thị D",
-      date: "22/02/2023",
-      rating: 5,
-      comment:
-        "Tôi rất hài lòng với dịch vụ. Bác sĩ rất chuyên nghiệp và thân thiện. Sẽ quay lại khám trong tương lai.",
-      likes: 8,
-      replies: 2,
-    },
-  ]
+  const [reviews, setReviews] = useState<Review[]>([])
+
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<Review[]>(`/doctor-site/doctor/${slug}/experience`)
+        setReviews(res);
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [])
 
   // Phân bố đánh giá
   const ratingDistribution = [
@@ -74,7 +75,7 @@ export default function DoctorReviews({ doctorId, rating, reviewCount }: DoctorR
       <h2 className="text-xl font-bold mb-4">Đánh giá từ bệnh nhân</h2>
 
       {/* Tổng quan đánh giá */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg">
         <div className="flex flex-col items-center justify-center">
           <div className="text-5xl font-bold text-teal-600">{rating}</div>
           <div className="flex items-center gap-1 my-2">
@@ -100,10 +101,10 @@ export default function DoctorReviews({ doctorId, rating, reviewCount }: DoctorR
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Form đánh giá */}
-      {!showReviewForm ? (
+      {/* {!showReviewForm ? (
         <div className="text-center">
           <Button onClick={() => setShowReviewForm(true)} className="bg-teal-600 hover:bg-teal-700">
             Viết đánh giá
@@ -156,11 +157,11 @@ export default function DoctorReviews({ doctorId, rating, reviewCount }: DoctorR
             </Button>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Danh sách đánh giá */}
       <div className="space-y-4">
-        {reviews.map((review) => (
+        {reviews?.map((review) => (
           <div key={review.id} className="border-b pb-4 last:border-b-0">
             <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">
@@ -188,11 +189,6 @@ export default function DoctorReviews({ doctorId, rating, reviewCount }: DoctorR
                   <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-teal-600">
                     <ThumbsUp className="h-4 w-4" />
                     <span>Hữu ích ({review.likes})</span>
-                  </button>
-
-                  <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-teal-600">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>Trả lời ({review.replies})</span>
                   </button>
                 </div>
               </div>

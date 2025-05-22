@@ -12,9 +12,10 @@ import {
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { useEffect, useState } from "react"
+import http from "@/helper/axios"
 
 // 1. Khai báo interface với icon là string
-interface SpecialtyType {
+interface Specialty {
   icon: string
   name: string
   slug: string
@@ -29,20 +30,25 @@ const iconMap: { [key: string]: React.ElementType } = {
   Stethoscope,
 }
 
-const mock: SpecialtyType[] = [
-  { icon: "Brain", name: "Thần kinh", slug: "than-kinh" },
-  { icon: "Heart", name: "Tim mạch", slug: "tim-mach" },
-  { icon: "Eye", name: "Mắt", slug: "mat" },
-  { icon: "Bone", name: "Cơ xương khớp", slug: "co-xuong-khop" },
-  { icon: "Baby", name: "Nhi khoa", slug: "nhi-khoa" },
-  { icon: "Stethoscope", name: "Tai mũi họng", slug: "tai-mui-hong" },
-]
 
 export default function PopularSpecialties() {
-  const [specialties, setSpecialties] = useState<SpecialtyType[]>([])
+  const [specialties, setSpecialties] = useState<Specialty[]>([])
+      const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setSpecialties(mock)
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<Specialty[]>("/home/specialties")
+        setSpecialties(res);
+      } catch (err) {
+        console.error("Failed to fetch specialties:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [])
 
   return (

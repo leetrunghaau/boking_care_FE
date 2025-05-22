@@ -1,51 +1,30 @@
 // app/co-so-y-te/page.tsx
 "use client"
 import HospitalCard, { Hospital } from "@/components/hospital/hospital-card";
-import HospitalList from "@/components/hospital/hospital-list";
 import SubHeader from "@/components/sub-header";
 import http from "@/helper/axios";
-import { HospitalSV } from "@/service/hospital";
 import { useEffect, useState } from "react";
 
-const fakeData: Hospital[] = [
-  {
-    id: 1,
-    name: "Bệnh viện Đại học Y Hà Nội",
-    slug: "dai-hoc-y-ha-noi",
-    address: "Số 1 Tôn Thất Tùng, Đống Đa, Hà Nội",
-    thumbnail: "/placeholder.svg?text=BV+1",
-  },
-  {
-    id: 2,
-    name: "Bệnh viện Bạch Mai",
-    slug: "bach-mai",
-    address: "78 Giải Phóng, Đống Đa, Hà Nội",
-    thumbnail: "/placeholder.svg?text=BV+2",
-  },
-  {
-    id: 3,
-    name: "Phòng khám Đa khoa Quốc tế",
-    slug: "da-khoa-quoc-te",
-    address: "123 Lê Lợi, Quận 1, TP.HCM",
-    thumbnail: "/placeholder.svg?text=PK+3",
-  },
-];
+
 
 const FacilitiesPage = () => {
   const [hospitals, setHospitals] = useState<Hospital[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const dataRS = await http.get<Hospital[]>("/hospitals")
-        console.log(dataRS)
-        // setHospitals(dataRS)
+        const res = await http.get<Hospital[]>("/hospitals")
+        setHospitals(res);
       } catch (err) {
-        console.error('Failed to load users:', err);
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchData();
   }, [])
 
   return (
@@ -69,7 +48,6 @@ const FacilitiesPage = () => {
           ))}
 
         </div>
-        <HospitalList hospitals={fakeData} />
       </section>
     </>
   );

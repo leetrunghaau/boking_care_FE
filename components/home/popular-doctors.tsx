@@ -2,50 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import http from "@/helper/axios"
 import { ChevronRight, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-const mock = [
-    {
-        id: 1,
-        name: "Nguyễn Văn A",
-        img: "/placeholder.svg",
-        slug: "Nguyen-Van-A-00004",
-        specialty: "Chuyên khoa Tim mạch",
-        rating: 3.7,
-        sumRating: 120
-    },
-    {
-        id: 2,
-        name: "Nguyễn Văn A",
-        img: "/placeholder.svg",
-        slug: "Nguyen-Van-A-00004",
-        specialty: "Chuyên khoa Tim mạch",
-        rating: 3.7,
-        sumRating: 120
-    },
-    {
-        id: 3,
-        name: "Nguyễn Văn A",
-        img: "/placeholder.svg",
-        slug: "Nguyen-Van-A-00004",
-        specialty: "Chuyên khoa Tim mạch",
-        rating: 3.7,
-        sumRating: 120
-    },
-    {
-        id: 4,
-        name: "Nguyễn Văn A",
-        img: "/placeholder.svg",
-        slug: "Nguyen-Van-A-00004",
-        specialty: "Chuyên khoa Tim mạch",
-        rating: 3.7,
-        sumRating: 120
-    }
-
-]
 interface Doctor {
     id: number
     name: string
@@ -57,9 +19,23 @@ interface Doctor {
 }
 export default function PopularDoctors() {
     const [doctors, setDoctors] = useState<Doctor[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
     useEffect(() => {
-        setDoctors(mock)
-    }, [])
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<Doctor[]>("/home/doctors")
+        setDoctors(res);
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [])
     return (
         <div className="container mx-auto">
             <div className="flex justify-between items-center mb-10">

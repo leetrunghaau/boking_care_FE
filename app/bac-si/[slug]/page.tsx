@@ -1,7 +1,7 @@
-//app/doctors/[id]/page.tsx
+'use client'
 import Link from "next/link"
 import Image from "next/image"
-import type { Metadata } from "next"
+// import type { Metadata } from "next"
 import {
   MapPin,
   Clock,
@@ -23,15 +23,19 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import DoctorReviews from "@/components/doctor-page/detail/doctor-reviews"
 import DoctorSchedule from "@/components/doctor-page/detail/doctor-schedule"
+import DoctorAbout from "@/components/doctor-page/detail/doctor-about"
+import { useParams } from "next/navigation"
+import DoctorExperience from "@/components/doctor-page/detail/doctor-experience"
 
+// export const metadata: Metadata = {
+//   title: `Bác sĩ Nguyễn Văn A - Chuyên khoa Tim mạch | BookingCare`,
+//   description:
+//     "Đặt lịch khám với Bác sĩ Nguyễn Văn A, chuyên gia Tim mạch với hơn 15 năm kinh nghiệm tại Bệnh viện Đại học Y Hà Nội",
+// }
 
-export const metadata: Metadata = {
-  title: "Bác sĩ Nguyễn Văn A - Chuyên khoa Tim mạch | BookingCare",
-  description:
-    "Đặt lịch khám với Bác sĩ Nguyễn Văn A, chuyên gia Tim mạch với hơn 15 năm kinh nghiệm tại Bệnh viện Đại học Y Hà Nội",
-}
-
-export default function DoctorDetailPage({ params }: { params: { id: string } }) {
+export default function DoctorDetailPage() {
+  const params = useParams()
+  const slug = params?.slug as string
   const doctor = {
     id: params.id,
     name: "Bác sĩ Nguyễn Văn A",
@@ -108,7 +112,7 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
   return (
     <>
       <section className="my-10">
-        <div className="container justify-center mx-auto ">
+        <div className="container justify-center mx-auto w-11/12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
@@ -191,165 +195,18 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
                 </TabsList>
 
                 <TabsContent value="about" className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-bold mb-4">Giới thiệu về bác sĩ</h2>
-                    <p className="text-muted-foreground">{doctor.about}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold mb-3">Chuyên môn</h3>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {doctor.specializations.map((spec, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                          <span>{spec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold mb-3">Học vấn</h3>
-                    <ul className="space-y-4">
-                      {doctor.education.map((edu, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                            <BookOpen className="h-5 w-5 text-teal-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{edu.degree}</p>
-                            <p className="text-muted-foreground">
-                              {edu.school} • {edu.year}
-                            </p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold mb-3">Giải thưởng</h3>
-                    <ul className="space-y-4">
-                      {doctor.awards.map((award, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                            <Award className="h-5 w-5 text-amber-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{award.title}</p>
-                            <p className="text-muted-foreground">{award.year}</p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold mb-3">Nghiên cứu & Xuất bản</h3>
-                    <ul className="space-y-4">
-                      {doctor.publications.map((pub, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <BookOpen className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{pub.title}</p>
-                            <p className="text-muted-foreground">
-                              {pub.journal} • {pub.year}
-                            </p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <DoctorAbout slug={slug } />
                 </TabsContent>
 
                 <TabsContent value="experience" className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-bold mb-4">Kinh nghiệm làm việc</h2>
-                    <ul className="space-y-6">
-                      {doctor.experience_detail.map((exp, index) => (
-                        <li
-                          key={index}
-                          className="relative pl-8 pb-6 border-l-2 border-teal-200 last:border-l-0 last:pb-0"
-                        >
-                          <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-teal-600"></div>
-                          <div className="mb-1">
-                            <span className="inline-block px-2 py-1 text-xs font-medium bg-teal-100 text-teal-800 rounded">
-                              {exp.period}
-                            </span>
-                          </div>
-                          <h3 className="text-lg font-bold">{exp.position}</h3>
-                          <p className="text-muted-foreground">{exp.hospital}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold mb-3">Ngôn ngữ</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {doctor.languages.map((lang, index) => (
-                        <Badge key={index} variant="outline" className="bg-slate-50">
-                          {lang}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
+                  <DoctorExperience slug={slug} />
                 </TabsContent>
 
                 <TabsContent value="reviews">
-                  <DoctorReviews doctorId={doctor.id} rating={doctor.rating} reviewCount={doctor.reviewCount} />
+                  <DoctorReviews slug={slug}  />
                 </TabsContent>
 
                 <TabsContent value="faq">
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-bold mb-4">Câu hỏi thường gặp</h2>
-
-                    <div className="space-y-4">
-                      <div className="border rounded-lg p-4">
-                        <h3 className="font-medium mb-2">Bác sĩ có chữa được bệnh tăng huyết áp không?</h3>
-                        <p className="text-muted-foreground">
-                          Có, bác sĩ Nguyễn Văn A là chuyên gia về tăng huyết áp với nhiều năm kinh nghiệm điều trị thành
-                          công cho nhiều bệnh nhân.
-                        </p>
-                      </div>
-
-                      <div className="border rounded-lg p-4">
-                        <h3 className="font-medium mb-2">Tôi cần chuẩn bị gì khi đến khám?</h3>
-                        <p className="text-muted-foreground">
-                          Bạn nên mang theo các kết quả xét nghiệm, chẩn đoán hình ảnh trước đây (nếu có), danh sách thuốc
-                          đang sử dụng và thẻ bảo hiểm y tế.
-                        </p>
-                      </div>
-
-                      <div className="border rounded-lg p-4">
-                        <h3 className="font-medium mb-2">Thời gian khám bệnh mất bao lâu?</h3>
-                        <p className="text-muted-foreground">
-                          Thông thường, mỗi buổi khám kéo dài khoảng 30 phút, tùy thuộc vào tình trạng bệnh của bạn.
-                        </p>
-                      </div>
-
-                      <div className="border rounded-lg p-4">
-                        <h3 className="font-medium mb-2">Tôi có thể hủy lịch hẹn không?</h3>
-                        <p className="text-muted-foreground">
-                          Có, bạn có thể hủy lịch hẹn trước 24 giờ mà không mất phí. Nếu hủy muộn hơn, có thể sẽ phát sinh
-                          phí hủy lịch.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="flex items-start gap-3">
-                        <MessageSquare className="h-5 w-5 text-teal-600 mt-0.5" />
-                        <div>
-                          <p className="font-medium">Bạn có câu hỏi khác?</p>
-                          <p className="text-sm text-muted-foreground mb-3">Đặt câu hỏi cho bác sĩ và nhận câu trả lời</p>
-                          <Button className="bg-teal-600 hover:bg-teal-700">Đặt câu hỏi</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </TabsContent>
               </Tabs>
 
@@ -421,7 +278,7 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
                     </div>
                   </div>
 
-                  <DoctorSchedule doctorId={doctor.id} />
+                  {/* <DoctorSchedule doctorId={doctor.id} /> */}
 
                   <div className="mt-6">
                     <Button className="w-full bg-teal-600 hover:bg-teal-700">Đặt lịch khám</Button>
