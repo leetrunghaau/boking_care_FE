@@ -1,14 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DoctorActivityChartProps {
-  dateRange: "today" | "week" | "month"
+  dateRange: "today" | "week" | "month";
 }
 
 export function DoctorActivityChart({ dateRange }: DoctorActivityChartProps) {
-  const [chartType, setChartType] = useState<"appointments" | "revenue">("appointments")
+  const [chartType, setChartType] = useState<"appointments" | "revenue">(
+    "appointments"
+  );
 
   // Dữ liệu mẫu cho biểu đồ
   const chartData = {
@@ -68,14 +76,21 @@ export function DoctorActivityChart({ dateRange }: DoctorActivityChartProps) {
         { time: "Tuần 4", amount: 6600000 },
       ],
     },
-  }
+  };
 
-  const currentData = chartData[dateRange][chartType]
+  const currentData = chartData[dateRange][chartType];
 
+  useEffect(() => {
+    console.log("Current Data:", chartData[dateRange][chartType]);
+  }, []);
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Select value={chartType} onValueChange={(value) => setChartType(value as "appointments" | "revenue")}>
+        <Select
+          value={chartType}
+          onValueChange={(value) =>
+            setChartType(value as "appointments" | "revenue")
+          }>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Loại biểu đồ" />
           </SelectTrigger>
@@ -91,25 +106,24 @@ export function DoctorActivityChart({ dateRange }: DoctorActivityChartProps) {
           <div className="h-full flex items-end">
             <div className="flex-1 h-full flex items-end">
               {currentData.map((item, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center justify-end h-full">
+                <div
+                  key={index}
+                  className="flex-1 flex flex-col items-center justify-end h-full">
                   <div className="w-full px-1 space-y-1 flex flex-col items-center justify-end">
                     {item.cancelled > 0 && (
                       <div
                         className="w-full bg-red-400 rounded-t-sm"
-                        style={{ height: `${item.cancelled * 20}px` }}
-                      ></div>
+                        style={{ height: `${item.cancelled * 20}px` }}></div>
                     )}
                     {item.upcoming > 0 && (
                       <div
                         className="w-full bg-blue-400 rounded-t-sm"
-                        style={{ height: `${item.upcoming * 20}px` }}
-                      ></div>
+                        style={{ height: `${item.upcoming * 20}px` }}></div>
                     )}
                     {item.completed > 0 && (
                       <div
                         className="w-full bg-green-400 rounded-t-sm"
-                        style={{ height: `${item.completed * 20}px` }}
-                      ></div>
+                        style={{ height: `${item.completed * 20}px` }}></div>
                     )}
                   </div>
                   <div className="mt-2 text-xs font-medium">{item.time}</div>
@@ -121,11 +135,14 @@ export function DoctorActivityChart({ dateRange }: DoctorActivityChartProps) {
           <div className="h-full flex items-end">
             <div className="flex-1 h-full flex items-end">
               {currentData.map((item, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center justify-end h-full">
+                <div
+                  key={index}
+                  className="flex-1 flex flex-col items-center justify-end h-full">
                   <div
                     className="w-full px-1 bg-teal-400 rounded-t-sm"
-                    style={{ height: `${(item.amount / 1000000) * 100}px` }}
-                  ></div>
+                    style={{
+                      height: `${(item.amount / 1000000) * 100}px`,
+                    }}></div>
                   <div className="mt-2 text-xs font-medium">{item.time}</div>
                   <div className="text-xs text-slate-500">
                     {new Intl.NumberFormat("vi-VN", {
@@ -158,5 +175,5 @@ export function DoctorActivityChart({ dateRange }: DoctorActivityChartProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

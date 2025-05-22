@@ -1,20 +1,37 @@
-"use client"
+"use client";
+// React core and hooks
+import { useState } from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { DoctorDashboardStats } from "@/components/doctor/doctor-dashboard/doctor-dashboard-stats"
-import { DoctorAppointmentList } from "@/components/doctor/doctor-dashboard/doctor-appointment-list"
-import { DoctorActivityChart } from "@/components/doctor/doctor-dashboard/doctor-activity-chart"
-import { DoctorRatingSummary } from "@/components/doctor/doctor-dashboard/doctor-rating-summary"
-import { DoctorNotifications } from "@/components/doctor/doctor-dashboard/doctor-notifications"
-import { DoctorTasks } from "@/components/doctor/doctor-dashboard/doctor-tasks"
-import { Calendar, ChevronLeft, ChevronRight, Download } from "lucide-react"
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header"
+// UI components
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+
+// Doctor dashboard components
+import { DoctorDashboardStats } from "@/components/doctor/doctor-dashboard/doctor-dashboard-stats";
+import { DoctorAppointmentList } from "@/components/doctor/doctor-dashboard/doctor-appointment-list";
+import { DoctorActivityChart } from "@/components/doctor/doctor-dashboard/doctor-activity-chart";
+import { DoctorRatingSummary } from "@/components/doctor/doctor-dashboard/doctor-rating-summary";
+import { DoctorNotifications } from "@/components/doctor/doctor-dashboard/doctor-notifications";
+import { DoctorTasks } from "@/components/doctor/doctor-dashboard/doctor-tasks";
+
+// Doctor schedule components
+import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+
+// Icons
+import { Calendar, ChevronLeft, ChevronRight, Download } from "lucide-react";
 
 export default function DoctorDashboardPage() {
-  const [dateRange, setDateRange] = useState<"today" | "week" | "month">("today")
+  //State
+  const [dateRange, setDateRange] = useState<"today" | "week" | "month">(
+    "today"
+  );
 
   // Thông tin bác sĩ
   const doctorInfo = {
@@ -26,7 +43,7 @@ export default function DoctorDashboardPage() {
       booked: 15,
       completed: 105,
     },
-  }
+  };
 
   // Thống kê theo ngày/tuần/tháng
   const statsData = {
@@ -51,7 +68,7 @@ export default function DoctorDashboardPage() {
       cancelled: 8,
       revenue: 45000000,
     },
-  }
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -65,7 +82,9 @@ export default function DoctorDashboardPage() {
 
       {/* Bộ chọn khoảng thời gian */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Bảng điều khiển</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+          Bảng điều khiển
+        </h1>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
             <ChevronLeft className="h-4 w-4 mr-1" />
@@ -86,12 +105,16 @@ export default function DoctorDashboardPage() {
       </div>
 
       {/* Tabs chọn khoảng thời gian */}
-      <Tabs defaultValue="today" onValueChange={(value) => setDateRange(value as "today" | "week" | "month")}>
-        <TabsList className="grid grid-cols-3 w-full max-w-md">
+      <Tabs
+        defaultValue="today"
+        onValueChange={(value) =>
+          setDateRange(value as "today" | "week" | "month")
+        }>
+        {/* <TabsList className="grid grid-cols-1 w-max">
           <TabsTrigger value="today">Hôm nay</TabsTrigger>
           <TabsTrigger value="week">Tuần này</TabsTrigger>
           <TabsTrigger value="month">Tháng này</TabsTrigger>
-        </TabsList>
+        </TabsList> */}
 
         <TabsContent value="today" className="mt-6">
           <DoctorDashboardStats stats={statsData.today} />
@@ -114,7 +137,9 @@ export default function DoctorDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Hoạt động</CardTitle>
-              <CardDescription>Biểu đồ hoạt động khám bệnh theo thời gian</CardDescription>
+              <CardDescription>
+                Biểu đồ hoạt động khám bệnh theo thời gian
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DoctorActivityChart dateRange={dateRange} />
@@ -125,7 +150,9 @@ export default function DoctorDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Lịch hẹn sắp tới</CardTitle>
-              <CardDescription>Danh sách lịch hẹn sắp tới của bạn</CardDescription>
+              <CardDescription>
+                Danh sách lịch hẹn sắp tới của bạn
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DoctorAppointmentList />
@@ -161,7 +188,9 @@ export default function DoctorDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Nhiệm vụ</CardTitle>
-              <CardDescription>Danh sách nhiệm vụ cần hoàn thành</CardDescription>
+              <CardDescription>
+                Danh sách nhiệm vụ cần hoàn thành
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DoctorTasks />
@@ -170,5 +199,5 @@ export default function DoctorDashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

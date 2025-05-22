@@ -1,19 +1,14 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
-
-
 import SubHeader from "@/components/sub-header";
 import DoctorCard, { Doctor } from "@/components/doctor-page/docter-card";
 import DoctorSearchFilter from "@/components/doctor-page/search-filter";
 
 export default function DoctorsPage() {
-
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
-
-
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -31,10 +26,8 @@ export default function DoctorsPage() {
     fetchDoctors();
   }, []);
 
-
-
   const handleSearch = (query: string) => {
-    console.log("query test", query)
+    console.log("query test", query);
   };
 
   return (
@@ -62,7 +55,9 @@ export default function DoctorsPage() {
             {loading ? (
               <div>Đang tải...</div>
             ) : (
-              doctors.map((doctor) => <DoctorCard key={doctor.id} doctor={doctor} />)
+              doctors.map((doctor) => (
+                <DoctorCard key={doctor.id} doctor={doctor} />
+              ))
             )}
           </div>
         </div>

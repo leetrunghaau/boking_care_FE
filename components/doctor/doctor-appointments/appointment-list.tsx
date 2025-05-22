@@ -1,14 +1,12 @@
-import { AppointmentCard, type AppointmentData } from "./appointment-card"
-import { EmptyState } from "./empty-state"
+import { AppointmentCard, type AppointmentData } from "./appointment-card";
+import { EmptyState } from "./empty-state";
 
-interface AppointmentListProps {
-  appointments: AppointmentData[]
-  filterType: string
-}
-
-export function AppointmentList({ appointments, filterType }: AppointmentListProps) {
+export function AppointmentList({
+  appointments,
+  filterType,
+}: AppointmentListProps) {
   if (!appointments || appointments.length === 0) {
-    return <EmptyState filterType={filterType} />
+    return <EmptyState filterType={filterType} />;
   }
 
   return (
@@ -17,5 +15,10 @@ export function AppointmentList({ appointments, filterType }: AppointmentListPro
         <AppointmentCard key={appointment.id} appointment={appointment} />
       ))}
     </div>
-  )
+  );
+}
+
+interface AppointmentListProps {
+  appointments: AppointmentData[];
+  filterType: string;
 }

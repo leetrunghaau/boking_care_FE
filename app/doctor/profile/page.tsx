@@ -1,21 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { DoctorProfileInfo } from "@/components/doctor/doctor-profile/doctor-profile-info"
-import { DoctorProfileExperience } from "@/components/doctor/doctor-profile/doctor-profile-experience"
-import { DoctorProfileEducation } from "@/components/doctor/doctor-profile/doctor-profile-education"
-import { DoctorProfileCertificates } from "@/components/doctor/doctor-profile/doctor-profile-certificates"
-import { Camera, Edit, Save, Upload } from "lucide-react"
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header"
+// React core and hooks
+import { useState } from "react";
+
+// UI components
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
+// Doctor profile components
+import { DoctorProfileInfo } from "@/components/doctor/doctor-profile/doctor-profile-info";
+import { DoctorProfileExperience } from "@/components/doctor/doctor-profile/doctor-profile-experience";
+import { DoctorProfileEducation } from "@/components/doctor/doctor-profile/doctor-profile-education";
+import { DoctorProfileCertificates } from "@/components/doctor/doctor-profile/doctor-profile-certificates";
+
+// Icons
+import { Camera, Edit, Save, Upload } from "lucide-react";
+
+// Doctor schedule components
+import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
 
 export default function DoctorProfilePage() {
-  const [isEditing, setIsEditing] = useState(false)
+  //State
+  const [isEditing, setIsEditing] = useState(false);
 
   // Thông tin bác sĩ
   const doctorInfo = {
@@ -27,7 +37,7 @@ export default function DoctorProfilePage() {
       booked: 15,
       completed: 105,
     },
-  }
+  };
 
   // Thông tin chi tiết
   const doctorDetails = {
@@ -43,7 +53,7 @@ export default function DoctorProfilePage() {
     languages: ["Tiếng Việt", "Tiếng Anh"],
     workingHours: "Thứ 2 - Thứ 6: 8:00 - 17:00",
     consultationFee: 300000,
-  }
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -57,12 +67,13 @@ export default function DoctorProfilePage() {
 
       {/* Tiêu đề trang */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Hồ sơ cá nhân</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+          Hồ sơ cá nhân
+        </h1>
         <Button
           variant={isEditing ? "default" : "outline"}
           onClick={() => setIsEditing(!isEditing)}
-          className={isEditing ? "bg-teal-600 hover:bg-teal-700" : ""}
-        >
+          className={isEditing ? "bg-teal-600 hover:bg-teal-700" : ""}>
           {isEditing ? (
             <>
               <Save className="h-4 w-4 mr-1" />
@@ -85,8 +96,13 @@ export default function DoctorProfilePage() {
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
                 <Avatar className="h-32 w-32 border-4 border-white shadow-md">
-                  <AvatarImage src={doctorDetails.avatar || "/placeholder.svg"} alt={doctorDetails.fullName} />
-                  <AvatarFallback className="text-3xl">{doctorDetails.fullName.charAt(0)}</AvatarFallback>
+                  <AvatarImage
+                    src={doctorDetails.avatar || "/placeholder.svg"}
+                    alt={doctorDetails.fullName}
+                  />
+                  <AvatarFallback className="text-3xl">
+                    {doctorDetails.fullName.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 {isEditing && (
                   <div className="absolute bottom-0 right-0 bg-teal-600 text-white p-1.5 rounded-full cursor-pointer shadow-md">
@@ -95,12 +111,18 @@ export default function DoctorProfilePage() {
                 )}
               </div>
 
-              <h2 className="text-xl font-bold text-slate-800">{doctorDetails.fullName}</h2>
-              <p className="text-sm text-slate-500 mt-1">{doctorInfo.specialty}</p>
+              <h2 className="text-xl font-bold text-slate-800">
+                {doctorDetails.fullName}
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                {doctorInfo.specialty}
+              </p>
 
               <div className="flex flex-wrap gap-2 mt-3 justify-center">
                 {doctorDetails.specialties.map((specialty, index) => (
-                  <Badge key={index} className="bg-teal-100 text-teal-800 hover:bg-teal-200">
+                  <Badge
+                    key={index}
+                    className="bg-teal-100 text-teal-800 hover:bg-teal-200">
                     {specialty}
                   </Badge>
                 ))}
@@ -111,19 +133,27 @@ export default function DoctorProfilePage() {
               <div className="w-full space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">ID:</span>
-                  <span className="text-sm font-medium">{doctorInfo.doctorId}</span>
+                  <span className="text-sm font-medium">
+                    {doctorInfo.doctorId}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Giới tính:</span>
-                  <span className="text-sm font-medium">{doctorDetails.gender}</span>
+                  <span className="text-sm font-medium">
+                    {doctorDetails.gender}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Ngày sinh:</span>
-                  <span className="text-sm font-medium">{doctorDetails.dateOfBirth}</span>
+                  <span className="text-sm font-medium">
+                    {doctorDetails.dateOfBirth}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Ngôn ngữ:</span>
-                  <span className="text-sm font-medium">{doctorDetails.languages.join(", ")}</span>
+                  <span className="text-sm font-medium">
+                    {doctorDetails.languages.join(", ")}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Phí tư vấn:</span>
@@ -158,7 +188,10 @@ export default function DoctorProfilePage() {
             </TabsList>
 
             <TabsContent value="info" className="mt-6">
-              <DoctorProfileInfo doctorDetails={doctorDetails} isEditing={isEditing} />
+              <DoctorProfileInfo
+                doctorDetails={doctorDetails}
+                isEditing={isEditing}
+              />
             </TabsContent>
 
             <TabsContent value="experience" className="mt-6">
@@ -176,5 +209,5 @@ export default function DoctorProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

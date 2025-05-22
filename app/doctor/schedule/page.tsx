@@ -1,29 +1,31 @@
+"use client";
 
+// React core and hooks
+import { useState } from "react";
 
-// app/doctor-schedule/page.tsx (hoặc pages/doctor-schedule.tsx nếu dùng pages router)
-"use client"
+// UI components - Tabs
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header"
-import { DailySchedule } from "@/components/doctor/doctor-schedule/daily-schedule"
-import { WeeklySchedule } from "@/components/doctor/doctor-schedule/weekly-schedule"
-import { ScheduleSettings } from "@/components/doctor/doctor-schedule/schedule-settings"
+// Doctor schedule components
+import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+import { DailySchedule } from "@/components/doctor/doctor-schedule/daily-schedule";
+import { WeeklySchedule } from "@/components/doctor/doctor-schedule/weekly-schedule";
+import { ScheduleSettings } from "@/components/doctor/doctor-schedule/schedule-settings";
 
 export default function DoctorSchedulePage() {
-  const [activeTab, setActiveTab] = useState<string>("daily")
+  //State
+  const [activeTab, setActiveTab] = useState<string>("daily");
 
-  // Giả lập ID bác sĩ từ session hoặc tạm hardcode
-  const doctorId = "doctor-123"
-  const doctorName = "BS. Nguyễn Văn A"
-  const specialty = "Nội khoa tổng quát"
-
+  const doctorId = "doctor-123";
+  const doctorName = "BS. Nguyễn Văn A";
+  const specialty = "Nội khoa tổng quát";
+  const today = new Date();
   const appointmentStats = {
     total: 15,
     booked: 3,
     available: 12,
     completed: 2,
-  }
+  };
 
   return (
     <div className="space-y-6 mt-5 mx-auto w-11/12">
@@ -36,7 +38,10 @@ export default function DoctorSchedulePage() {
       />
 
       {/* Tabs cho các chế độ xem lịch */}
-      <Tabs defaultValue="daily" className="w-full" onValueChange={setActiveTab}>
+      <Tabs
+        defaultValue="daily"
+        className="w-full"
+        onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-3 w-full max-w-md">
           <TabsTrigger value="daily">Theo ngày</TabsTrigger>
           <TabsTrigger value="weekly">Theo tuần</TabsTrigger>
@@ -44,7 +49,7 @@ export default function DoctorSchedulePage() {
         </TabsList>
 
         <TabsContent value="daily" className="space-y-6 mt-4">
-          <DailySchedule />
+          <DailySchedule initialDate={today} />
         </TabsContent>
 
         <TabsContent value="weekly" className="space-y-6 mt-4">
@@ -56,5 +61,5 @@ export default function DoctorSchedulePage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

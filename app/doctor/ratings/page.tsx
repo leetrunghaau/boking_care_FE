@@ -1,22 +1,49 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { DoctorRatingOverview } from "@/components/doctor/doctor-ratings/doctor-rating-overview"
-import { DoctorRatingList } from "@/components/doctor/doctor-ratings/doctor-rating-list"
-import { DoctorRatingChart } from "@/components/doctor/doctor-ratings/doctor-rating-chart"
-import { Search, Filter, Download } from "lucide-react"
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header"
+// HTTP helper
+import http from "@/helper/axios";
+
+// React core and hooks
+import { useEffect, useState } from "react";
+
+// UI components
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+
+// Doctor rating components
+import { DoctorRatingOverview } from "@/components/doctor/doctor-ratings/doctor-rating-overview";
+import { DoctorRatingList } from "@/components/doctor/doctor-ratings/doctor-rating-list";
+import { DoctorRatingChart } from "@/components/doctor/doctor-ratings/doctor-rating-chart";
+
+// Icons
+import { Search, Filter, Download } from "lucide-react";
+
+// Doctor schedule components
+import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
 
 export default function DoctorRatingsPage() {
-  const [timeRange, setTimeRange] = useState<"all" | "month" | "year">("all")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [ratingFilter, setRatingFilter] = useState("all")
-  const [responseFilter, setResponseFilter] = useState("all")
+  //State
+  const [timeRange, setTimeRange] = useState<"all" | "month" | "year">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [responseFilter, setResponseFilter] = useState("all");
+  const [ratingData, setRatingData] = useState<RatingData | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Thông tin bác sĩ
   const doctorInfo = {
@@ -28,30 +55,44 @@ export default function DoctorRatingsPage() {
       booked: 15,
       completed: 105,
     },
-  }
-
-  // Dữ liệu mẫu cho đánh giá
-  const ratingData = {
-    average: 4.7,
-    total: 120,
-    distribution: [
-      { stars: 5, count: 90 },
-      { stars: 4, count: 20 },
-      { stars: 3, count: 7 },
-      { stars: 2, count: 2 },
-      { stars: 1, count: 1 },
-    ],
-    responseRate: 95, // Tỷ lệ phản hồi (%)
+  };
+  type RatingData = {
+    average: number;
+    total: number;
+    distribution: {
+      stars: number;
+      count: number;
+    }[];
+    responseRate: number;
     trends: {
-      all: [4.5, 4.6, 4.7, 4.7, 4.8, 4.7],
-      month: [4.6, 4.7, 4.8, 4.7, 4.9, 4.8],
-      year: [4.3, 4.4, 4.5, 4.6, 4.7, 4.7],
-    },
-  }
+      all: number[];
+      month: number[];
+      year: number[];
+    };
+  };
+  //Effect
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await http.get<RatingData>(`/doctor-rating/ratings`);
 
+        setRatingData(res);
+        console.log("Fetched Rating Data:", res);
+      } catch (err) {
+        console.error("Failed to fetch Rating Data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRating();
+  }, []);
+
+  if (!ratingData) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header với thông tin bác sĩ và thống kê */}
       <DoctorHeader
         doctorId={doctorInfo.doctorId}
         doctorName={doctorInfo.doctorName}
@@ -61,7 +102,9 @@ export default function DoctorRatingsPage() {
 
       {/* Tiêu đề trang */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Đánh giá & Phản hồi</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+          Đánh giá & Phản hồi
+        </h1>
         <Button variant="outline">
           <Download className="h-4 w-4 mr-1" />
           <span>Xuất báo cáo</span>
@@ -72,7 +115,11 @@ export default function DoctorRatingsPage() {
       <DoctorRatingOverview ratingData={ratingData} />
 
       {/* Tabs chọn khoảng thời gian */}
-      <Tabs defaultValue="all" onValueChange={(value) => setTimeRange(value as "all" | "month" | "year")}>
+      <Tabs
+        defaultValue="all"
+        onValueChange={(value) =>
+          setTimeRange(value as "all" | "month" | "year")
+        }>
         <TabsList className="grid grid-cols-3 w-full max-w-md">
           <TabsTrigger value="all">Tất cả thời gian</TabsTrigger>
           <TabsTrigger value="month">30 ngày qua</TabsTrigger>
@@ -141,7 +188,9 @@ export default function DoctorRatingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Danh sách đánh giá</CardTitle>
-          <CardDescription>Đánh giá từ bệnh nhân và phản hồi của bạn</CardDescription>
+          <CardDescription>
+            Đánh giá từ bệnh nhân và phản hồi của bạn
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <DoctorRatingList
@@ -153,5 +202,5 @@ export default function DoctorRatingsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

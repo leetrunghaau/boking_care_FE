@@ -1,30 +1,37 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Copy, Save, Clock3 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Clock, Copy, Save, Clock3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 interface TimeSlot {
-  time: string
-  available: boolean
-  booked: boolean
-  patient?: string
+  time: string;
+  available: boolean;
+  booked: boolean;
+  patient?: string;
 }
 
 interface TimeSlotsProps {
-  selectedDate: Date
-  timeSlots: TimeSlot[]
-  selectedTime: string | null
-  onTimeSelect: (time: string) => void
-  onSaveSchedule: () => void
+  selectedDate: Date;
+  timeSlots: TimeSlot[];
+  selectedTime: string | null;
+  onTimeSelect: (time: string) => void;
+  onSaveSchedule: () => void;
   stats: {
-    available: number
-    booked: number
-  }
+    available: number;
+    booked: number;
+  };
 }
 
 export function TimeSlots({
@@ -48,13 +55,19 @@ export function TimeSlots({
               <Copy className="h-4 w-4 mr-1" />
               Sao chép
             </Button>
-            <Button variant="default" size="sm" className="bg-teal-600 hover:bg-teal-700" onClick={onSaveSchedule}>
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-teal-600 hover:bg-teal-700"
+              onClick={onSaveSchedule}>
               <Save className="h-4 w-4 mr-1" />
               Lưu lịch
             </Button>
           </div>
         </div>
-        <CardDescription>Nhấp vào ô giờ để bật/tắt trạng thái khả dụng</CardDescription>
+        <CardDescription>
+          Nhấp vào ô giờ để bật/tắt trạng thái khả dụng
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -66,21 +79,26 @@ export function TimeSlots({
               className={cn(
                 "relative py-3 px-2 text-sm rounded-md border transition-colors",
                 slot.booked && "cursor-not-allowed",
-                !slot.available && !slot.booked && "bg-slate-50 border-slate-200 text-slate-400",
+                !slot.available &&
+                  !slot.booked &&
+                  "bg-slate-50 border-slate-200 text-slate-400",
                 slot.booked
                   ? "bg-blue-50 border-blue-200 text-blue-700"
                   : selectedTime === slot.time
-                    ? "bg-teal-50 border-teal-200 text-teal-700"
-                    : slot.available && !slot.booked
-                      ? "hover:bg-teal-50 hover:border-teal-200"
-                      : "",
-              )}
-            >
+                  ? "bg-teal-50 border-teal-200 text-teal-700"
+                  : slot.available && !slot.booked
+                  ? "hover:bg-teal-50 hover:border-teal-200"
+                  : ""
+              )}>
               <div className="flex items-center justify-center gap-1">
                 <Clock3
                   className={cn(
                     "h-3.5 w-3.5",
-                    slot.booked ? "text-blue-600" : slot.available ? "text-teal-600" : "text-slate-400",
+                    slot.booked
+                      ? "text-blue-600"
+                      : slot.available
+                      ? "text-teal-600"
+                      : "text-slate-400"
                   )}
                 />
                 {slot.time}
@@ -92,7 +110,11 @@ export function TimeSlots({
                 </div>
               )}
 
-              {slot.booked && <Badge className="absolute -top-2 -right-2 bg-blue-500">Đã đặt</Badge>}
+              {slot.booked && (
+                <Badge className="absolute -top-2 -right-2 bg-blue-500">
+                  Đã đặt
+                </Badge>
+              )}
             </button>
           ))}
         </div>
@@ -112,5 +134,5 @@ export function TimeSlots({
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
