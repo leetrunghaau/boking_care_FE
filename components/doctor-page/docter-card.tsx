@@ -6,6 +6,7 @@ import Image from 'next/image';
 
 export interface Doctor {
   id: string
+  slug: string
   name: string
   specialty: string
   hospital: string
@@ -35,7 +36,7 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
             </div>
             <div className="ml-4">
               <h3 className="font-semibold text-lg">
-                <Link href={`/bac-si/${doctor.id}`} className="hover:text-blue-600 transition-colors">
+                <Link href={`/bac-si/${doctor.slug}`} className="hover:text-blue-600 transition-colors">
                   {doctor.name}
                 </Link>
               </h3>
@@ -62,7 +63,7 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
             </div>
             
             <div className="mt-4">
-              <Link href={`/bac-si/${doctor.id}`}>
+              <Link href={`/bac-si/${doctor.slug}`}>
               <Button variant="outline" size="sm" className="mr-2">Xem hồ sơ</Button>
               </Link>
               <Button size="sm">Đặt lịch khám</Button>

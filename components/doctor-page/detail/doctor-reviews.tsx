@@ -8,20 +8,24 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import http from "@/helper/axios"
 
-interface DoctorReviewsProps {
-  doctorId: string
-  rating: number
-  reviewCount: number
-}
 
 interface Review {
-  id: string;
-  name: string;
-  date: string;
-  rating: number;
-  comment: string;
-  likes: number;
-  replies: number;
+  ratingDistribution:
+  {
+    stars: number;
+    percentage: number
+  }[],
+  avgRating: number,
+  sumRating: number,
+  reviews: {
+    id: string;
+    name: string;
+    date: string;
+    rating: number;
+    comment: string;
+    likes: number;
+    replies: number;
+  }[]
 }
 
 interface Pops {
@@ -33,7 +37,7 @@ export default function DoctorReviews({ slug }: Pops) {
   const [userRating, setUserRating] = useState(0)
   const [hoveredRating, setHoveredRating] = useState(0)
 
-  const [reviews, setReviews] = useState<Review[]>([])
+  const [review, setReview] = useState<Review | null>(null)
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
@@ -41,8 +45,8 @@ export default function DoctorReviews({ slug }: Pops) {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<Review[]>(`/doctor-site/doctor/${slug}/experience`)
-        setReviews(res);
+        const res = await http.get<Review>(`/doctor-site/doctor/${slug}/review`)
+        setReview(res);
       } catch (err) {
         console.error("Failed to fetch doctors:", err);
       } finally {
@@ -53,18 +57,13 @@ export default function DoctorReviews({ slug }: Pops) {
     fetchData();
   }, [])
 
-  // Phân bố đánh giá
-  const ratingDistribution = [
-    { stars: 5, percentage: 75 },
-    { stars: 4, percentage: 15 },
-    { stars: 3, percentage: 7 },
-    { stars: 2, percentage: 2 },
-    { stars: 1, percentage: 1 },
-  ]
 
-  const handleSubmitReview = () => {
+  const handleSubmitReview = async() => {
     // Xử lý gửi đánh giá
-    console.log({ rating: userRating, comment: reviewText })
+    // console.log({ rating: userRating, comment: reviewText })
+    //call api
+    const rs = await http.post(`/doctor-site/doctor/${slug}/rating`, { rating: userRating, comment: reviewText })
+    console.log("update rating", rs)
     setShowReviewForm(false)
     setReviewText("")
     setUserRating(0)
@@ -75,22 +74,22 @@ export default function DoctorReviews({ slug }: Pops) {
       <h2 className="text-xl font-bold mb-4">Đánh giá từ bệnh nhân</h2>
 
       {/* Tổng quan đánh giá */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg">
         <div className="flex flex-col items-center justify-center">
-          <div className="text-5xl font-bold text-teal-600">{rating}</div>
+          <div className="text-5xl font-bold text-teal-600">{review?.avgRating}</div>
           <div className="flex items-center gap-1 my-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`h-5 w-5 ${star <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                className={`h-5 w-5 ${star <= Math.round(review?.avgRating ?? 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
               />
             ))}
           </div>
-          <div className="text-sm text-muted-foreground">{reviewCount} đánh giá</div>
+          <div className="text-sm text-muted-foreground">{review?.sumRating} đánh giá</div>
         </div>
 
         <div className="space-y-2">
-          {ratingDistribution.map((item) => (
+          {review?.ratingDistribution.map((item) => (
             <div key={item.stars} className="flex items-center gap-2">
               <div className="flex items-center gap-1 w-16">
                 <span>{item.stars}</span>
@@ -101,10 +100,10 @@ export default function DoctorReviews({ slug }: Pops) {
             </div>
           ))}
         </div>
-      </div> */}
+      </div>
 
       {/* Form đánh giá */}
-      {/* {!showReviewForm ? (
+      {!showReviewForm ? (
         <div className="text-center">
           <Button onClick={() => setShowReviewForm(true)} className="bg-teal-600 hover:bg-teal-700">
             Viết đánh giá
@@ -157,11 +156,11 @@ export default function DoctorReviews({ slug }: Pops) {
             </Button>
           </div>
         </div>
-      )} */}
+      )}
 
       {/* Danh sách đánh giá */}
       <div className="space-y-4">
-        {reviews?.map((review) => (
+        {review?.reviews.map((review) => (
           <div key={review.id} className="border-b pb-4 last:border-b-0">
             <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">

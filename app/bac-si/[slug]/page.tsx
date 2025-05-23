@@ -26,6 +26,7 @@ import DoctorSchedule from "@/components/doctor-page/detail/doctor-schedule"
 import DoctorAbout from "@/components/doctor-page/detail/doctor-about"
 import { useParams } from "next/navigation"
 import DoctorExperience from "@/components/doctor-page/detail/doctor-experience"
+import DoctorFAQ from "@/components/doctor-page/detail/doctor-FAQ"
 
 // export const metadata: Metadata = {
 //   title: `Bác sĩ Nguyễn Văn A - Chuyên khoa Tim mạch | BookingCare`,
@@ -207,6 +208,7 @@ export default function DoctorDetailPage() {
                 </TabsContent>
 
                 <TabsContent value="faq">
+                  <DoctorFAQ slug={slug}/>
                 </TabsContent>
               </Tabs>
 

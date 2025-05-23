@@ -1,16 +1,40 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import http from "@/helper/axios"
 import { MessageSquare } from "lucide-react"
+import { useEffect, useState } from "react"
 
-type DoctorFAQProps = {
-  faqs: {
-    question: string
-    answer: string
-  }[]
+
+
+interface Faqs {
+  question: string
+  answer: string
+}
+interface Pops {
+  slug: string
 }
 
-const DoctorFAQ: React.FC<DoctorFAQProps> = ({ faqs }) => {
+export default function DoctorFAQ({ slug }: Pops) {
+  const [faqs, setFaqs] = useState<Faqs[] >([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<Faqs[] >(`/doctor-site/doctor/${slug}/faqs`)
+        console.log(res)
+        setFaqs(res);
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [])
   return (
     <div className="space-y-6">
       {/* Tiêu đề */}
@@ -43,4 +67,3 @@ const DoctorFAQ: React.FC<DoctorFAQProps> = ({ faqs }) => {
   )
 }
 
-export default DoctorFAQ
