@@ -1,16 +1,32 @@
-"use client"
+"use client";
+// React core and hooks
+import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge"
+// UI components - Data display
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+// Icons
 import {
   Bell,
   Calendar,
@@ -26,11 +42,14 @@ import {
   Smartphone,
   Sun,
   User,
-} from "lucide-react"
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header"
+} from "lucide-react";
+
+// Doctor components
+import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
 
 export default function DoctorSettingsPage() {
-  const [activeTab, setActiveTab] = useState("account")
+  //State
+  const [activeTab, setActiveTab] = useState("account");
 
   // Thông tin bác sĩ
   const doctorInfo = {
@@ -42,7 +61,7 @@ export default function DoctorSettingsPage() {
       booked: 15,
       completed: 105,
     },
-  }
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -56,11 +75,16 @@ export default function DoctorSettingsPage() {
 
       {/* Tiêu đề trang */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Cài đặt</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+          Cài đặt
+        </h1>
       </div>
 
       {/* Tabs cài đặt */}
-      <Tabs defaultValue="account" value={activeTab} onValueChange={setActiveTab}>
+      <Tabs
+        defaultValue="account"
+        value={activeTab}
+        onValueChange={setActiveTab}>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar */}
           <Card className="md:w-64">
@@ -68,43 +92,40 @@ export default function DoctorSettingsPage() {
               <TabsList className="flex flex-col h-auto bg-transparent space-y-1">
                 <TabsTrigger
                   value="account"
-                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none"
-                >
+                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none">
                   <User className="h-4 w-4 mr-2" />
                   Tài khoản
                 </TabsTrigger>
                 <TabsTrigger
                   value="security"
-                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none"
-                >
+                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none">
                   <Lock className="h-4 w-4 mr-2" />
                   Bảo mật
                 </TabsTrigger>
                 <TabsTrigger
                   value="notifications"
-                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none"
-                >
+                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none">
                   <Bell className="h-4 w-4 mr-2" />
                   Thông báo
                 </TabsTrigger>
                 <TabsTrigger
                   value="schedule"
-                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none"
-                >
+                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none">
                   <Calendar className="h-4 w-4 mr-2" />
                   Lịch làm việc
                 </TabsTrigger>
                 <TabsTrigger
                   value="appearance"
-                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none"
-                >
+                  className="justify-start px-3 data-[state=active]:bg-slate-100 data-[state=active]:shadow-none">
                   <Settings className="h-4 w-4 mr-2" />
                   Giao diện
                 </TabsTrigger>
 
                 <Separator className="my-2" />
 
-                <Button variant="ghost" className="justify-start px-3 text-red-500 hover:text-red-700 hover:bg-red-50">
+                <Button
+                  variant="ghost"
+                  className="justify-start px-3 text-red-500 hover:text-red-700 hover:bg-red-50">
                   <LogOut className="h-4 w-4 mr-2" />
                   Đăng xuất
                 </Button>
@@ -137,7 +158,7 @@ export default function DoctorSettingsPage() {
         </div>
       </Tabs>
     </div>
-  )
+  );
 }
 
 function AccountSettings() {
@@ -146,7 +167,9 @@ function AccountSettings() {
       <Card>
         <CardHeader>
           <CardTitle>Thông tin tài khoản</CardTitle>
-          <CardDescription>Cập nhật thông tin tài khoản của bạn</CardDescription>
+          <CardDescription>
+            Cập nhật thông tin tài khoản của bạn
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,7 +183,11 @@ function AccountSettings() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="nguyenvana@example.com" />
+              <Input
+                id="email"
+                type="email"
+                defaultValue="nguyenvana@example.com"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Số điện thoại</Label>
@@ -172,7 +199,10 @@ function AccountSettings() {
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="bio">Giới thiệu</Label>
-              <Input id="bio" defaultValue="Bác sĩ chuyên khoa Nội tổng quát với hơn 15 năm kinh nghiệm." />
+              <Input
+                id="bio"
+                defaultValue="Bác sĩ chuyên khoa Nội tổng quát với hơn 15 năm kinh nghiệm."
+              />
             </div>
           </div>
         </CardContent>
@@ -212,9 +242,15 @@ function AccountSettings() {
                   <SelectValue placeholder="Chọn múi giờ" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="asia_ho_chi_minh">Asia/Ho_Chi_Minh (GMT+7)</SelectItem>
-                  <SelectItem value="asia_bangkok">Asia/Bangkok (GMT+7)</SelectItem>
-                  <SelectItem value="asia_singapore">Asia/Singapore (GMT+8)</SelectItem>
+                  <SelectItem value="asia_ho_chi_minh">
+                    Asia/Ho_Chi_Minh (GMT+7)
+                  </SelectItem>
+                  <SelectItem value="asia_bangkok">
+                    Asia/Bangkok (GMT+7)
+                  </SelectItem>
+                  <SelectItem value="asia_singapore">
+                    Asia/Singapore (GMT+8)
+                  </SelectItem>
                   <SelectItem value="asia_tokyo">Asia/Tokyo (GMT+9)</SelectItem>
                 </SelectContent>
               </Select>
@@ -254,7 +290,7 @@ function AccountSettings() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 
 function SecuritySettings() {
@@ -263,14 +299,19 @@ function SecuritySettings() {
       <Card>
         <CardHeader>
           <CardTitle>Đổi mật khẩu</CardTitle>
-          <CardDescription>Cập nhật mật khẩu của bạn để bảo mật tài khoản</CardDescription>
+          <CardDescription>
+            Cập nhật mật khẩu của bạn để bảo mật tài khoản
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Mật khẩu hiện tại</Label>
             <div className="relative">
               <Input id="currentPassword" type="password" />
-              <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full">
                 <Eye className="h-4 w-4" />
               </Button>
             </div>
@@ -279,7 +320,10 @@ function SecuritySettings() {
             <Label htmlFor="newPassword">Mật khẩu mới</Label>
             <div className="relative">
               <Input id="newPassword" type="password" />
-              <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full">
                 <EyeOff className="h-4 w-4" />
               </Button>
             </div>
@@ -288,7 +332,10 @@ function SecuritySettings() {
             <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
             <div className="relative">
               <Input id="confirmPassword" type="password" />
-              <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full">
                 <EyeOff className="h-4 w-4" />
               </Button>
             </div>
@@ -305,27 +352,35 @@ function SecuritySettings() {
       <Card>
         <CardHeader>
           <CardTitle>Xác thực hai yếu tố</CardTitle>
-          <CardDescription>Tăng cường bảo mật cho tài khoản của bạn</CardDescription>
+          <CardDescription>
+            Tăng cường bảo mật cho tài khoản của bạn
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="2fa">Xác thực hai yếu tố</Label>
-              <p className="text-sm text-slate-500">Bảo vệ tài khoản của bạn bằng xác thực hai yếu tố.</p>
+              <p className="text-sm text-slate-500">
+                Bảo vệ tài khoản của bạn bằng xác thực hai yếu tố.
+              </p>
             </div>
             <Switch id="2fa" />
           </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="sms">Xác thực qua SMS</Label>
-              <p className="text-sm text-slate-500">Nhận mã xác thực qua tin nhắn SMS.</p>
+              <p className="text-sm text-slate-500">
+                Nhận mã xác thực qua tin nhắn SMS.
+              </p>
             </div>
             <Switch id="sms" />
           </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="app">Xác thực qua ứng dụng</Label>
-              <p className="text-sm text-slate-500">Sử dụng ứng dụng xác thực như Google Authenticator.</p>
+              <p className="text-sm text-slate-500">
+                Sử dụng ứng dụng xác thực như Google Authenticator.
+              </p>
             </div>
             <Switch id="app" />
           </div>
@@ -353,7 +408,9 @@ function SecuritySettings() {
                   </div>
                   <div>
                     <p className="font-medium">iPhone 13 Pro - Safari</p>
-                    <p className="text-xs text-slate-500">Hà Nội, Việt Nam - Hiện tại</p>
+                    <p className="text-xs text-slate-500">
+                      Hà Nội, Việt Nam - Hiện tại
+                    </p>
                   </div>
                 </div>
                 <Badge className="bg-green-100 text-green-700">Hiện tại</Badge>
@@ -368,7 +425,9 @@ function SecuritySettings() {
                   </div>
                   <div>
                     <p className="font-medium">Windows 10 - Chrome</p>
-                    <p className="text-xs text-slate-500">Hà Nội, Việt Nam - 2 ngày trước</p>
+                    <p className="text-xs text-slate-500">
+                      Hà Nội, Việt Nam - 2 ngày trước
+                    </p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
@@ -379,13 +438,15 @@ function SecuritySettings() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button variant="outline" className="text-red-500 hover:text-red-700 hover:bg-red-50">
+          <Button
+            variant="outline"
+            className="text-red-500 hover:text-red-700 hover:bg-red-50">
             Đăng xuất khỏi tất cả các thiết bị
           </Button>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 
 function NotificationSettings() {
@@ -403,21 +464,27 @@ function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="appointment-email">Thông báo qua email</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo về lịch hẹn qua email.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo về lịch hẹn qua email.
+                  </p>
                 </div>
                 <Switch id="appointment-email" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="appointment-push">Thông báo đẩy</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo đẩy về lịch hẹn.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo đẩy về lịch hẹn.
+                  </p>
                 </div>
                 <Switch id="appointment-push" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="appointment-sms">Thông báo qua SMS</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo về lịch hẹn qua SMS.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo về lịch hẹn qua SMS.
+                  </p>
                 </div>
                 <Switch id="appointment-sms" />
               </div>
@@ -432,21 +499,27 @@ function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="message-email">Thông báo qua email</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo về tin nhắn mới qua email.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo về tin nhắn mới qua email.
+                  </p>
                 </div>
                 <Switch id="message-email" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="message-push">Thông báo đẩy</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo đẩy về tin nhắn mới.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo đẩy về tin nhắn mới.
+                  </p>
                 </div>
                 <Switch id="message-push" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="message-sms">Thông báo qua SMS</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo về tin nhắn mới qua SMS.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo về tin nhắn mới qua SMS.
+                  </p>
                 </div>
                 <Switch id="message-sms" />
               </div>
@@ -461,14 +534,18 @@ function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="review-email">Thông báo qua email</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo về đánh giá mới qua email.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo về đánh giá mới qua email.
+                  </p>
                 </div>
                 <Switch id="review-email" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="review-push">Thông báo đẩy</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo đẩy về đánh giá mới.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo đẩy về đánh giá mới.
+                  </p>
                 </div>
                 <Switch id="review-push" defaultChecked />
               </div>
@@ -483,14 +560,18 @@ function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="system-email">Thông báo qua email</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo về cập nhật hệ thống qua email.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo về cập nhật hệ thống qua email.
+                  </p>
                 </div>
                 <Switch id="system-email" defaultChecked />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="system-push">Thông báo đẩy</Label>
-                  <p className="text-sm text-slate-500">Nhận thông báo đẩy về cập nhật hệ thống.</p>
+                  <p className="text-sm text-slate-500">
+                    Nhận thông báo đẩy về cập nhật hệ thống.
+                  </p>
                 </div>
                 <Switch id="system-push" />
               </div>
@@ -505,7 +586,7 @@ function NotificationSettings() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 
 function ScheduleSettings() {
@@ -525,8 +606,7 @@ function ScheduleSettings() {
                   key={index}
                   variant={index < 6 ? "default" : "outline"}
                   className={index < 6 ? "bg-teal-600 hover:bg-teal-700" : ""}
-                  size="sm"
-                >
+                  size="sm">
                   {day}
                 </Button>
               ))}
@@ -602,7 +682,9 @@ function ScheduleSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="appointment-duration">Thời gian khám mặc định</Label>
+            <Label htmlFor="appointment-duration">
+              Thời gian khám mặc định
+            </Label>
             <Select defaultValue="30">
               <SelectTrigger id="appointment-duration">
                 <SelectValue placeholder="Chọn thời gian khám" />
@@ -632,14 +714,18 @@ function ScheduleSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="max-appointments">Số lượng lịch hẹn tối đa mỗi ngày</Label>
+            <Label htmlFor="max-appointments">
+              Số lượng lịch hẹn tối đa mỗi ngày
+            </Label>
             <Input id="max-appointments" type="number" defaultValue="15" />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="auto-confirm">Tự động xác nhận lịch hẹn</Label>
-              <p className="text-sm text-slate-500">Tự động xác nhận lịch hẹn khi bệnh nhân đặt lịch.</p>
+              <p className="text-sm text-slate-500">
+                Tự động xác nhận lịch hẹn khi bệnh nhân đặt lịch.
+              </p>
             </div>
             <Switch id="auto-confirm" />
           </div>
@@ -652,7 +738,7 @@ function ScheduleSettings() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
 
 function AppearanceSettings() {
@@ -667,18 +753,21 @@ function AppearanceSettings() {
           <div className="space-y-2">
             <Label>Chế độ hiển thị</Label>
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" className="flex flex-col items-center justify-center h-24 p-4">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center justify-center h-24 p-4">
                 <Sun className="h-8 w-8 mb-2" />
                 <span>Sáng</span>
               </Button>
-              <Button variant="outline" className="flex flex-col items-center justify-center h-24 p-4">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center justify-center h-24 p-4">
                 <Moon className="h-8 w-8 mb-2" />
                 <span>Tối</span>
               </Button>
               <Button
                 variant="default"
-                className="flex flex-col items-center justify-center h-24 p-4 bg-teal-600 hover:bg-teal-700"
-              >
+                className="flex flex-col items-center justify-center h-24 p-4 bg-teal-600 hover:bg-teal-700">
                 <div className="flex">
                   <Sun className="h-8 w-8" />
                   <Moon className="h-8 w-8" />
@@ -721,7 +810,9 @@ function AppearanceSettings() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="animations">Hiệu ứng chuyển động</Label>
-              <p className="text-sm text-slate-500">Bật/tắt hiệu ứng chuyển động trong giao diện.</p>
+              <p className="text-sm text-slate-500">
+                Bật/tắt hiệu ứng chuyển động trong giao diện.
+              </p>
             </div>
             <Switch id="animations" defaultChecked />
           </div>
@@ -729,7 +820,9 @@ function AppearanceSettings() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="compact-view">Chế độ xem gọn</Label>
-              <p className="text-sm text-slate-500">Hiển thị nhiều thông tin hơn trên một màn hình.</p>
+              <p className="text-sm text-slate-500">
+                Hiển thị nhiều thông tin hơn trên một màn hình.
+              </p>
             </div>
             <Switch id="compact-view" />
           </div>
@@ -742,5 +835,5 @@ function AppearanceSettings() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
