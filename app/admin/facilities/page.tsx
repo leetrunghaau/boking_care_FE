@@ -1,54 +1,49 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react"
-import { Input } from "@/components/ui/input"
+"use client";
+import { useState, useEffect } from "react";
+import http from "@/helper/axios";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
-const facilities = [
-  {
-    id: "123",
-    name: "Phòng khám Đa khoa An Tâm",
-    address: "123 Nguyễn Văn Cừ, Quận 5, TP.HCM",
-    phone: "1900 999 888",
-    status: "active",
-    updatedAt: "Hôm nay",
-  },
-  {
-    id: "456",
-    name: "Bệnh viện Quốc tế Việt Đức",
-    address: "456 Lê Hồng Phong, Quận 10, TP.HCM",
-    phone: "1800 888 777",
-    status: "active",
-    updatedAt: "Hôm qua",
-  },
-  {
-    id: "789",
-    name: "Phòng khám Chuyên khoa Mắt Sáng Tươi",
-    address: "789 Trần Hưng Đạo, Quận 1, TP.HCM",
-    phone: "1900 777 666",
-    status: "pending",
-    updatedAt: "3 ngày trước",
-  },
-  {
-    id: "101",
-    name: "Phòng khám Nha khoa Răng Khỏe",
-    address: "101 Nguyễn Thị Minh Khai, Quận 3, TP.HCM",
-    phone: "1800 666 555",
-    status: "active",
-    updatedAt: "1 tuần trước",
-  },
-  {
-    id: "202",
-    name: "Trung tâm Y tế Quận 2",
-    address: "202 Mai Chí Thọ, Quận 2, TP.HCM",
-    phone: "1900 555 444",
-    status: "inactive",
-    updatedAt: "2 tuần trước",
-  },
-]
+type FacilityStatus = "active" | "pending" | "inactive";
+
+interface Facility {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  status: FacilityStatus;
+  updatedAt: string;
+}
 
 export default function FacilitiesPage() {
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchAllFacilities = async () => {
+      try {
+        const res = await http.get<Facility[]>(`/admin-facility/facilities`);
+        setFacilities(res);
+        console.log("Fetched facilities:", res);
+      } catch (err) {
+        console.error("Failed to fetch facilities:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllFacilities();
+  }, []);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -69,7 +64,11 @@ export default function FacilitiesPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="relative w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Tìm kiếm..." className="w-full pl-8" />
+              <Input
+                type="search"
+                placeholder="Tìm kiếm..."
+                className="w-full pl-8"
+              />
             </div>
             <Button variant="outline" size="sm">
               <Filter className="mr-2 h-4 w-4" />
@@ -100,15 +99,14 @@ export default function FacilitiesPage() {
                         facility.status === "active"
                           ? "bg-green-50 text-green-700 border-green-200"
                           : facility.status === "pending"
-                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                            : "bg-red-50 text-red-700 border-red-200"
-                      }`}
-                    >
+                          ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                          : "bg-red-50 text-red-700 border-red-200"
+                      }`}>
                       {facility.status === "active"
                         ? "Hoạt động"
                         : facility.status === "pending"
-                          ? "Đang xét duyệt"
-                          : "Tạm ngưng"}
+                        ? "Đang xét duyệt"
+                        : "Tạm ngưng"}
                     </span>
                   </TableCell>
                   <TableCell>{facility.updatedAt}</TableCell>
@@ -126,7 +124,10 @@ export default function FacilitiesPage() {
                           <span className="sr-only">Sửa</span>
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-red-500">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500">
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Xóa</span>
                       </Button>
@@ -139,5 +140,5 @@ export default function FacilitiesPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

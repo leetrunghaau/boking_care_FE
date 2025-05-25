@@ -1,17 +1,28 @@
-"use client"
-
-import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertCircle, Plus, X, Trash2, Upload, MapPin } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
+"use client";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AlertCircle, Plus, X, Trash2, Upload, MapPin } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 
 const fakeFacilityData = {
   id: "123",
@@ -31,7 +42,14 @@ const fakeFacilityData = {
     "Tư vấn trực tuyến",
     "Gói khám doanh nghiệp",
   ],
-  specialties: ["Nội tổng quát", "Sản phụ khoa", "Nhi khoa", "Tai mũi họng", "Da liễu", "Tim mạch"],
+  specialties: [
+    "Nội tổng quát",
+    "Sản phụ khoa",
+    "Nhi khoa",
+    "Tai mũi họng",
+    "Da liễu",
+    "Tim mạch",
+  ],
   doctors: [
     {
       name: "BS. Nguyễn Văn A",
@@ -56,72 +74,76 @@ const fakeFacilityData = {
     rating: 4.9,
   },
   status: "active",
-}
+};
 
 export default function EditFacilityPage() {
-  const { id } = useParams()
-  const router = useRouter()
-  const [facility, setFacility] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [newService, setNewService] = useState("")
-  const [newSpecialty, setNewSpecialty] = useState("")
-  const [newDoctor, setNewDoctor] = useState({ name: "", specialty: "", image: "" })
+  const { id } = useParams();
+  const router = useRouter();
+  const [facility, setFacility] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [newService, setNewService] = useState("");
+  const [newSpecialty, setNewSpecialty] = useState("");
+  const [newDoctor, setNewDoctor] = useState({
+    name: "",
+    specialty: "",
+    image: "",
+  });
 
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      setFacility(fakeFacilityData)
-      setLoading(false)
-    }, 500)
-  }, [id])
+      setFacility(fakeFacilityData);
+      setLoading(false);
+    }, 500);
+  }, [id]);
 
   const handleSave = () => {
-    setSaving(true)
+    setSaving(true);
     // Simulate API call
     setTimeout(() => {
-      setSaving(false)
-      router.push("/admin/facilities")
-    }, 1000)
-  }
+      setSaving(false);
+      router.push("/admin/facilities");
+    }, 1000);
+  };
 
   const handleAddService = () => {
     if (newService.trim()) {
       setFacility({
         ...facility,
         services: [...facility.services, newService.trim()],
-      })
-      setNewService("")
+      });
+      setNewService("");
     }
-  }
+  };
 
   const handleRemoveService = (index: number) => {
-    const updatedServices = [...facility.services]
-    updatedServices.splice(index, 1)
+    const updatedServices = [...facility.services];
+    updatedServices.splice(index, 1);
     setFacility({
       ...facility,
       services: updatedServices,
-    })
-  }
+    });
+  };
 
   const handleAddSpecialty = () => {
     if (newSpecialty.trim()) {
       setFacility({
         ...facility,
         specialties: [...facility.specialties, newSpecialty.trim()],
-      })
-      setNewSpecialty("")
+      });
+      setNewSpecialty("");
     }
-  }
+  };
 
   const handleRemoveSpecialty = (index: number) => {
-    const updatedSpecialties = [...facility.specialties]
-    updatedSpecialties.splice(index, 1)
+    const updatedSpecialties = [...facility.specialties];
+    updatedSpecialties.splice(index, 1);
     setFacility({
       ...facility,
       specialties: updatedSpecialties,
-    })
-  }
+    });
+  };
 
   const handleAddDoctor = () => {
     if (newDoctor.name.trim() && newDoctor.specialty.trim()) {
@@ -131,34 +153,36 @@ export default function EditFacilityPage() {
           ...facility.doctors,
           {
             ...newDoctor,
-            image: newDoctor.image || "/placeholder.svg?height=300&width=300&text=BS",
+            image:
+              newDoctor.image ||
+              "/placeholder.svg?height=300&width=300&text=BS",
           },
         ],
-      })
-      setNewDoctor({ name: "", specialty: "", image: "" })
+      });
+      setNewDoctor({ name: "", specialty: "", image: "" });
     }
-  }
+  };
 
   const handleRemoveDoctor = (index: number) => {
-    const updatedDoctors = [...facility.doctors]
-    updatedDoctors.splice(index, 1)
+    const updatedDoctors = [...facility.doctors];
+    updatedDoctors.splice(index, 1);
     setFacility({
       ...facility,
       doctors: updatedDoctors,
-    })
-  }
+    });
+  };
 
   const handleRemoveGalleryImage = (index: number) => {
-    const updatedGallery = [...facility.gallery]
-    updatedGallery.splice(index, 1)
+    const updatedGallery = [...facility.gallery];
+    updatedGallery.splice(index, 1);
     setFacility({
       ...facility,
       gallery: updatedGallery,
-    })
-  }
+    });
+  };
 
   if (loading) {
-    return <p className="text-center py-10">Đang tải dữ liệu...</p>
+    return <p className="text-center py-10">Đang tải dữ liệu...</p>;
   }
 
   return (
@@ -178,7 +202,10 @@ export default function EditFacilityPage() {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Lưu ý</AlertTitle>
-        <AlertDescription>Thông tin cơ sở y tế sẽ được hiển thị công khai sau khi được phê duyệt.</AlertDescription>
+        <AlertDescription>
+          Thông tin cơ sở y tế sẽ được hiển thị công khai sau khi được phê
+          duyệt.
+        </AlertDescription>
       </Alert>
 
       <Tabs defaultValue="basic">
@@ -203,7 +230,9 @@ export default function EditFacilityPage() {
                   <Input
                     id="name"
                     value={facility.name}
-                    onChange={(e) => setFacility({ ...facility, name: e.target.value })}
+                    onChange={(e) =>
+                      setFacility({ ...facility, name: e.target.value })
+                    }
                   />
                 </div>
 
@@ -213,7 +242,9 @@ export default function EditFacilityPage() {
                     id="description"
                     rows={4}
                     value={facility.description}
-                    onChange={(e) => setFacility({ ...facility, description: e.target.value })}
+                    onChange={(e) =>
+                      setFacility({ ...facility, description: e.target.value })
+                    }
                   />
                 </div>
 
@@ -222,7 +253,9 @@ export default function EditFacilityPage() {
                   <Input
                     id="address"
                     value={facility.address}
-                    onChange={(e) => setFacility({ ...facility, address: e.target.value })}
+                    onChange={(e) =>
+                      setFacility({ ...facility, address: e.target.value })
+                    }
                   />
                 </div>
 
@@ -232,7 +265,9 @@ export default function EditFacilityPage() {
                     <Input
                       id="phone"
                       value={facility.phone}
-                      onChange={(e) => setFacility({ ...facility, phone: e.target.value })}
+                      onChange={(e) =>
+                        setFacility({ ...facility, phone: e.target.value })
+                      }
                     />
                   </div>
 
@@ -241,7 +276,9 @@ export default function EditFacilityPage() {
                     <Input
                       id="license"
                       value={facility.license}
-                      onChange={(e) => setFacility({ ...facility, license: e.target.value })}
+                      onChange={(e) =>
+                        setFacility({ ...facility, license: e.target.value })
+                      }
                     />
                   </div>
                 </div>
@@ -251,7 +288,9 @@ export default function EditFacilityPage() {
                   <Input
                     id="openingHours"
                     value={facility.openingHours}
-                    onChange={(e) => setFacility({ ...facility, openingHours: e.target.value })}
+                    onChange={(e) =>
+                      setFacility({ ...facility, openingHours: e.target.value })
+                    }
                   />
                 </div>
 
@@ -259,8 +298,9 @@ export default function EditFacilityPage() {
                   <Label htmlFor="status">Trạng thái</Label>
                   <Select
                     value={facility.status}
-                    onValueChange={(value) => setFacility({ ...facility, status: value })}
-                  >
+                    onValueChange={(value) =>
+                      setFacility({ ...facility, status: value })
+                    }>
                     <SelectTrigger>
                       <SelectValue placeholder="Chọn trạng thái" />
                     </SelectTrigger>
@@ -278,7 +318,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Hình ảnh đại diện</CardTitle>
-              <CardDescription>Hình ảnh chính hiển thị trên trang chi tiết cơ sở y tế</CardDescription>
+              <CardDescription>
+                Hình ảnh chính hiển thị trên trang chi tiết cơ sở y tế
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -300,7 +342,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Bản đồ</CardTitle>
-              <CardDescription>Nhúng bản đồ Google Maps để hiển thị vị trí cơ sở y tế</CardDescription>
+              <CardDescription>
+                Nhúng bản đồ Google Maps để hiển thị vị trí cơ sở y tế
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -309,7 +353,9 @@ export default function EditFacilityPage() {
                   <Input
                     id="mapEmbedUrl"
                     value={facility.mapEmbedUrl}
-                    onChange={(e) => setFacility({ ...facility, mapEmbedUrl: e.target.value })}
+                    onChange={(e) =>
+                      setFacility({ ...facility, mapEmbedUrl: e.target.value })
+                    }
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -327,7 +373,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Dịch vụ nổi bật</CardTitle>
-              <CardDescription>Các dịch vụ chính mà cơ sở y tế cung cấp</CardDescription>
+              <CardDescription>
+                Các dịch vụ chính mà cơ sở y tế cung cấp
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -345,9 +393,14 @@ export default function EditFacilityPage() {
 
                 <div className="space-y-2">
                   {facility.services.map((service: string, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-2 border rounded-md">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 border rounded-md">
                       <span>{service}</span>
-                      <Button variant="ghost" size="icon" onClick={() => handleRemoveService(index)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveService(index)}>
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
@@ -360,7 +413,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Chuyên khoa</CardTitle>
-              <CardDescription>Các chuyên khoa mà cơ sở y tế cung cấp</CardDescription>
+              <CardDescription>
+                Các chuyên khoa mà cơ sở y tế cung cấp
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -377,23 +432,23 @@ export default function EditFacilityPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {facility.specialties.map((specialty: string, index: number) => (
-                    <Badge
-                      key={index}
-                      variant="outline"
-                      className="flex items-center gap-1 bg-teal-50 text-teal-800 hover:bg-teal-100"
-                    >
-                      {specialty}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
-                        onClick={() => handleRemoveSpecialty(index)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </Badge>
-                  ))}
+                  {facility.specialties.map(
+                    (specialty: string, index: number) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="flex items-center gap-1 bg-teal-50 text-teal-800 hover:bg-teal-100">
+                        {specialty}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
+                          onClick={() => handleRemoveSpecialty(index)}>
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    )
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -404,7 +459,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Bác sĩ</CardTitle>
-              <CardDescription>Danh sách bác sĩ làm việc tại cơ sở y tế</CardDescription>
+              <CardDescription>
+                Danh sách bác sĩ làm việc tại cơ sở y tế
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -415,7 +472,9 @@ export default function EditFacilityPage() {
                       id="doctorName"
                       placeholder="Nhập tên bác sĩ"
                       value={newDoctor.name}
-                      onChange={(e) => setNewDoctor({ ...newDoctor, name: e.target.value })}
+                      onChange={(e) =>
+                        setNewDoctor({ ...newDoctor, name: e.target.value })
+                      }
                     />
                   </div>
 
@@ -425,7 +484,12 @@ export default function EditFacilityPage() {
                       id="doctorSpecialty"
                       placeholder="Nhập chuyên khoa"
                       value={newDoctor.specialty}
-                      onChange={(e) => setNewDoctor({ ...newDoctor, specialty: e.target.value })}
+                      onChange={(e) =>
+                        setNewDoctor({
+                          ...newDoctor,
+                          specialty: e.target.value,
+                        })
+                      }
                     />
                   </div>
 
@@ -435,7 +499,9 @@ export default function EditFacilityPage() {
                       id="doctorImage"
                       placeholder="Nhập URL hình ảnh"
                       value={newDoctor.image}
-                      onChange={(e) => setNewDoctor({ ...newDoctor, image: e.target.value })}
+                      onChange={(e) =>
+                        setNewDoctor({ ...newDoctor, image: e.target.value })
+                      }
                     />
                   </div>
                 </div>
@@ -458,14 +524,15 @@ export default function EditFacilityPage() {
                           variant="destructive"
                           size="icon"
                           className="absolute top-2 right-2"
-                          onClick={() => handleRemoveDoctor(index)}
-                        >
+                          onClick={() => handleRemoveDoctor(index)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                       <CardContent className="p-4">
                         <h3 className="font-semibold">{doctor.name}</h3>
-                        <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {doctor.specialty}
+                        </p>
                       </CardContent>
                     </Card>
                   ))}
@@ -479,7 +546,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Thư viện hình ảnh</CardTitle>
-              <CardDescription>Hình ảnh cơ sở vật chất, trang thiết bị, không gian làm việc</CardDescription>
+              <CardDescription>
+                Hình ảnh cơ sở vật chất, trang thiết bị, không gian làm việc
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -497,7 +566,10 @@ export default function EditFacilityPage() {
                         className="w-full h-48 object-cover rounded-lg"
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                        <Button variant="destructive" size="icon" onClick={() => handleRemoveGalleryImage(index)}>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleRemoveGalleryImage(index)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -513,7 +585,9 @@ export default function EditFacilityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Thống kê</CardTitle>
-              <CardDescription>Các số liệu thống kê về cơ sở y tế</CardDescription>
+              <CardDescription>
+                Các số liệu thống kê về cơ sở y tế
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -526,7 +600,10 @@ export default function EditFacilityPage() {
                     onChange={(e) =>
                       setFacility({
                         ...facility,
-                        stats: { ...facility.stats, years: Number.parseInt(e.target.value) },
+                        stats: {
+                          ...facility.stats,
+                          years: Number.parseInt(e.target.value),
+                        },
                       })
                     }
                   />
@@ -541,7 +618,10 @@ export default function EditFacilityPage() {
                     onChange={(e) =>
                       setFacility({
                         ...facility,
-                        stats: { ...facility.stats, patients: Number.parseInt(e.target.value) },
+                        stats: {
+                          ...facility.stats,
+                          patients: Number.parseInt(e.target.value),
+                        },
                       })
                     }
                   />
@@ -556,7 +636,10 @@ export default function EditFacilityPage() {
                     onChange={(e) =>
                       setFacility({
                         ...facility,
-                        stats: { ...facility.stats, doctors: Number.parseInt(e.target.value) },
+                        stats: {
+                          ...facility.stats,
+                          doctors: Number.parseInt(e.target.value),
+                        },
                       })
                     }
                   />
@@ -574,7 +657,10 @@ export default function EditFacilityPage() {
                     onChange={(e) =>
                       setFacility({
                         ...facility,
-                        stats: { ...facility.stats, rating: Number.parseFloat(e.target.value) },
+                        stats: {
+                          ...facility.stats,
+                          rating: Number.parseFloat(e.target.value),
+                        },
                       })
                     }
                   />
@@ -594,5 +680,5 @@ export default function EditFacilityPage() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

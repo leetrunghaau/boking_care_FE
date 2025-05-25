@@ -32,7 +32,7 @@ interface Role {
 export function AdminRoleList() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
-  //a
+
   useEffect(() => {
     const fetchAllAccounts = async () => {
       try {

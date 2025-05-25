@@ -1,8 +1,15 @@
-"use client"
-
-import { useState } from "react"
-import { Eye, MoreHorizontal, Lock, Unlock, Edit, Trash2 } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+"use client";
+import { useState, useEffect } from "react";
+import http from "@/helper/axios";
+import { Eye, MoreHorizontal, Lock, Unlock, Edit, Trash2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +17,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
   PaginationContent,
@@ -22,70 +29,41 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 
-// Dữ liệu mẫu
-const users = [
-  {
-    id: "1",
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    phone: "0901234567",
-    registeredDate: "15/04/2023",
-    lastActive: "Hôm nay",
-    appointments: 12,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "2",
-    name: "Trần Thị B",
-    email: "tranthib@example.com",
-    phone: "0912345678",
-    registeredDate: "20/05/2023",
-    lastActive: "Hôm qua",
-    appointments: 8,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "3",
-    name: "Lê Văn C",
-    email: "levanc@example.com",
-    phone: "0923456789",
-    registeredDate: "10/06/2023",
-    lastActive: "3 ngày trước",
-    appointments: 5,
-    status: "inactive",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "4",
-    name: "Phạm Thị D",
-    email: "phamthid@example.com",
-    phone: "0934567890",
-    registeredDate: "05/07/2023",
-    lastActive: "1 tuần trước",
-    appointments: 3,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "5",
-    name: "Hoàng Văn E",
-    email: "hoangvane@example.com",
-    phone: "0945678901",
-    registeredDate: "18/08/2023",
-    lastActive: "2 tuần trước",
-    appointments: 0,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-]
+export type UserStatus = "active" | "inactive";
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  registeredDate: string;
+  lastActive: string;
+  appointments: number;
+  status: UserStatus;
+  avatar: string;
+}
 
 export function AdminUserList() {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchAllFacilities = async () => {
+      try {
+        const res = await http.get<User[]>(`/admin-users/users`);
+        setUsers(res);
+        console.log("Fetched users:", res);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchAllFacilities();
+  }, []);
   return (
     <div className="rounded-md border">
       <Table>
@@ -106,12 +84,17 @@ export function AdminUserList() {
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                    <AvatarImage
+                      src={user.avatar || "/placeholder.svg"}
+                      alt={user.name}
+                    />
                     <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">ID: {user.id}</p>
+                    <p className="text-xs text-muted-foreground">
+                      ID: {user.id}
+                    </p>
                   </div>
                 </div>
               </TableCell>
@@ -125,7 +108,8 @@ export function AdminUserList() {
               <TableCell>{user.lastActive}</TableCell>
               <TableCell>{user.appointments}</TableCell>
               <TableCell>
-                <Badge variant={user.status === "active" ? "outline" : "secondary"}>
+                <Badge
+                  variant={user.status === "active" ? "outline" : "secondary"}>
                   {user.status === "active" ? "Hoạt động" : "Đã khóa"}
                 </Badge>
               </TableCell>
@@ -172,7 +156,9 @@ export function AdminUserList() {
         </TableBody>
       </Table>
       <div className="flex items-center justify-between px-4 py-2">
-        <div className="text-sm text-muted-foreground">Hiển thị 1-5 của 100 người dùng</div>
+        <div className="text-sm text-muted-foreground">
+          Hiển thị 1-5 của 100 người dùng
+        </div>
         <Pagination>
           <PaginationContent>
             <PaginationItem>
@@ -199,5 +185,5 @@ export function AdminUserList() {
         </Pagination>
       </div>
     </div>
-  )
+  );
 }
