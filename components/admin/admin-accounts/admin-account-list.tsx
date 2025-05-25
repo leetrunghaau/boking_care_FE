@@ -1,16 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Edit, Key, MoreHorizontal, Trash, UserCog } from 'lucide-react'
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState, useEffect } from "react";
+import { Edit, Key, MoreHorizontal, Trash, UserCog } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -18,72 +17,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// Utilities
+import http from "@/helper/axios";
 
-// Dữ liệu mẫu cho tài khoản admin
-const accounts = [
-  {
-    id: 1,
-    name: "Nguyễn Văn Admin",
-    email: "admin@example.com",
-    role: "Super Admin",
-    lastActive: "2023-12-15T08:30:00",
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 2,
-    name: "Trần Thị Hỗ Trợ",
-    email: "support@example.com",
-    role: "CSKH",
-    lastActive: "2023-12-15T09:15:00",
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 3,
-    name: "Lê Văn Điều Phối",
-    email: "coordinator@example.com",
-    role: "Điều phối",
-    lastActive: "2023-12-15T10:00:00",
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 4,
-    name: "Phạm Thị Kế Toán",
-    email: "finance@example.com",
-    role: "Kế toán",
-    lastActive: "2023-12-15T11:30:00",
-    status: "inactive",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 5,
-    name: "Hoàng Văn Marketing",
-    email: "marketing@example.com",
-    role: "Marketing",
-    lastActive: "2023-12-15T13:00:00",
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-]
-
-// Format ngày giờ
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
+interface AdminAccount {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  lastActive: string;
+  status: "active" | "inactive";
+  avatar: string;
 }
 
 export function AdminAccountList() {
+  const [accounts, setAccounts] = useState<AdminAccount[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAllAccounts = async () => {
+      try {
+        const res = await http.get<AdminAccount[]>(`/admin-account/accounts`);
+        setAccounts(res);
+        console.log("Fetched Appointments:", res);
+      } catch (err) {
+        console.error("Failed to fetch appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllAccounts();
+  }, []);
   return (
     <Card>
       <CardContent className="p-0">
@@ -94,7 +62,9 @@ export function AdminAccountList() {
               <TableHead>Tên</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Vai trò</TableHead>
-              <TableHead className="hidden md:table-cell">Hoạt động cuối</TableHead>
+              <TableHead className="hidden md:table-cell">
+                Hoạt động cuối
+              </TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
@@ -106,19 +76,34 @@ export function AdminAccountList() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={account.avatar || "/placeholder.svg"} alt={account.name} />
-                      <AvatarFallback>{account.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage
+                        src={account.avatar || "/placeholder.svg"}
+                        alt={account.name}
+                      />
+                      <AvatarFallback>
+                        {" "}
+                        {account.name ? account.name.charAt(0) : "?"}
+                      </AvatarFallback>
                     </Avatar>
-                    <span>{account.name}</span>
+                    <span>{account.name ? account.name : "?"}</span>
                   </div>
                 </TableCell>
                 <TableCell>{account.email}</TableCell>
                 <TableCell>{account.role}</TableCell>
-                <TableCell className="hidden md:table-cell">{formatDate(account.lastActive)}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {new Intl.DateTimeFormat("vi-VN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(new Date(account.lastActive))}
+                </TableCell>
                 <TableCell>
                   <Badge
-                    variant={account.status === "active" ? "default" : "secondary"}
-                  >
+                    variant={
+                      account.status === "active" ? "default" : "secondary"
+                    }>
                     {account.status === "active" ? "Hoạt động" : "Tạm ngưng"}
                   </Badge>
                 </TableCell>
@@ -156,5 +141,5 @@ export function AdminAccountList() {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }
