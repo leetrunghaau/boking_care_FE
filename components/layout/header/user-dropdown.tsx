@@ -49,63 +49,63 @@ export default function UserDropdown({
           </span>
         </Button>
       </DropdownMenuTrigger>
-      
-<DropdownMenuContent className="w-56" align="end">
-  <DropdownMenuLabel className="text-sm">
-    Xin chào, {user.name}
-  </DropdownMenuLabel>
-  <DropdownMenuSeparator />
 
-  <DropdownMenuItem
-    onClick={() => router.push("/benh-nhan")}
-    className="hover:cursor-pointer"
-  >
-    <User className="w-4 h-4 mr-2" />
-    Tài khoản
-  </DropdownMenuItem>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel className="text-sm">
+          Xin chào, {user.name}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
 
-  <DropdownMenuItem
-    onClick={() => router.push("/benh-nhan/thong-bao")}
-    className="hover:cursor-pointer"
-  >
-    <Bell className="w-4 h-4 mr-2" />
-    Thông báo
-  </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/benh-nhan")}
+          className="hover:cursor-pointer"
+        >
+          <User className="w-4 h-4 mr-2" />
+          Tài khoản
+        </DropdownMenuItem>
 
-  <DropdownMenuItem
-    onClick={() => router.push("/benh-nhan/lich-kham")}
-    className="hover:cursor-pointer"
-  >
-    <CalendarClock className="w-4 h-4 mr-2" />
-    Lịch khám
-  </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/benh-nhan/thong-bao")}
+          className="hover:cursor-pointer"
+        >
+          <Bell className="w-4 h-4 mr-2" />
+          Thông báo
+        </DropdownMenuItem>
 
-  <DropdownMenuItem
-    onClick={() => router.push("/benh-nhan/lich-su-kham")}
-    className="hover:cursor-pointer"
-  >
-    <History className="w-4 h-4 mr-2" />
-    Lịch sử khám
-  </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/benh-nhan/lich-kham")}
+          className="hover:cursor-pointer"
+        >
+          <CalendarClock className="w-4 h-4 mr-2" />
+          Lịch khám
+        </DropdownMenuItem>
 
-  <DropdownMenuItem
-    onClick={() => router.push("/benh-nhan/tai-khoan")}
-    className="hover:cursor-pointer"
-  >
-    <Settings className="w-4 h-4 mr-2" />
-    Cài đặt
-  </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/benh-nhan/lich-su-kham")}
+          className="hover:cursor-pointer"
+        >
+          <History className="w-4 h-4 mr-2" />
+          Lịch sử khám
+        </DropdownMenuItem>
 
-  <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => router.push("/benh-nhan/tai-khoan")}
+          className="hover:cursor-pointer"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Cài đặt
+        </DropdownMenuItem>
 
-  <DropdownMenuItem
-    onClick={handleLogout}
-    className="hover:cursor-pointer"
-  >
-    <LogOut className="w-4 h-4 mr-2 text-red-500" />
-    <span className="text-red-500">Đăng xuất</span>
-  </DropdownMenuItem>
-</DropdownMenuContent>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="hover:cursor-pointer"
+        >
+          <LogOut className="w-4 h-4 mr-2 text-red-500" />
+          <span className="text-red-500">Đăng xuất</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   )
 }

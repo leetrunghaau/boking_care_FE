@@ -1,39 +1,49 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { format, addDays } from "date-fns"
 import { vi } from "date-fns/locale"
 import { Calendar, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
+import http from "@/helper/axios"
+import { getTimeFormat } from "@/helper/time"
+import { CardLoading } from "@/components/ui/loading"
 
-interface DoctorScheduleProps {
-  doctorId: string
+interface Time {
+  time: number,
+  available: boolean
 }
 
-export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
+interface Pops {
+  slug: string
+}
+
+export default function DoctorSchedule({ slug }: Pops) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [selectedTime, setSelectedTime] = useState<number | null>(null)
+  const [availableTimes, setAvailableTimes] = useState<Time[]>([])
 
-  // Tạo danh sách 7 ngày từ hôm nay
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<Time[]>(`/doctor-site/doctor/${slug}/schedule/${selectedDate}`)
+        setAvailableTimes(res);
+        console.log("fetch Hospital", res)
+      } catch (err) {
+        console.error("Failed to fetch Hospital:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedDate])
+
+
   const dates = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i))
-
-  // Tạo danh sách các khung giờ có sẵn (mẫu)
-  const availableTimes = [
-    { time: "08:00", available: true },
-    { time: "08:30", available: true },
-    { time: "09:00", available: true },
-    { time: "09:30", available: false },
-    { time: "10:00", available: true },
-    { time: "10:30", available: true },
-    { time: "11:00", available: false },
-    { time: "14:00", available: true },
-    { time: "14:30", available: true },
-    { time: "15:00", available: true },
-    { time: "15:30", available: false },
-    { time: "16:00", available: true },
-    { time: "16:30", available: true },
-  ]
-
   return (
     <div className="space-y-4">
       <div>
@@ -68,26 +78,33 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
           <h3 className="font-medium">Chọn giờ</h3>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {availableTimes.map((slot, index) => (
-            <button
-              key={index}
-              disabled={!slot.available}
-              onClick={() => setSelectedTime(slot.time)}
-              className={cn(
-                "py-2 px-1 text-sm rounded-md border transition-colors",
-                !slot.available && "opacity-50 cursor-not-allowed bg-slate-50",
-                selectedTime === slot.time
-                  ? "bg-teal-50 border-teal-200 text-teal-700"
-                  : slot.available
-                    ? "hover:bg-slate-50"
-                    : "",
-              )}
-            >
-              {slot.time}
-            </button>
-          ))}
-        </div>
+        {isLoading ? <CardLoading /> :
+          <div className="grid grid-cols-3 gap-2">
+            {availableTimes.length != 0 ? availableTimes.map((slot, index) => (
+              <button
+                key={index}
+                disabled={!slot.available}
+                onClick={() => setSelectedTime(slot.time)}
+                className={cn(
+                  "py-2 px-1 text-sm rounded-md border transition-colors",
+                  !slot.available && "opacity-50 cursor-not-allowed bg-slate-50",
+                  selectedTime === slot.time
+                    ? "bg-teal-50 border-teal-200 text-teal-700"
+                    : slot.available
+                      ? "hover:bg-slate-50"
+                      : "",
+                )}
+              >
+                {getTimeFormat(slot.time)}
+              </button>
+            )) :
+              <>
+                <p className="col-span-3">Bác sĩ không có lịch làm việc trong hôm nay</p>
+              </>
+
+            }
+          </div>
+        }
       </div>
     </div>
   )
