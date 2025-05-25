@@ -42,9 +42,9 @@ export function AdminAccountList() {
       try {
         const res = await http.get<AdminAccount[]>(`/admin-account/accounts`);
         setAccounts(res);
-        console.log("Fetched Appointments:", res);
+        console.log("Fetched Accounts:", res);
       } catch (err) {
-        console.error("Failed to fetch appointments:", err);
+        console.error("Failed to fetch account:", err);
       } finally {
         setLoading(false);
       }
