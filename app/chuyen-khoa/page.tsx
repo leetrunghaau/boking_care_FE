@@ -9,9 +9,10 @@ import http from "@/helper/axios"
 import { CardLoading, Loading } from "@/components/ui/loading"
 
 interface Specialty {
+  id:number;
   name: string;
   slug: string;
-  description: string;
+  title: string;
   icon: string;
 }
 

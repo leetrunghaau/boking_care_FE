@@ -13,22 +13,17 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 import http from "@/helper/axios"
+import { getIconByName } from "@/helper/icon-map"
 
 // 1. Khai báo interface với icon là string
 interface Specialty {
+  id: number
   icon: string
   name: string
   slug: string
 }
 
-const iconMap: { [key: string]: React.ElementType } = {
-  Brain,
-  Heart,
-  Eye,
-  Bone,
-  Baby,
-  Stethoscope,
-}
+
 
 
 export default function PopularSpecialties() {
@@ -65,7 +60,7 @@ export default function PopularSpecialties() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {specialties.map((specialty, index) => {
-          const Icon = iconMap[specialty.icon]
+          const Icon = getIconByName(specialty.icon)
           return (
             <Link href={`/chuyen-khoa/${specialty.slug}`} key={index}>
               <Card className="hover:shadow-md transition-shadow text-center h-full">

@@ -7,44 +7,20 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import http from "@/helper/axios"
 import { getIconByName } from "@/helper/icon-map"
+import Link from "next/link"
 
 interface SpecialtyDetail {
   id: number;
   name: string;
   icon: string;
   description: string;
-  banner: string;
-  commonDiseases: Disease[];
+  img: string;
+  commonDiseases: { name: string; img: string }[];
   advantages: string[];
-  doctors: Doctor[];
-  facilities: Facility[];
-  faqs: FAQ[];
+  doctors: { id: number; name: string; title: string; thumbnail: string; rating: number; sumRating: number; }[];
+  hospitals: { slug: string; name: string; address: string; img: string; }[];
+  faqs: { question: string; answer: string; }[];
 }
-
-interface Disease {
-  name: string;
-  image: string;
-}
-
-interface Doctor {
-  name: string;
-  title: string;
-  image: string;
-  rating: number;
-  reviews: number;
-}
-
-interface Facility {
-  name: string;
-  location: string;
-  image: string;
-}
-
-interface FAQ {
-  question: string;
-  answer: string;
-}
-
 
 
 export default function SpecialtyDetailPage() {
@@ -76,10 +52,10 @@ export default function SpecialtyDetailPage() {
   return (
     <div className="space-y-16">
       {/* Banner */}
-      {specialty.banner && (
+      {specialty.img && (
         <div className="relative h-[300px] w-full">
           <Image
-            src={specialty.banner}
+            src={specialty.img}
             alt="Banner chuyên khoa"
             fill
             className="object-cover"
@@ -94,7 +70,7 @@ export default function SpecialtyDetailPage() {
       <section className="px-6 max-w-5xl mx-auto">
         <div className="flex items-start gap-4">
           <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center ">
-            <Icon className="h-10 w-10 text-teal-600"/>
+            <Icon className="h-10 w-10 text-teal-600" />
           </div>
           <div>
             <h2 className="text-2xl font-bold mb-2 text-slate-800">{specialty.name}</h2>
@@ -110,7 +86,7 @@ export default function SpecialtyDetailPage() {
           {specialty.commonDiseases.map((disease: any, idx: number) => (
             <div key={idx} className="text-center">
               <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow">
-                <Image src={disease.image} alt={disease.name} fill className="object-cover" />
+                <Image src={disease.img} alt={disease.name} fill className="object-cover" />
               </div>
               <p className="mt-2 font-medium">{disease.name}</p>
             </div>
@@ -135,18 +111,18 @@ export default function SpecialtyDetailPage() {
           {specialty.doctors.map((doc: any, idx: number) => (
             <div key={idx} className="bg-white rounded-md shadow-md overflow-hidden">
               <div className="relative w-full h-56">
-                <Image src={doc.image} alt={doc.name} fill className="object-cover" />
+                <Image src={doc.img} alt={doc.name} fill className="object-cover" />
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-lg">{doc.name}</h3>
                 <p className="text-sm text-muted-foreground mb-2">{doc.title}</p>
                 <div className="flex items-center gap-1 mb-3">
-                  {Array(doc.rating)
+                  {Array(Math.floor(doc.rating))
                     .fill(0)
                     .map((_, i) => (
                       <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                     ))}
-                  <span className="text-sm text-muted-foreground">({doc.reviews})</span>
+                  <span className="text-sm text-muted-foreground">({doc.sumRating})</span>
                 </div>
                 <Button className="w-full bg-teal-600 text-white hover:bg-teal-700">Đặt lịch khám</Button>
               </div>
@@ -159,15 +135,17 @@ export default function SpecialtyDetailPage() {
       <section className="px-6 max-w-6xl mx-auto">
         <h2 className="text-2xl font-semibold text-slate-800 mb-6">Cơ sở y tế hỗ trợ</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {specialty.facilities.map((f: any, idx: number) => (
+          {specialty.hospitals.map((hop: any, idx: number) => (
             <div key={idx} className="bg-white p-4 rounded-md shadow-md flex gap-4">
               <div className="relative w-28 h-20 shrink-0 rounded-md overflow-hidden">
-                <Image src={f.image} alt={f.name} fill className="object-cover" />
+                <Image src={hop.thumbnail} alt={hop.name} fill className="object-cover" />
               </div>
               <div>
-                <h3 className="font-semibold">{f.name}</h3>
-                <p className="text-sm text-muted-foreground">{f.location}</p>
-                <Button variant="link" className="text-teal-600 px-0 mt-1">Xem chi tiết</Button>
+                <h3 className="font-semibold">{hop.name}</h3>
+                <p className="text-sm text-muted-foreground">{hop.address}</p>
+                <Link href={`/co-so-y-te/${hop.slug}`}>
+                  <Button variant="link" className="text-teal-600 px-0 mt-1">Xem chi tiết</Button>
+                </Link>
               </div>
             </div>
           ))}

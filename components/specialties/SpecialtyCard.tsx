@@ -7,11 +7,11 @@ interface SpecialtyCardProps {
   name: string
   slug: string
   icon: string 
-  description?: string
+  title?: string
 }
 
 
-export default function SpecialtyCard({ name, slug, icon, description }: SpecialtyCardProps) {
+export default function SpecialtyCard({ name, slug, icon, title }: SpecialtyCardProps) {
   const Icon = getIconByName(icon)
 
   return (
@@ -22,7 +22,7 @@ export default function SpecialtyCard({ name, slug, icon, description }: Special
            <Icon className="w-7 h-7 text-teal-600" />
           </div>
           <h3 className="text-lg font-semibold text-slate-800">{name}</h3>
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          {title && <p className="text-sm text-muted-foreground">{title}</p>}
           <div className="flex items-center gap-1 text-teal-600 text-sm mt-2 group-hover:underline">
             Xem chi tiết <ChevronRight className="w-4 h-4" />
           </div>

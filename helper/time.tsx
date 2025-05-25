@@ -27,6 +27,7 @@ export function parseTimeFormat(timeStr: string): number {
     const minutes = parseInt(minutesStr, 10);
 
     return hours * 60 + minutes;
+
 }
 
 export function getReadableTimeRanges(times: TimeRange[]): string[] {
