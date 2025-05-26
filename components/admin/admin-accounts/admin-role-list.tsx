@@ -1,15 +1,16 @@
-"use client"
+"use client";
 
-import { Edit, MoreHorizontal, Shield, Trash } from 'lucide-react'
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Edit, MoreHorizontal, Shield, Trash } from "lucide-react";
+import { useState, useEffect } from "react";
+import http from "@/helper/axios";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -17,49 +18,36 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
-// Dữ liệu mẫu cho vai trò
-const roles = [
-  {
-    id: 1,
-    name: "Super Admin",
-    description: "Toàn quyền quản lý hệ thống",
-    userCount: 1,
-    permissions: ["Tất cả quyền"],
-  },
-  {
-    id: 2,
-    name: "CSKH",
-    description: "Quản lý hỗ trợ và chăm sóc khách hàng",
-    userCount: 5,
-    permissions: ["Quản lý hỗ trợ", "Xem người dùng", "Xem lịch hẹn"],
-  },
-  {
-    id: 3,
-    name: "Điều phối",
-    description: "Quản lý lịch hẹn và điều phối bác sĩ",
-    userCount: 3,
-    permissions: ["Quản lý lịch hẹn", "Xem bác sĩ", "Xem người dùng"],
-  },
-  {
-    id: 4,
-    name: "Kế toán",
-    description: "Quản lý thanh toán và hóa đơn",
-    userCount: 2,
-    permissions: ["Quản lý thanh toán", "Xem báo cáo tài chính"],
-  },
-  {
-    id: 5,
-    name: "Marketing",
-    description: "Quản lý nội dung và marketing",
-    userCount: 2,
-    permissions: ["Quản lý nội dung", "Xem thống kê"],
-  },
-]
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+  userCount: number;
+  permissions: string[];
+}
 
 export function AdminRoleList() {
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAllAccounts = async () => {
+      try {
+        const res = await http.get<Role[]>(`/admin-role/roles`);
+        setRoles(res);
+        console.log("Fetched Roles:", res);
+      } catch (err) {
+        console.error("Failed to fetch roles:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllAccounts();
+  }, []);
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -127,5 +115,5 @@ export function AdminRoleList() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

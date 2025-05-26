@@ -1,9 +1,15 @@
-import { AdminDoctorList } from "@/components/admin/admin-doctors/admin-doctor-list"
-import { AdminDoctorPendingList } from "@/components/admin/admin-doctors/admin-doctor-pending-list"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AdminDoctorList } from "@/components/admin/admin-doctors/admin-doctor-list";
+import { AdminDoctorPendingList } from "@/components/admin/admin-doctors/admin-doctor-pending-list";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AdminDoctorsPage() {
   return (
@@ -23,7 +29,10 @@ export default function AdminDoctorsPage() {
         </TabsList>
         <TabsContent value="active" className="space-y-4">
           <div className="flex items-center gap-4">
-            <Input placeholder="Tìm kiếm theo tên, chuyên khoa, ID..." className="max-w-md" />
+            <Input
+              placeholder="Tìm kiếm theo tên, chuyên khoa, ID..."
+              className="max-w-md"
+            />
             <Select defaultValue="all">
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Chuyên khoa" />
@@ -51,7 +60,10 @@ export default function AdminDoctorsPage() {
         </TabsContent>
         <TabsContent value="pending" className="space-y-4">
           <div className="flex items-center gap-4">
-            <Input placeholder="Tìm kiếm theo tên, chuyên khoa, ID..." className="max-w-md" />
+            <Input
+              placeholder="Tìm kiếm theo tên, chuyên khoa, ID..."
+              className="max-w-md"
+            />
             <Select defaultValue="all">
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Chuyên khoa" />
@@ -80,5 +92,5 @@ export default function AdminDoctorsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

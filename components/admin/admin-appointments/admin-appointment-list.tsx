@@ -1,8 +1,23 @@
-"use client"
-
-import { useState } from "react"
-import { Eye, MoreHorizontal, CheckCircle, XCircle, Clock, Calendar, CheckSquare } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+"use client";
+import { useState, useEffect } from "react";
+import http from "@/helper/axios";
+import {
+  Eye,
+  MoreHorizontal,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Calendar,
+  CheckSquare,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +25,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
   PaginationContent,
@@ -22,134 +37,92 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 
-// Dữ liệu mẫu
-const appointments = [
-  {
-    id: "A1",
-    patient: {
-      name: "Nguyễn Văn A",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    doctor: {
-      name: "BS. Trần Thị B",
-      specialty: "Tim mạch",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    date: "15/05/2023",
-    time: "09:00 - 09:30",
-    type: "Khám định kỳ",
-    status: "confirmed",
-    payment: "Đã thanh toán",
-  },
-  {
-    id: "A2",
-    patient: {
-      name: "Lê Văn C",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    doctor: {
-      name: "BS. Phạm Thị D",
-      specialty: "Nhi khoa",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    date: "15/05/2023",
-    time: "10:00 - 10:30",
-    type: "Khám lần đầu",
-    status: "pending",
-    payment: "Chưa thanh toán",
-  },
-  {
-    id: "A3",
-    patient: {
-      name: "Hoàng Văn E",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    doctor: {
-      name: "BS. Nguyễn Văn F",
-      specialty: "Da liễu",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    date: "15/05/2023",
-    time: "11:00 - 11:30",
-    type: "Tái khám",
-    status: "completed",
-    payment: "Đã thanh toán",
-  },
-  {
-    id: "A4",
-    patient: {
-      name: "Trần Thị G",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    doctor: {
-      name: "BS. Lê Văn H",
-      specialty: "Thần kinh",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    date: "16/05/2023",
-    time: "09:00 - 09:30",
-    type: "Khám định kỳ",
-    status: "cancelled",
-    payment: "Hoàn tiền",
-  },
-  {
-    id: "A5",
-    patient: {
-      name: "Phạm Văn I",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    doctor: {
-      name: "BS. Hoàng Thị K",
-      specialty: "Nội tiết",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    date: "16/05/2023",
-    time: "10:00 - 10:30",
-    type: "Khám lần đầu",
-    status: "confirmed",
-    payment: "Đã thanh toán",
-  },
-]
+interface PersonInfo {
+  name: string;
+  avatar: string;
+}
+
+interface DoctorInfo extends PersonInfo {
+  specialty: string;
+}
+
+type AppointmentStatus = "confirmed" | "pending" | "completed" | "cancelled";
+type PaymentStatus = "Đã thanh toán" | "Chưa thanh toán" | "Hoàn tiền";
+
+interface Appointment {
+  id: string;
+  patient: PersonInfo;
+  doctor: DoctorInfo;
+  date: string;
+  time: string;
+  type: string;
+  status: AppointmentStatus;
+  payment: PaymentStatus;
+}
 
 export function AdminAppointmentList() {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchAllAppointments = async () => {
+      try {
+        const res = await http.get<Appointment[]>(`/admin-appointments/list`);
+        setAppointments(res);
+        console.log("Fetched Appointments:", res);
+      } catch (err) {
+        console.error("Failed to fetch appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchAllAppointments();
+  }, []);
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
         return (
-          <Badge variant="outline" className="flex w-fit items-center gap-1 border-yellow-500 text-yellow-500">
+          <Badge
+            variant="outline"
+            className="flex w-fit items-center gap-1 border-yellow-500 text-yellow-500">
             <Clock className="h-3 w-3" />
             <span>Chờ xác nhận</span>
           </Badge>
-        )
+        );
       case "confirmed":
         return (
-          <Badge variant="outline" className="flex w-fit items-center gap-1 border-blue-500 text-blue-500">
+          <Badge
+            variant="outline"
+            className="flex w-fit items-center gap-1 border-blue-500 text-blue-500">
             <Calendar className="h-3 w-3" />
             <span>Đã xác nhận</span>
           </Badge>
-        )
+        );
       case "completed":
         return (
-          <Badge variant="outline" className="flex w-fit items-center gap-1 border-green-500 text-green-500">
+          <Badge
+            variant="outline"
+            className="flex w-fit items-center gap-1 border-green-500 text-green-500">
             <CheckSquare className="h-3 w-3" />
             <span>Đã hoàn tất</span>
           </Badge>
-        )
+        );
       case "cancelled":
         return (
-          <Badge variant="outline" className="flex w-fit items-center gap-1 border-red-500 text-red-500">
+          <Badge
+            variant="outline"
+            className="flex w-fit items-center gap-1 border-red-500 text-red-500">
             <XCircle className="h-3 w-3" />
             <span>Đã hủy</span>
           </Badge>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="rounded-md border">
@@ -177,7 +150,9 @@ export function AdminAppointmentList() {
                       src={appointment.patient.avatar || "/placeholder.svg"}
                       alt={appointment.patient.name}
                     />
-                    <AvatarFallback>{appointment.patient.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>
+                      {appointment.patient.name.charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
                   <span>{appointment.patient.name}</span>
                 </div>
@@ -185,19 +160,28 @@ export function AdminAppointmentList() {
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src={appointment.doctor.avatar || "/placeholder.svg"} alt={appointment.doctor.name} />
-                    <AvatarFallback>{appointment.doctor.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage
+                      src={appointment.doctor.avatar || "/placeholder.svg"}
+                      alt={appointment.doctor.name}
+                    />
+                    <AvatarFallback>
+                      {appointment.doctor.name.charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="text-sm">{appointment.doctor.name}</span>
-                    <span className="text-xs text-muted-foreground">{appointment.doctor.specialty}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {appointment.doctor.specialty}
+                    </span>
                   </div>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex flex-col">
                   <span className="text-sm">{appointment.date}</span>
-                  <span className="text-xs text-muted-foreground">{appointment.time}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {appointment.time}
+                  </span>
                 </div>
               </TableCell>
               <TableCell>{appointment.type}</TableCell>
@@ -238,7 +222,9 @@ export function AdminAppointmentList() {
         </TableBody>
       </Table>
       <div className="flex items-center justify-between px-4 py-2">
-        <div className="text-sm text-muted-foreground">Hiển thị 1-5 của 120 lịch hẹn</div>
+        <div className="text-sm text-muted-foreground">
+          Hiển thị 1-5 của 120 lịch hẹn
+        </div>
         <Pagination>
           <PaginationContent>
             <PaginationItem>
@@ -265,5 +251,5 @@ export function AdminAppointmentList() {
         </Pagination>
       </div>
     </div>
-  )
+  );
 }

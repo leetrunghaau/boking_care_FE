@@ -1,8 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Eye, MoreHorizontal, PauseCircle, PlayCircle, Edit, Award, Star } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState, useEffect } from "react";
+import http from "@/helper/axios";
+import {
+  Eye,
+  MoreHorizontal,
+  PauseCircle,
+  PlayCircle,
+  Edit,
+  Award,
+  Star,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +26,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
   PaginationContent,
@@ -22,70 +38,41 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 
-// Dữ liệu mẫu
-const doctors = [
-  {
-    id: "1",
-    name: "TS. BS. Nguyễn Văn A",
-    specialty: "Tim mạch",
-    hospital: "Bệnh viện Đa khoa Trung ương",
-    experience: "15 năm",
-    appointments: 245,
-    rating: 4.9,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "2",
-    name: "PGS. TS. Trần Thị B",
-    specialty: "Nhi khoa",
-    hospital: "Bệnh viện Nhi Trung ương",
-    experience: "12 năm",
-    appointments: 198,
-    rating: 4.8,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "3",
-    name: "BS. CKI. Lê Văn C",
-    specialty: "Da liễu",
-    hospital: "Bệnh viện Da liễu Trung ương",
-    experience: "8 năm",
-    appointments: 156,
-    rating: 4.7,
-    status: "inactive",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "4",
-    name: "BS. CKII. Phạm Thị D",
-    specialty: "Thần kinh",
-    hospital: "Bệnh viện Bạch Mai",
-    experience: "10 năm",
-    appointments: 187,
-    rating: 4.6,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "5",
-    name: "TS. BS. Hoàng Văn E",
-    specialty: "Nội tiết",
-    hospital: "Bệnh viện Việt Đức",
-    experience: "14 năm",
-    appointments: 210,
-    rating: 4.5,
-    status: "active",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-]
+type DoctorStatus = "active" | "inactive";
+
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  hospital: string;
+  experience: string; // ví dụ: "15 năm"
+  appointments: number; // số lượt khám
+  rating: number; // ví dụ: 4.9
+  status: DoctorStatus;
+  avatar: string;
+}
 
 export function AdminDoctorList() {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchAvailableDoctors = async () => {
+      try {
+        const res = await http.get<Doctor[]>(`/admin-doctor/available`);
+        setDoctors(res);
+        console.log("Fetched available doctors:", res);
+      } catch (err) {
+        console.error("Failed to fetch available doctors:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchAvailableDoctors();
+  }, []);
   return (
     <div className="rounded-md border">
       <Table>
@@ -107,12 +94,17 @@ export function AdminDoctorList() {
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={doctor.avatar || "/placeholder.svg"} alt={doctor.name} />
+                    <AvatarImage
+                      src={doctor.avatar || "/placeholder.svg"}
+                      alt={doctor.name}
+                    />
                     <AvatarFallback>{doctor.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">{doctor.name}</p>
-                    <p className="text-xs text-muted-foreground">ID: {doctor.id}</p>
+                    <p className="text-xs text-muted-foreground">
+                      ID: {doctor.id}
+                    </p>
                   </div>
                 </div>
               </TableCell>
@@ -127,7 +119,10 @@ export function AdminDoctorList() {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={doctor.status === "active" ? "outline" : "secondary"}>
+                <Badge
+                  variant={
+                    doctor.status === "active" ? "outline" : "secondary"
+                  }>
                   {doctor.status === "active" ? "Hoạt động" : "Tạm ngưng"}
                 </Badge>
               </TableCell>
@@ -174,7 +169,9 @@ export function AdminDoctorList() {
         </TableBody>
       </Table>
       <div className="flex items-center justify-between px-4 py-2">
-        <div className="text-sm text-muted-foreground">Hiển thị 1-5 của 50 bác sĩ</div>
+        <div className="text-sm text-muted-foreground">
+          Hiển thị 1-5 của 50 bác sĩ
+        </div>
         <Pagination>
           <PaginationContent>
             <PaginationItem>
@@ -201,5 +198,5 @@ export function AdminDoctorList() {
         </Pagination>
       </div>
     </div>
-  )
+  );
 }
