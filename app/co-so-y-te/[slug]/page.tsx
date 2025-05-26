@@ -9,6 +9,7 @@ import SpecialtiyList from "@/components/hospital/specialtiy-list"
 import http from "@/helper/axios"
 import { getReadableTimeRanges } from "@/helper/time"
 import { Card, CardContent } from "@/components/ui/card"
+import { formatPhoneNumber } from "@/helper/customNumView"
 
 
 
@@ -63,13 +64,13 @@ export default function HealthFacilityDetailPage() {
                                 <div className="relative h-[200px] w-full">
                                     <Image
                                         src={doc.img ?? "/placeholder.svg"}
-                                        alt={doc.user.name}
+                                        alt={doc.name}
                                         fill
                                         className="object-cover"
                                     />
                                 </div>
                                 <CardContent className="p-4">
-                                    <h3 className="font-semibold text-lg">{doc.user.name}</h3>
+                                    <h3 className="font-semibold text-lg">{doc.name}</h3>
                                     <p className="text-sm text-muted-foreground">{doc.specialty.name}</p>
                                 </CardContent>
                             </Card>
@@ -128,7 +129,7 @@ export default function HealthFacilityDetailPage() {
                     <p className="text-muted-foreground">{data.hospital.description}</p>
                     <div className="grid sm:grid-cols-2 gap-6 text-sm text-slate-700">
                         <div><strong>Địa chỉ:</strong> {data.hospital.address}</div>
-                        <div><strong>Điện thoại:</strong> {data.hospital.phone}</div>
+                        <div><strong>Điện thoại:</strong> {formatPhoneNumber(data.hospital.phone)}</div>
                         <div className="flex gap-3 items-start">
                             <div><strong>Giờ làm việc:</strong></div>
                             <div>{getReadableTimeRanges(data.hospital.time).map((item: string, index: number) => (<p key={index}>{item}</p>))}</div>

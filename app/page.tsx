@@ -58,17 +58,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Specialties Section */}
         <section className="py-16 bg-slate-50 px-16">
            <PopularSpecialties/>
         </section>
 
-        {/* Featured Doctors */}
         <section className="py-16 px-16">
           <PopularDoctors/>
         </section>
 
-        {/* How It Works */}
         <section className="py-16 bg-slate-50 px-16">
           <div className="container  mx-auto">
             <h2 className="text-3xl font-bold text-slate-800 text-center mb-12">Quy trình đặt lịch khám</h2>

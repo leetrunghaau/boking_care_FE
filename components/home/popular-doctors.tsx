@@ -8,24 +8,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-interface Doctor {
-    id: number
-    name: string
-    img: string
-    slug: string
-    specialty: string
-    rating: number
-    sumRating: number
-}
 export default function PopularDoctors() {
-    const [doctors, setDoctors] = useState<Doctor[]>([])
+    const [doctors, setDoctors] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<Doctor[]>("/home/doctors")
+        const res = await http.get<any[]>("/home/doctors")
+        console.log("bác sĩ ở trang home \n", res)
         setDoctors(res);
       } catch (err) {
         console.error("Failed to fetch doctors:", err);
@@ -58,7 +50,7 @@ export default function PopularDoctors() {
                         </div>
                         <CardContent className="p-4">
                             <h3 className="font-bold text-lg mb-1">Bác sĩ {doctor.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">{doctor.specialty}</p>
+                            <p className="text-sm text-muted-foreground mb-2">{doctor.specialty.name}</p>
                             <div className="flex items-center gap-1 mb-3">
                                 {Array(5)
                                     .fill(0)
@@ -71,7 +63,7 @@ export default function PopularDoctors() {
                                                 }`}
                                         />
                                     ))}
-                                <span className="text-sm text-muted-foreground">({doctor.sumRating})</span>
+                                <span className="text-sm text-muted-foreground">({doctor.reviews})</span>
                             </div>
                             <Link href={`/bac-si/${doctor.slug}`}>
                                 <Button className="w-full bg-teal-600 hover:bg-teal-700">Đặt lịch khám</Button>

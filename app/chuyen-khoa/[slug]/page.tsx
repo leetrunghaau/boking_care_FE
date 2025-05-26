@@ -9,31 +9,20 @@ import http from "@/helper/axios"
 import { getIconByName } from "@/helper/icon-map"
 import Link from "next/link"
 
-interface SpecialtyDetail {
-  id: number;
-  name: string;
-  icon: string;
-  description: string;
-  img: string;
-  commonDiseases: { name: string; img: string }[];
-  advantages: string[];
-  doctors: { id: number; name: string; title: string; thumbnail: string; rating: number; sumRating: number; }[];
-  hospitals: { slug: string; name: string; address: string; img: string; }[];
-  faqs: { question: string; answer: string; }[];
-}
 
 
 export default function SpecialtyDetailPage() {
   const params = useParams()
   const slug = params?.slug as string
-  const [specialty, setSpecialty] = useState<SpecialtyDetail | null>(null)
+  const [specialty, setSpecialty] = useState<any | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<SpecialtyDetail>(`/specialty/${slug}`)
+        const res = await http.get<any>(`/specialty/${slug}`)
+        console.log("chuyên khoa chi tết\n", res)
         setSpecialty(res);
       } catch (err) {
         console.error("Failed to fetch doctors:", err);
@@ -52,16 +41,16 @@ export default function SpecialtyDetailPage() {
   return (
     <div className="space-y-16">
       {/* Banner */}
-      {specialty.img && (
+      {specialty.specialty.img && (
         <div className="relative h-[300px] w-full">
           <Image
-            src={specialty.img}
+            src={specialty.specialty.img}
             alt="Banner chuyên khoa"
             fill
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <h1 className="text-white text-4xl font-bold">{specialty.name}</h1>
+            <h1 className="text-white text-4xl font-bold">{specialty.specialty.name}</h1>
           </div>
         </div>
       )}
@@ -73,8 +62,8 @@ export default function SpecialtyDetailPage() {
             <Icon className="h-10 w-10 text-teal-600" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-2 text-slate-800">{specialty.name}</h2>
-            <p className="text-muted-foreground text-lg">{specialty.description}</p>
+            <h2 className="text-2xl font-bold mb-2 text-slate-800">{specialty.specialty.name}</h2>
+            <p className="text-muted-foreground text-lg">{specialty.specialty.about}</p>
           </div>
         </div>
       </section>
@@ -83,7 +72,7 @@ export default function SpecialtyDetailPage() {
       <section className="px-6 max-w-6xl mx-auto">
         <h2 className="text-2xl font-semibold text-slate-800 mb-6">Bệnh lý phổ biến</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {specialty.commonDiseases.map((disease: any, idx: number) => (
+          {specialty.specialty.commonDiseases.map((disease: any, idx: number) => (
             <div key={idx} className="text-center">
               <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow">
                 <Image src={disease.img} alt={disease.name} fill className="object-cover" />
@@ -98,7 +87,7 @@ export default function SpecialtyDetailPage() {
       <section className="px-6 max-w-5xl mx-auto">
         <h2 className="text-2xl font-semibold text-slate-800 mb-4">Tại sao nên chọn chuyên khoa này?</h2>
         <ul className="list-disc pl-6 space-y-2 text-muted-foreground text-lg">
-          {specialty.advantages.map((adv: string, idx: number) => (
+          {specialty.specialty.advantages.map((adv: string, idx: number) => (
             <li key={idx}>{adv}</li>
           ))}
         </ul>
@@ -156,7 +145,7 @@ export default function SpecialtyDetailPage() {
       <section className="px-6 max-w-5xl mx-auto">
         <h2 className="text-2xl font-semibold text-slate-800 mb-4">Câu hỏi thường gặp</h2>
         <div className="space-y-4">
-          {specialty.faqs.map((faq: any, idx: number) => (
+          {specialty.specialty.faqs.map((faq: any, idx: number) => (
             <div key={idx} className="border p-4 rounded-md bg-slate-50">
               <h4 className="font-medium text-slate-700 mb-2">{faq.question}</h4>
               <p className="text-muted-foreground">{faq.answer}</p>

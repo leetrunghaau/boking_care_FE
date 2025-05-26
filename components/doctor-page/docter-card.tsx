@@ -19,7 +19,7 @@ export default function DoctorCard({ doctor }: Pops) {
             <div className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-white">
               <Image
                 src={doctor.img || "/placeholder.svg"}
-                alt={doctor.user.name}
+                alt={doctor.name}
                 fill
                 className="object-cover"
               />
@@ -27,7 +27,7 @@ export default function DoctorCard({ doctor }: Pops) {
             <div className="ml-4">
               <h3 className="font-semibold text-lg">
                 <Link href={`/bac-si/${doctor.slug}`} className="hover:text-blue-600 transition-colors">
-                  {doctor.user.name}
+                  {doctor.name}
                 </Link>
               </h3>
               <p className="text-sm text-muted-foreground">{doctor.specialty.name}</p>
