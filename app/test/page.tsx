@@ -1,5 +1,7 @@
 "use client";
 
+import { HealthcareChat } from "@/components/chat/healthcare-chat";
+
 export default function TestErrorPage() {
-  throw new Error("Lỗi test từ TestErrorPage");
+  return <HealthcareChat />;
 }
