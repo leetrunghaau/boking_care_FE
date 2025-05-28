@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
 import useAuthStore from "@/store/auth";
 import { loginSchema } from "@/schemas/logInSchema";
+
 export default function LoginPage() {
   const { toast } = useToast();
   const { logIn } = useAuthStore();

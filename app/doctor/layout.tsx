@@ -6,11 +6,7 @@ import useAuthStore from "@/store/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import withAuth from "@/helper/withAuth";
-export default withAuth(function DoctorLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DoctorLayout({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, role, hasHydrated } = useAuthStore();
   const router = useRouter();
   useEffect(() => {
@@ -28,4 +24,6 @@ export default withAuth(function DoctorLayout({
       <Footer />
     </div>
   );
-});
+}
+
+export default withAuth(DoctorLayout, ["doctor"]);

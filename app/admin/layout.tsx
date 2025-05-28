@@ -20,11 +20,7 @@ import withAuth from "@/helper/withAuth";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
-export default withAuth(function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider defaultOpen={true}>
       <AdminSidebar />
@@ -33,4 +29,5 @@ export default withAuth(function AdminLayout({
       </SidebarInset>
     </SidebarProvider>
   );
-});
+}
+export default withAuth(AdminLayout, ["doctor"]);
