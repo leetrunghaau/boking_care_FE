@@ -1,117 +1,119 @@
-"use client"
+"use client";
 // app/auth/login/page.tsx
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
-import http from "@/helper/axios"
-import useAuthStore from "@/store/auth"
-
+import type React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import http from "@/helper/axios";
+import useAuthStore from "@/store/auth";
+import { loginSchema } from "@/schemas/logInSchema";
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const { toast } = useToast();
+  const { logIn } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
-  })
-  const [errors, setErrors] = useState({
+  });
+  const formErrors = {
     email: "",
+
     password: "",
-  })
-  const { toast } = useToast()
-  const { logIn } = useAuthStore()
+  };
+  const [errors, setErrors] = useState(formErrors);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear error when user types
     if (errors[name as keyof typeof errors]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }))
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  }
+  };
 
   const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev) => ({ ...prev, rememberMe: checked }))
-  }
+    setFormData((prev) => ({ ...prev, rememberMe: checked }));
+  };
 
   const validateForm = () => {
-    let valid = true
-    const newErrors = { ...errors }
+    const result = loginSchema.safeParse(formData);
 
-    if (!formData.email) {
-      newErrors.email = "Vui lòng nhập email hoặc số điện thoại"
-      valid = false
-    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email) && !/^[0-9]{10}$/.test(formData.email)) {
-      newErrors.email = "Email hoặc số điện thoại không hợp lệ"
-      valid = false
+    if (!result.success) {
+      const zodErrors = result.error.flatten().fieldErrors;
+
+      setErrors({
+        email: zodErrors.email?.[0] || "",
+        password: zodErrors.password?.[0] || "",
+      });
+      return false;
     }
-
-    if (!formData.password) {
-      newErrors.password = "Vui lòng nhập mật khẩu"
-      valid = false
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự"
-      valid = false
-    }
-
-    setErrors(newErrors)
-    return valid
-  }
+    setErrors(formErrors);
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // Simulate API call
-      const rs = await http.post<any>("/sig/login", formData)
+      const rs = await http.post<any>("/sig/login", formData);
       toast({
         title: "Thành công!",
         description: "Bạn đã đăng nhập thành công.",
         variant: "success",
         duration: 2000,
-      })
+      });
       logIn({
         id: rs.id,
         token: rs.token,
-        role: rs.role
-      })
+        role: rs.role,
+      });
     } catch (err) {
       const e = err as Error;
       toast({
         title: "Đăng nhập thất bại",
         description: e.message || "Đã có lỗi xảy ra",
         variant: "warning",
-        duration: 2000
-      })
+        duration: 2000,
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Đăng nhập</CardTitle>
-        <CardDescription className="text-center">Nhập thông tin đăng nhập của bạn để tiếp tục</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center">
+          Đăng nhập
+        </CardTitle>
+        <CardDescription className="text-center">
+          Nhập thông tin đăng nhập của bạn để tiếp tục
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email hoặc số điện thoại</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               name="email"
@@ -122,12 +124,16 @@ export default function LoginPage() {
               disabled={isLoading}
               className={errors.email ? "border-red-500" : ""}
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Mật khẩu</Label>
-              <Link href="/xac-thuc/quen-mat-khau" className="text-sm text-teal-600 hover:text-teal-700">
+              <Link
+                href="/xac-thuc/quen-mat-khau"
+                className="text-sm text-teal-600 hover:text-teal-700">
                 Quên mật khẩu?
               </Link>
             </div>
@@ -145,12 +151,13 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+                onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password}</p>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -163,10 +170,14 @@ export default function LoginPage() {
               Ghi nhớ đăng nhập
             </Label>
           </div>
-          <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700"
+            disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang đăng nhập...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang đăng
+                nhập...
               </>
             ) : (
               "Đăng nhập"
@@ -218,11 +229,13 @@ export default function LoginPage() {
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
           Chưa có tài khoản?{" "}
-          <Link href="/xac-thuc/dang-ky" className="text-teal-600 hover:text-teal-700 font-medium">
+          <Link
+            href="/xac-thuc/dang-ky"
+            className="text-teal-600 hover:text-teal-700 font-medium">
             Đăng ký ngay
           </Link>
         </p>
       </CardFooter>
     </Card>
-  )
+  );
 }

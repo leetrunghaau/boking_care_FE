@@ -1,16 +1,24 @@
-import { AdminDashboardActivity } from "@/components/admin/admin-dashboard/admin-dashboard-activity"
-import { AdminDashboardAlerts } from "@/components/admin/admin-dashboard/admin-dashboard-alerts"
-import { AdminDashboardCharts } from "@/components/admin/admin-dashboard/admin-dashboard-charts"
-import { AdminDashboardDoctors } from "@/components/admin/admin-dashboard/admin-dashboard-doctors"
-import { AdminDashboardStats } from "@/components/admin/admin-dashboard/admin-dashboard-stats"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+"use client";
+import { AdminDashboardActivity } from "@/components/admin/admin-dashboard/admin-dashboard-activity";
+import { AdminDashboardAlerts } from "@/components/admin/admin-dashboard/admin-dashboard-alerts";
+import { AdminDashboardCharts } from "@/components/admin/admin-dashboard/admin-dashboard-charts";
+import { AdminDashboardDoctors } from "@/components/admin/admin-dashboard/admin-dashboard-doctors";
+import { AdminDashboardStats } from "@/components/admin/admin-dashboard/admin-dashboard-stats";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function AdminDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Tổng quan hệ thống</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Tổng quan hệ thống
+        </h1>
         <Tabs defaultValue="today" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="today">Hôm nay</TabsTrigger>
@@ -48,7 +56,9 @@ export default function AdminDashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Hoạt động gần đây</CardTitle>
-            <CardDescription>Các hoạt động mới nhất trên hệ thống</CardDescription>
+            <CardDescription>
+              Các hoạt động mới nhất trên hệ thống
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <AdminDashboardActivity />
@@ -65,5 +75,5 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

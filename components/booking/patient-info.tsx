@@ -1,27 +1,29 @@
-"use client"
+"use client";
 
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { InfoIcon } from 'lucide-react'
-import { useState } from "react"
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Patient } from "./type"
-import { format } from "date-fns"
-
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { InfoIcon } from "lucide-react";
+import { useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Patient } from "./type";
+import { format } from "date-fns";
 
 interface Pops {
-  patientInfo: Patient
-  patientChange: (patient: Patient) => void
+  patientInfo: Patient;
+  patientChange: (patient: Patient) => void;
 }
 
-export default function PatientInformation({ patientInfo, patientChange }: Pops) {
-  const [patient, setPatient] = useState<Patient>(patientInfo)
+export default function PatientInformation({
+  patientInfo,
+  patientChange,
+}: Pops) {
+  const [patient, setPatient] = useState<Patient>(patientInfo);
   const handleChange = (field: keyof Patient, value: string) => {
-    setPatient(prev => ({ ...prev, [field]: value }));
-    patientChange(patient)
+    setPatient((prev) => ({ ...prev, [field]: value }));
+    patientChange(patient);
   };
 
   return (
@@ -32,13 +34,17 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
         <InfoIcon className="h-5 w-5 text-blue-500 mt-0.5" />
         <div>
           <p className="text-blue-800 text-sm">
-            Vui lòng cung cấp thông tin chính xác để đảm bảo quá trình khám chữa bệnh diễn ra thuận lợi.
-            Thông tin của bạn sẽ được bảo mật theo quy định.
+            Vui lòng cung cấp thông tin chính xác để đảm bảo quá trình khám chữa
+            bệnh diễn ra thuận lợi. Thông tin của bạn sẽ được bảo mật theo quy
+            định.
           </p>
         </div>
       </div>
       <Card>
-        <CardHeader> <h2 className="text-xl font-semibold">Thông tin bệnh nhân</h2></CardHeader>
+        <CardHeader>
+          {" "}
+          <h2 className="text-xl font-semibold">Thông tin bệnh nhân</h2>
+        </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="space-y-2">
             <Label htmlFor="name">
@@ -67,9 +73,7 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">
-              Email
-            </Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
@@ -80,9 +84,7 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dob">
-              Ngày sinh
-            </Label>
+            <Label htmlFor="dob">Ngày sinh</Label>
             <Input
               id="dob"
               type="date"
@@ -96,27 +98,42 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
             <RadioGroup
               value={patient.gender}
               onValueChange={(value) => handleChange("gender", value)}
-              className="flex space-x-4"
-            >
+              className="flex space-x-4">
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="male" id="male" checked={patient.gender == "male"}/>
-                <Label htmlFor="male" className="cursor-pointer">Nam</Label>
+                <RadioGroupItem
+                  value="male"
+                  id="male"
+                  checked={patient.gender == "male"}
+                />
+                <Label htmlFor="male" className="cursor-pointer">
+                  Nam
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="female" id="female"  checked={patient.gender == "female"}/>
-                <Label htmlFor="female" className="cursor-pointer">Nữ</Label>
+                <RadioGroupItem
+                  value="female"
+                  id="female"
+                  checked={patient.gender == "female"}
+                />
+                <Label htmlFor="female" className="cursor-pointer">
+                  Nữ
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="other" id="other" checked={patient.gender == "other"}/>
-                <Label htmlFor="other" className="cursor-pointer">Khác</Label>
+                <RadioGroupItem
+                  value="other"
+                  id="other"
+                  checked={patient.gender == "other"}
+                />
+                <Label htmlFor="other" className="cursor-pointer">
+                  Khác
+                </Label>
               </div>
             </RadioGroup>
           </div>
 
           <div className="space-y-2 md:col-span-2 lg:col-span-4">
-            <Label htmlFor="address">
-              Địa chỉ
-            </Label>
+            <Label htmlFor="address">Địa chỉ</Label>
             <Input
               id="address"
               value={patient.address}
@@ -125,67 +142,16 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
             />
           </div>
         </CardContent>
-
       </Card>
 
       <Card>
-        <CardHeader> <h2 className="text-xl font-semibold">Thông tin y tế</h2></CardHeader>
+        <CardHeader>
+          {" "}
+          <h2 className="text-xl font-semibold">Thông tin y tế</h2>
+        </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-6 ">
-          <div className="space-y-2 col-span-1 md:col-span-2">
-            <Label htmlFor="bloodType">
-              Nhóm máu
-            </Label>
-            <Input
-              id="bloodType"
-              value={patient.bloodType}
-              onChange={(e) => handleChange("bloodType", e.target.value)}
-              placeholder="Mhóm máu"
-            />
-          </div>
-
-          <div className="space-y-2 col-span-1 md:col-span-2">
-            <Label htmlFor="height">
-              Chiều cao (Cm)
-            </Label>
-            <Input
-              id="height"
-              type="number"
-              value={patient.height}
-              onChange={(e) => handleChange("height", e.target.value)}
-              placeholder="Nhập chiều cao"
-              required
-            />
-          </div>
-
-          <div className="space-y-2 col-span-1 md:col-span-2">
-            <Label htmlFor="weight">
-              Cân nặng (Kg)
-            </Label>
-            <Input
-              id="weight"
-              type="number"
-              value={patient.weight}
-              onChange={(e) => handleChange("weight", e.target.value)}
-              placeholder="Nhập cân nặng"
-            />
-          </div>
-
           <div className="space-y-2 md:col-span-6 lg:col-span-3">
-            <Label htmlFor="chronicDiseases">
-              Bệnh nền
-            </Label>
-            <Textarea
-              id="chronicDiseases"
-              value={patient.chronicDiseases}
-              onChange={(e) => handleChange("chronicDiseases", e.target.value)}
-              placeholder="Bệnh nền"
-              rows={3}
-            />
-          </div>
-          <div className="space-y-2 md:col-span-6 lg:col-span-3">
-            <Label htmlFor="allergies">
-              Dị ứng
-            </Label>
+            <Label htmlFor="allergies">Dị ứng</Label>
             <Textarea
               id="allergies"
               value={patient.allergies}
@@ -195,9 +161,7 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
             />
           </div>
           <div className="space-y-2 md:col-span-6 lg:col-span-3">
-            <Label htmlFor="medicalHistory">
-              Tiền sử bệnh
-            </Label>
+            <Label htmlFor="medicalHistory">Tiền sử bệnh</Label>
             <Textarea
               id="medicalHistory"
               value={patient.medicalHistory}
@@ -206,33 +170,19 @@ export default function PatientInformation({ patientInfo, patientChange }: Pops)
               rows={3}
             />
           </div>
-          <div className="space-y-2 md:col-span-6 lg:col-span-3">
-            <Label htmlFor="vaccinations">
-              Vắc-xin đã tiêm
-            </Label>
-            <Textarea
-              id="vaccinations"
-              value={patient.vaccinations}
-              onChange={(e) => handleChange("vaccinations", e.target.value)}
-              placeholder=" Vắc-xin đã tiêm"
-              rows={3}
-            />
-          </div>
         </CardContent>
       </Card>
-
 
       <div className="flex items-start space-x-2 pt-4">
         <Checkbox id="terms" />
         <div className="grid gap-1.5 leading-none">
           <Label
             htmlFor="terms"
-            className="text-sm font-normal leading-snug text-gray-700"
-          >
+            className="text-sm font-normal leading-snug text-gray-700">
             Tôi đồng ý với các điều khoản dịch vụ và chính sách bảo mật
           </Label>
         </div>
       </div>
     </div>
-  )
+  );
 }

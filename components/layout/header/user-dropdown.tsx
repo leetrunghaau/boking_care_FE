@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   DropdownMenu,
@@ -7,36 +7,41 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu"
-import Image from "next/image"
-import { LogOut, User, Calendar, Settings, Bell, CalendarClock, History } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import useAuthStore from "@/store/auth"
-import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
-import http from "@/helper/axios"
+} from "@/components/ui/dropdown-menu";
+import Image from "next/image";
+import {
+  LogOut,
+  User,
+  Settings,
+  Bell,
+  CalendarClock,
+  History,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/auth";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import http from "@/helper/axios";
 
 export default function UserDropdown() {
-  const router = useRouter()
-  const { logOut } = useAuthStore()
-  const { toast } = useToast()
-  const [user, setUser] = useState<any | null>()
+  const router = useRouter();
+  const { logOut } = useAuthStore();
+  const { toast } = useToast();
+  const [user, setUser] = useState<any | null>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchAllFacilities = async () => {
       try {
         const res = await http.get<any>(`/sig/info`);
         setUser(res);
-        console.log("Fetched specialties:", res);
       } catch (err) {
-        const e = err as Error
+        const e = err as Error;
         toast({
           title: "Lỗi",
           description: e.message,
-          variant: "error"
-
-        })
+          variant: "error",
+        });
       } finally {
         setLoading(false);
       }
@@ -47,22 +52,19 @@ export default function UserDropdown() {
   const handleLogout = () => {
     logOut();
     toast({
-
       title: "Thành công!",
       description: "Bạn đã đăng xuất thành công.",
       variant: "success",
       duration: 2000,
-
-    })
-  }
+    });
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full"
-        >
+          className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full">
           {user?.img ? (
             <Image
               src={user.img}
@@ -88,40 +90,35 @@ export default function UserDropdown() {
 
         <DropdownMenuItem
           onClick={() => router.push("/benh-nhan")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <User className="w-4 h-4 mr-2" />
           Tài khoản
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/benh-nhan/thong-bao")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <Bell className="w-4 h-4 mr-2" />
           Thông báo
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/benh-nhan/lich-kham")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <CalendarClock className="w-4 h-4 mr-2" />
           Lịch khám
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/benh-nhan/lich-su-kham")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <History className="w-4 h-4 mr-2" />
           Lịch sử khám
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/benh-nhan/tai-khoan")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <Settings className="w-4 h-4 mr-2" />
           Cài đặt
         </DropdownMenuItem>
@@ -130,12 +127,11 @@ export default function UserDropdown() {
 
         <DropdownMenuItem
           onClick={handleLogout}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <LogOut className="w-4 h-4 mr-2 text-red-500" />
           <span className="text-red-500">Đăng xuất</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

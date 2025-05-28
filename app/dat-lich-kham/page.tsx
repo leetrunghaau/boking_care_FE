@@ -10,8 +10,6 @@ import SelectSpecialty from "@/components/booking/select-specialty";
 import { SelectDoctor } from "@/components/booking/select-doctor";
 import PatientInformation from "@/components/booking/patient-info";
 
-
-
 export default function BookingPage() {
   const [step, setStep] = useState(0);
   const [bookingData, setBookingData] = useState<BookingData>({
@@ -27,13 +25,12 @@ export default function BookingPage() {
       gender: "male",
       address: "123 Đường Lê Lợi, Quận 1, TP.HCM",
       reason: "Khám định kỳ",
-      bloodType: "O+",
-      height: 170,
-      weight: 65,
-      chronicDiseases: ["Tăng huyết áp", "Tiểu đường type 2"],
+
       allergies: ["Phấn hoa", "Penicillin"],
-      medicalHistory: ["Phẫu thuật ruột thừa năm 2015", "Chấn thương đầu gối năm 2018"],
-      vaccinations: ["COVID-19", "Cúm mùa", "Viêm gan B"]
+      medicalHistory: [
+        "Phẫu thuật ruột thừa năm 2015",
+        "Chấn thương đầu gối năm 2018",
+      ],
     },
   });
 
@@ -137,15 +134,13 @@ export default function BookingPage() {
           <button
             onClick={handleBack}
             className="text-gray-600 px-4 py-2 disabled:opacity-50"
-            disabled={step === 0}
-          >
+            disabled={step === 0}>
             Quay lại
           </button>
           <button
             onClick={handleNext}
             className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!canProceed()}
-          >
+            disabled={!canProceed()}>
             {step === 4 ? "Hoàn thành" : "Tiếp tục"}
           </button>
         </div>

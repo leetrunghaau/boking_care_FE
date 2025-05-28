@@ -1,22 +1,31 @@
-"use client"
+"use client";
 // app/auth/register/page.tsx
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import http from "@/helper/axios";
+import { registerSchema } from "@/schemas/registerSchema";
 
 export default function RegisterPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -24,119 +33,100 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     agreeTerms: false,
-  })
-  const [errors, setErrors] = useState({
+  });
+  const formErrors = {
     fullName: "",
     email: "",
     phone: "",
     password: "",
     confirmPassword: "",
     agreeTerms: "",
-  })
-  const router = useRouter()
-  const { toast } = useToast()
+  };
+
+  const [errors, setErrors] = useState(formErrors);
+
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear error when user types
     if (errors[name as keyof typeof errors]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }))
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  }
+  };
 
   const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev) => ({ ...prev, agreeTerms: checked }))
+    setFormData((prev) => ({ ...prev, agreeTerms: checked }));
     if (checked) {
-      setErrors((prev) => ({ ...prev, agreeTerms: "" }))
+      setErrors((prev) => ({ ...prev, agreeTerms: "" }));
     }
-  }
+  };
 
   const validateForm = () => {
-    let valid = true
-    const newErrors = { ...errors }
+    const result = registerSchema.safeParse(formData);
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Vui lòng nhập họ tên"
-      valid = false
+    if (!result.success) {
+      const zodErrors = result.error.flatten().fieldErrors;
+
+      setErrors({
+        fullName: zodErrors.fullName?.[0] || "",
+        email: zodErrors.email?.[0] || "",
+        phone: zodErrors.phone?.[0] || "",
+        password: zodErrors.password?.[0] || "",
+        confirmPassword: zodErrors.confirmPassword?.[0] || "",
+        agreeTerms: zodErrors.agreeTerms?.[0] || "",
+      });
+
+      return false;
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Vui lòng nhập email"
-      valid = false
-    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
-      newErrors.email = "Email không hợp lệ"
-      valid = false
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Vui lòng nhập số điện thoại"
-      valid = false
-    } else if (!/^[0-9]{10}$/.test(formData.phone)) {
-      newErrors.phone = "Số điện thoại không hợp lệ"
-      valid = false
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Vui lòng nhập mật khẩu"
-      valid = false
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự"
-      valid = false
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu"
-      valid = false
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp"
-      valid = false
-    }
-
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "Bạn phải đồng ý với điều khoản dịch vụ"
-      valid = false
-    }
-
-    setErrors(newErrors)
-    return valid
-  }
-
+    setErrors(formErrors);
+    return true;
+  };
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("dataa",formData )
-
+      const rs = await http.post<any>("/sig/signup", formData);
+      console.log("Form data:", formData);
       toast({
         title: "Đăng ký thành công",
         description: "Chào mừng bạn đến với BookingCare",
-      })
+        variant: "success",
+        duration: 2000,
+      });
 
-      router.push("/xac-thuc/dang-nhap")
+      router.push("/xac-thuc/dang-nhap");
     } catch (error) {
+      console.log("Form data:", formData);
+
+      console.log(error);
       toast({
         title: "Đăng ký thất bại",
         description: "Có lỗi xảy ra, vui lòng thử lại sau",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Đăng ký tài khoản</CardTitle>
-        <CardDescription className="text-center">Nhập thông tin của bạn để tạo tài khoản mới</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center">
+          Đăng ký tài khoản
+        </CardTitle>
+        <CardDescription className="text-center">
+          Nhập thông tin của bạn để tạo tài khoản mới
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -151,7 +141,9 @@ export default function RegisterPage() {
               disabled={isLoading}
               className={errors.fullName ? "border-red-500" : ""}
             />
-            {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
+            {errors.fullName && (
+              <p className="text-sm text-red-500">{errors.fullName}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -166,7 +158,9 @@ export default function RegisterPage() {
               disabled={isLoading}
               className={errors.email ? "border-red-500" : ""}
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -181,7 +175,9 @@ export default function RegisterPage() {
               disabled={isLoading}
               className={errors.phone ? "border-red-500" : ""}
             />
-            {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
+            {errors.phone && (
+              <p className="text-sm text-red-500">{errors.phone}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -200,12 +196,13 @@ export default function RegisterPage() {
               <button
                 type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+                onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -219,17 +216,20 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 disabled={isLoading}
-                className={errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                className={
+                  errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"
+                }
               />
               <button
                 type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-500">{errors.confirmPassword}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -240,24 +240,36 @@ export default function RegisterPage() {
                 onCheckedChange={handleCheckboxChange}
                 disabled={isLoading}
               />
-              <Label htmlFor="terms" className="text-sm font-normal leading-tight">
+              <Label
+                htmlFor="terms"
+                className="text-sm font-normal leading-tight">
                 Tôi đồng ý với{" "}
-                <Link href="/terms" className="text-teal-600 hover:text-teal-700 font-medium">
+                <Link
+                  href="/terms"
+                  className="text-teal-600 hover:text-teal-700 font-medium">
                   Điều khoản dịch vụ
                 </Link>{" "}
                 và{" "}
-                <Link href="/privacy" className="text-teal-600 hover:text-teal-700 font-medium">
+                <Link
+                  href="/privacy"
+                  className="text-teal-600 hover:text-teal-700 font-medium">
                   Chính sách bảo mật
                 </Link>
               </Label>
             </div>
-            {errors.agreeTerms && <p className="text-sm text-red-500">{errors.agreeTerms}</p>}
+            {errors.agreeTerms && (
+              <p className="text-sm text-red-500">{errors.agreeTerms}</p>
+            )}
           </div>
 
-          <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700"
+            disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang đăng ký...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang đăng
+                ký...
               </>
             ) : (
               "Đăng ký"
@@ -270,7 +282,9 @@ export default function RegisterPage() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500">Hoặc đăng ký với</span>
+            <span className="bg-white px-2 text-gray-500">
+              Hoặc đăng ký với
+            </span>
           </div>
         </div>
 
@@ -311,11 +325,13 @@ export default function RegisterPage() {
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
           Đã có tài khoản?{" "}
-          <Link href="/xac-thuc/dang-nhap" className="text-teal-600 hover:text-teal-700 font-medium">
+          <Link
+            href="/xac-thuc/dang-nhap"
+            className="text-teal-600 hover:text-teal-700 font-medium">
             Đăng nhập
           </Link>
         </p>
       </CardFooter>
     </Card>
-  )
+  );
 }
