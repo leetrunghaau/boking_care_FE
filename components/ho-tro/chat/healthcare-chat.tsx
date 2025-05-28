@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChatBubble } from "./chat-bubble";
+import { ChatBubble } from "../chat-bubble";
 import { Send, Phone, FileText, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -141,12 +141,13 @@ export function HealthcareChat() {
           <div className="text-center py-8">
             <div className="bg-blue-50 rounded-lg p-6 max-w-md mx-auto">
               <h3 className="font-semibold text-gray-800 mb-2">
-                Welcome to HealthCare AI
+                Chào mừng đến với Booking Care AI. Tôi là Medly!
               </h3>
               <p className="text-sm text-gray-600 mb-4">
-                I'm here to help with general health questions and guidance. How
-                can I assist you today?
+                Tôi ở đây để hỗ trợ bạn với các câu hỏi sức khỏe chung và hướng
+                dẫn cần thiết. Hôm nay tôi có thể giúp gì cho bạn?
               </p>
+
               <div className="flex flex-wrap gap-2 justify-center">
                 {quickActions.map((action, index) => (
                   <Button
@@ -224,7 +225,7 @@ export function HealthcareChat() {
             <Button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="bg-blue-600 hover:bg-blue-700">
+              className="bg-teal-600 hover:bg-teal-700">
               <Send className="w-4 h-4" />
             </Button>
           </form>

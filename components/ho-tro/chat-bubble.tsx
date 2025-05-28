@@ -68,7 +68,7 @@ export function ChatBubble({
           className={cn(
             "rounded-2xl px-4 py-3 shadow-sm border",
             isUser
-              ? "bg-blue-600 text-white ml-auto"
+              ? "bg-teal-600 text-white ml-auto"
               : cn(
                   "bg-white text-gray-800",
                   !isUser && priority !== "low" && getPriorityColor(priority)
