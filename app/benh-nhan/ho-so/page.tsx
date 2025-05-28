@@ -1,9 +1,17 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Pencil, User, ShieldCheck, BriefcaseMedical, Heart, Airplay } from "lucide-react"
-import Link from "next/link"
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Pencil,
+  User,
+  ShieldCheck,
+  BriefcaseMedical,
+  Heart,
+  Airplay,
+} from "lucide-react";
+import Link from "next/link";
+import withAuth from "@/helper/withAuth";
 
 // Mock data for patient profile
 const mockPatientProfile = {
@@ -17,7 +25,7 @@ const mockPatientProfile = {
   insurance: {
     code: "BHYT-0123456789",
     provider: "Bảo hiểm Y tế Quốc gia",
-    validUntil: "2026-12-31"
+    validUntil: "2026-12-31",
   },
   medicalInfo: {
     bloodType: "O+",
@@ -26,12 +34,12 @@ const mockPatientProfile = {
     chronicDiseases: ["Tăng huyết áp", "Tiểu đường type 2"],
     allergies: ["Penicillin"],
     medicalHistory: ["Phẫu thuật ruột thừa năm 2015", "Mổ khớp gối năm 2018"],
-    vaccinations: ["Phòng ngừa cúm hàng năm", "Tiêm phòng viêm gan B"]
-  }
-}
+    vaccinations: ["Phòng ngừa cúm hàng năm", "Tiêm phòng viêm gan B"],
+  },
+};
 
-export default function PatientProfilePage() {
-  const profile = mockPatientProfile
+function PatientProfilePage() {
+  const profile = mockPatientProfile;
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
@@ -39,11 +47,20 @@ export default function PatientProfilePage() {
       <section className="flex items-center justify-between gap-8">
         <div className="flex items-center gap-6">
           <div className="relative w-32 h-32 rounded-full ring-4 ring-teal-500 overflow-hidden">
-            <Image src={profile.avatar} alt="Avatar" fill className="object-cover" />
+            <Image
+              src={profile.avatar}
+              alt="Avatar"
+              fill
+              className="object-cover"
+            />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">{profile.name}</h1>
-            <p className="text-sm text-muted-foreground">Chào bạn, hãy cập nhật thông tin nếu có thay đổi.</p>
+            <h1 className="text-3xl font-bold text-slate-800">
+              {profile.name}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Chào bạn, hãy cập nhật thông tin nếu có thay đổi.
+            </p>
           </div>
         </div>
         <Link href="/benh-nhan/ho-so/chinh-sua">
@@ -60,11 +77,21 @@ export default function PatientProfilePage() {
           Thông tin cá nhân
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700">
-          <div><strong>Ngày sinh:</strong> {profile.dob}</div>
-          <div><strong>Giới tính:</strong> {profile.gender}</div>
-          <div><strong>Số điện thoại:</strong> {profile.phone}</div>
-          <div><strong>Email:</strong> {profile.email}</div>
-          <div><strong>Địa chỉ:</strong> {profile.address}</div>
+          <div>
+            <strong>Ngày sinh:</strong> {profile.dob}
+          </div>
+          <div>
+            <strong>Giới tính:</strong> {profile.gender}
+          </div>
+          <div>
+            <strong>Số điện thoại:</strong> {profile.phone}
+          </div>
+          <div>
+            <strong>Email:</strong> {profile.email}
+          </div>
+          <div>
+            <strong>Địa chỉ:</strong> {profile.address}
+          </div>
         </div>
       </section>
 
@@ -75,9 +102,15 @@ export default function PatientProfilePage() {
           Thông tin bảo hiểm y tế
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700">
-          <div><strong>Số thẻ:</strong> {profile.insurance.code}</div>
-          <div><strong>Nhà cung cấp:</strong> {profile.insurance.provider}</div>
-          <div><strong>Hiệu lực đến:</strong> {profile.insurance.validUntil}</div>
+          <div>
+            <strong>Số thẻ:</strong> {profile.insurance.code}
+          </div>
+          <div>
+            <strong>Nhà cung cấp:</strong> {profile.insurance.provider}
+          </div>
+          <div>
+            <strong>Hiệu lực đến:</strong> {profile.insurance.validUntil}
+          </div>
         </div>
       </section>
 
@@ -88,13 +121,30 @@ export default function PatientProfilePage() {
           Thông tin y tế
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-700">
-          <div><strong>Nhóm máu:</strong> {profile.medicalInfo.bloodType}</div>
-          <div><strong>Chiều cao:</strong> {profile.medicalInfo.height} cm</div>
-          <div><strong>Cân nặng:</strong> {profile.medicalInfo.weight} kg</div>
-          <div><strong>Bệnh nền:</strong> {profile.medicalInfo.chronicDiseases.join(", ")}</div>
-          <div><strong>Dị ứng:</strong> {profile.medicalInfo.allergies.join(", ")}</div>
-          <div><strong>Tiền sử bệnh:</strong> {profile.medicalInfo.medicalHistory.join(", ")}</div>
-          <div><strong>Vắc-xin đã tiêm:</strong> {profile.medicalInfo.vaccinations.join(", ")}</div>
+          <div>
+            <strong>Nhóm máu:</strong> {profile.medicalInfo.bloodType}
+          </div>
+          <div>
+            <strong>Chiều cao:</strong> {profile.medicalInfo.height} cm
+          </div>
+          <div>
+            <strong>Cân nặng:</strong> {profile.medicalInfo.weight} kg
+          </div>
+          <div>
+            <strong>Bệnh nền:</strong>{" "}
+            {profile.medicalInfo.chronicDiseases.join(", ")}
+          </div>
+          <div>
+            <strong>Dị ứng:</strong> {profile.medicalInfo.allergies.join(", ")}
+          </div>
+          <div>
+            <strong>Tiền sử bệnh:</strong>{" "}
+            {profile.medicalInfo.medicalHistory.join(", ")}
+          </div>
+          <div>
+            <strong>Vắc-xin đã tiêm:</strong>{" "}
+            {profile.medicalInfo.vaccinations.join(", ")}
+          </div>
         </div>
       </section>
 
@@ -106,14 +156,17 @@ export default function PatientProfilePage() {
         </h2>
         <div className="space-y-4 text-sm text-slate-700">
           <div>
-            <strong>Lần khám gần nhất:</strong> Khám tại Bệnh viện Đại học Y Dược TP.HCM, bác sĩ: TS.BS. Nguyễn Văn A
+            <strong>Lần khám gần nhất:</strong> Khám tại Bệnh viện Đại học Y
+            Dược TP.HCM, bác sĩ: TS.BS. Nguyễn Văn A
             <br />
             <strong>Chẩn đoán:</strong> Tăng huyết áp, yêu cầu theo dõi định kỳ.
             <br />
             <strong>Ngày khám:</strong> 2025-04-15
           </div>
           <Link href="/lich-su-kham">
-            <Button variant="outline" className="w-full text-sm">Xem chi tiết lịch sử khám</Button>
+            <Button variant="outline" className="w-full text-sm">
+              Xem chi tiết lịch sử khám
+            </Button>
           </Link>
         </div>
       </section>
@@ -131,5 +184,7 @@ export default function PatientProfilePage() {
         </div>
       </section>
     </main>
-  )
+  );
 }
+
+export default withAuth(PatientProfilePage, ["patient"]);

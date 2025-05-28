@@ -1,30 +1,26 @@
-// hoc/withAuth.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import useAuthStore from "@/store/auth";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
+import Forbidden from "@/app/forbidden";
+import Unauthorized from "@/app/unauthorized";
 
-const withAuth = (WrappedComponent: React.ComponentType<any>) => {
+type Role = "admin" | "patient" | "doctor";
+
+const withAuth = (
+  WrappedComponent: React.ComponentType<any>,
+  allowedRoles?: Role[]
+) => {
   const ComponentWithAuth = (props: any) => {
-    const router = useRouter();
-    const { isLoggedIn, hasHydrated } = useAuthStore();
     const { toast } = useToast();
+    const { isLoggedIn, role } = useAuthStore();
 
-    useEffect(() => {
-      if (hasHydrated && !isLoggedIn) {
-        toast({
-          title: "Chưa đăng nhập",
-          description: "Vui lòng đăng nhập để tiếp tục.",
-          variant: "destructive",
-        });
-        router.replace("/xac-thuc/dang-nhap");
-      }
-    }, [hasHydrated, isLoggedIn]);
+    if (!isLoggedIn) {
+      return <Unauthorized />;
+    }
 
-    if (!hasHydrated || !isLoggedIn) {
-      return null;
+    if (allowedRoles && !allowedRoles.includes(role as Role)) {
+      return <Forbidden />;
     }
 
     return <WrappedComponent {...props} />;

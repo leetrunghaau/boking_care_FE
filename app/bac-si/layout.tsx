@@ -1,9 +1,8 @@
 "use client";
 import Footer from "@/components/layout/footer";
 import MainHeader from "@/components/layout/header/main-header";
-import withAuth from "@/helper/withAuth";
 
-export default withAuth(function DoctorsLayout({
+export default function DoctorsLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,4 +14,4 @@ export default withAuth(function DoctorsLayout({
       <Footer />
     </div>
   );
-});
+}
