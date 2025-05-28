@@ -12,18 +12,48 @@ import Image from "next/image"
 import { LogOut, User, Calendar, Settings, Bell, CalendarClock, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import useAuthStore from "@/store/auth"
+import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react"
+import http from "@/helper/axios"
 
-export default function DoctorDropdown({
-  user,
-}: {
-  user: { name: string; avatar?: string }
-}) {
+export default function DoctorDropdown() {
   const router = useRouter()
+  const { logOut } = useAuthStore()
+  const { toast } = useToast()
+  const [doctor, setDoctor] = useState<any | null>()
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchAllFacilities = async () => {
+      try {
+        const res = await http.get<any>(`/sig/info`);
+        setDoctor(res);
+        console.log("Fetched specialties:", res);
+      } catch (err) {
+        const e = err as Error
+        toast({
+          title: "Lỗi",
+          description: e.message,
+          variant: "error"
 
+        })
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllFacilities();
+  }, []);
   const handleLogout = () => {
-    // Xử lý đăng xuất ở đây (xoá token, gọi API, v.v.)
-    alert("Đăng xuất thành công")
-    router.push("/xac-thuc/dang-nhap")
+    logOut();
+    toast({
+
+      title: "Thành công!",
+      description: "Bạn đã đăng xuất thành công.",
+      variant: "success",
+      duration: 2000,
+
+    })
   }
 
   return (
@@ -33,9 +63,9 @@ export default function DoctorDropdown({
           variant="ghost"
           className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full"
         >
-          {user.avatar ? (
+          {doctor?.img ? (
             <Image
-              src={user.avatar}
+              src={doctor?.img }
               alt="Avatar"
               width={32}
               height={32}
@@ -45,51 +75,51 @@ export default function DoctorDropdown({
             <User className="w-6 h-6 text-slate-600 dark:text-white" />
           )}
           <span className="hidden md:inline font-medium text-sm text-slate-700 dark:text-white">
-            {user.name}
+            {doctor?.name ?? ""}
           </span>
         </Button>
       </DropdownMenuTrigger>
-      
-<DropdownMenuContent className="w-56" align="end">
-  <DropdownMenuLabel className="text-sm">
-    Xin chào, {user.name}
-  </DropdownMenuLabel>
-  <DropdownMenuSeparator />
 
-  <DropdownMenuItem
-    onClick={() => router.push("/doctor/profile")}
-    className="hover:cursor-pointer"
-  >
-    <User className="w-4 h-4 mr-2" />
-    Hồ sơ cá nhân
-  </DropdownMenuItem>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel className="text-sm">
+          Xin chào, {doctor?.name ?? ""}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
 
-  <DropdownMenuItem
-    onClick={() => router.push("/doctor/notifications")}
-    className="hover:cursor-pointer"
-  >
-    <Bell className="w-4 h-4 mr-2" />
-    Thông báo
-  </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/doctor/profile")}
+          className="hover:cursor-pointer"
+        >
+          <User className="w-4 h-4 mr-2" />
+          Hồ sơ cá nhân
+        </DropdownMenuItem>
 
-  <DropdownMenuItem
-    onClick={() => router.push("/doctor/settings")}
-    className="hover:cursor-pointer"
-  >
-    <Settings className="w-4 h-4 mr-2" />
-    Cài đặt
-  </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/doctor/notifications")}
+          className="hover:cursor-pointer"
+        >
+          <Bell className="w-4 h-4 mr-2" />
+          Thông báo
+        </DropdownMenuItem>
 
-  <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => router.push("/doctor/settings")}
+          className="hover:cursor-pointer"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Cài đặt
+        </DropdownMenuItem>
 
-  <DropdownMenuItem
-    onClick={handleLogout}
-    className="hover:cursor-pointer"
-  >
-    <LogOut className="w-4 h-4 mr-2 text-red-500" />
-    <span className="text-red-500">Đăng xuất</span>
-  </DropdownMenuItem>
-</DropdownMenuContent>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="hover:cursor-pointer"
+        >
+          <LogOut className="w-4 h-4 mr-2 text-red-500" />
+          <span className="text-red-500">Đăng xuất</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   )
 }

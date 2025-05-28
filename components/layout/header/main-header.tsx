@@ -3,22 +3,14 @@
 import Link from "next/link"
 import { Stethoscope } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { UserCircle, LogOut } from "lucide-react"
 import UserDropdown from "./user-dropdown"
+import useAuthStore from "@/store/auth"
+import DoctorDropdown from "./doctor-dropdown"
+import { useRouter } from 'next/navigation';
 
 export default function MainHeader() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true) // Giả sử trạng thái đăng nhập
-  const [userInfo, setUserInfo] = useState({
-    name: "Nguyễn Văn A", // Tên người dùng
-    avatar: "/placeholder.svg", // Ảnh đại diện mặc định
-  })
-
-  const handleLogout = () => {
-    // Xử lý đăng xuất (ví dụ xóa token, hoặc session)
-    setIsLoggedIn(false)
-    alert("Đã đăng xuất!")
-  }
+  const { isLoggedIn, role } = useAuthStore()
+  const router = useRouter()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -34,49 +26,49 @@ export default function MainHeader() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-6">
-          <Link href="/chuyen-khoa" className="text-md font-medium hover:text-teal-600 transition-colors">
+          <div  onClick={()=>{router.push("/chuyen-khoa")}} className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Chuyên khoa
-          </Link>
-          <Link href="/co-so-y-te" className="text-md font-medium hover:text-teal-600 transition-colors">
+          </div>
+          <div  onClick={()=>{router.push("/co-so-y-te")}} className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Cơ sở y tế
-          </Link>
-          <Link href="/bac-si" className="text-md font-medium hover:text-teal-600 transition-colors">
+          </div>
+          <div  onClick={()=>{router.push("/bac-si")}} className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Bác sĩ
-          </Link>
-          <Link href="/dat-lich-kham" className="text-md font-medium hover:text-teal-600 transition-colors">
+          </div>
+          <div  onClick={()=>{router.push("/dat-lich-kham")}} className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Đặt lịch khám
-          </Link>
-          <Link href="/huong-dan" className="text-md font-medium hover:text-teal-600 transition-colors">
+          </div>
+          <div onClick={()=>{router.push("/huong-dan")}} className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Hướng dẫn
-          </Link>
+          </div>
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-5">
           <>
-          <Link
-                  href="/benh-nhan"
-                  className="text-sm font-medium hover:text-teal-600 transition-colors hidden sm:inline-flex"
-                >
-                  Hỗ trợ
-                </Link>
+            <Link
+              href="/benh-nhan"
+              className="text-sm font-medium hover:text-teal-600 transition-colors hidden sm:inline-flex"
+              onClick={()=>{router.push("/co-so-y-te")}}
+            >
+              Hỗ trợ
+            </Link>
             {isLoggedIn ? (
-              <UserDropdown user={userInfo} />
+              role === "patient" ? (
+                <UserDropdown />
+              ) : (
+                <DoctorDropdown />
+              )
             ) : (
               <>
                 
-                <Link
-                  href="/xac-thuc/dang-nhap">
-                  <Button variant="outline" className="hidden md:inline-flex">
+                  <Button variant="outline" className="hidden md:inline-flex" onClick={()=>{router.push("/xac-thuc/dang-nhap")}}>
                     Đăng nhập
                   </Button>
-                </Link>
-                <Link
-                  href="/xac-thuc/dang-ky">
-                  <Button className="bg-teal-600 hover:bg-teal-700">Đăng ký</Button>
-                </Link>
+                  <Button className="bg-teal-600 hover:bg-teal-700" onClick={()=>{router.push("/xac-thuc/dang-ky")}}>Đăng ký</Button>
               </>
             )}
+
 
           </>
         </div>

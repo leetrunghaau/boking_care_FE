@@ -53,129 +53,8 @@ export default function DoctorDetailPage() {
     fetchDoctors();
   }, []);
 
-  const doctorAbout = () => {
-    return (
-      <div className="space-y-8">
-        {/* Giới thiệu về bác sĩ */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">Giới thiệu về bác sĩ</h2>
-          <p className="text-muted-foreground">{doctor?.about}</p>
-        </div>
 
-        {/* Chuyên môn */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Chuyên môn</h3>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {doctor?.technique.map((spec: string, index: number) => (
-              <li key={index} className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                <span>{spec}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        {/* Học vấn */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Học vấn</h3>
-          <ul className="space-y-4">
-            {doctor?.education.map((edu: any, index: number) => (
-              <li key={index} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="h-5 w-5 text-teal-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{edu.degree}</p>
-                  <p className="text-muted-foreground">
-                    {edu.school} • {edu.year}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Giải thưởng */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Giải thưởng</h3>
-          <ul className="space-y-4">
-            {doctor?.awards.map((award: any, index: number) => (
-              <li key={index} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Award className="h-5 w-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{award.title}</p>
-                  <p className="text-muted-foreground">{award.year}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Nghiên cứu & Xuất bản */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Nghiên cứu & Xuất bản</h3>
-          <ul className="space-y-4">
-            {doctor?.analysis.map((pub: any, index: number) => (
-              <li key={index} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-medium">{pub.title}</p>
-                  <p className="text-muted-foreground">
-                    {pub.journal} • {pub.year}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    )
-  }
-
-  const doctorExperience = () => {
-    return (
-      <div className="space-y-8">
-        {/* Kinh nghiệm làm việc */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">Kinh nghiệm làm việc</h2>
-          <ul className="space-y-6">
-            {doctor?.experience
-              .map((exp:any, index: number) => (
-                <li
-                  key={index}
-                  className="relative pl-8 pb-6 border-l-2 border-teal-200 last:border-l-0 last:pb-0"
-                >
-                  <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-teal-600"></div>
-                  <div className="mb-1">
-                    <span className="inline-block px-2 py-1 text-xs font-medium bg-teal-100 text-teal-800 rounded">
-                      {exp.period}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold">{exp.position}</h3>
-                  <p className="text-muted-foreground">{exp.hospital}</p>
-                </li>
-              ))}
-          </ul>
-        </div>
-
-        {/* Ngôn ngữ */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Ngôn ngữ</h3>
-          <div className="flex flex-wrap gap-2">
-            {doctor?.language.map((lang: string, index: number) => (
-              <Badge key={index} variant="outline" className="bg-slate-50">
-                {lang}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
   return (
     <>
       <section className="my-10">
@@ -262,11 +141,12 @@ export default function DoctorDetailPage() {
                 </TabsList>
 
                 <TabsContent value="about" className="space-y-6">
-                  {doctorAbout()}
+                  <DoctorAbout doctor={doctor}/>
                 </TabsContent>
 
                 <TabsContent value="experience" className="space-y-6">
-                  {doctorExperience()}
+                  <DoctorExperience doctor={doctor} />
+
                 </TabsContent>
 
                 <TabsContent value="reviews">

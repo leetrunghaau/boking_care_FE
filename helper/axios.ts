@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import useAuthStore from '@/store/auth';
 
+
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API}`,
   headers: {
@@ -10,18 +11,19 @@ const axiosInstance: AxiosInstance = axios.create({
 
 // Gắn token tự động
 axiosInstance.interceptors.request.use((config) => {
-  const { id, isLoggedIn } = useAuthStore.getState();
+  const { token, isLoggedIn } = useAuthStore.getState(); 
+
   if (isLoggedIn && config.headers) {
-    config.headers.Authorization = `Bearer ${id}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
-
 const handleResponse = <T>(response: any): T => {
   if (response?.data?.message == 'Ok') {
     return response.data.data as T;
   }
-  throw new Error(response?.data?.message || 'Unknown error');
+  throw new Error(response?.data?.message || 'Đã xảy ra lỗi');
 };
 
 // Helper chung

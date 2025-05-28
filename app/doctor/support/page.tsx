@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SupportTicketList } from "@/components/doctor-site/support/support-ticket-list"
-import { CreateTicketForm } from "@/components/doctor-site/support/create-ticket-form"
-import { SupportHeader } from "@/components/doctor-site/support/support-header"
-import { SupportFAQ } from "@/components/doctor-site/support/support-faq"
-import { SupportStats } from "@/components/doctor-site/support/support-stats"
 import { Ticket } from "@/types/support"
+import { SupportHeader } from "@/components/doctor/doctor-support/support-header"
+import { SupportStats } from "@/components/doctor/doctor-support/support-stats"
+import { SupportTicketList } from "@/components/doctor/doctor-support/support-ticket-list"
+import { CreateTicketForm } from "@/components/doctor/doctor-support/create-ticket-form"
+import { SupportFAQ } from "@/components/doctor/doctor-support/support-faq"
 
 // Dữ liệu mẫu cho các ticket hỗ trợ
 const sampleTickets: Ticket[] = [

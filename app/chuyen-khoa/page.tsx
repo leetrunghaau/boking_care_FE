@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import http from "@/helper/axios"
 import { CardLoading, Loading } from "@/components/ui/loading"
+import { useToast } from "@/hooks/use-toast"
 
 interface Specialty {
-  id:number;
+  id: number;
   name: string;
   slug: string;
   title: string;
@@ -19,6 +20,7 @@ interface Specialty {
 export default function SpecialtyListPage() {
   const [specialties, setSpecialties] = useState<Specialty[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +29,13 @@ export default function SpecialtyListPage() {
         const res = await http.get<Specialty[]>("/specialties")
         setSpecialties(res);
       } catch (err) {
-        console.error("Failed to fetch doctors:", err);
+        const e = err as Error
+        toast({
+          title: "Đăng nhập thất bại",
+          description: e.message || "Đã có lỗi xảy ra",
+          variant: "error",
+          duration: 2000
+        })
       } finally {
         setIsLoading(false);
       }

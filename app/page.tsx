@@ -15,11 +15,14 @@ import {
   Eye,
   Bone,
   Baby,
+  Users,
+  Clock,
 } from "lucide-react"
 import MainHeader from "@/components/layout/header/main-header"
 import Footer from '../components/layout/footer';
 import PopularSpecialties from "@/components/home/popular-specialties"
 import PopularDoctors from "@/components/home/popular-doctors"
+import HeroSection1 from "@/components/home/hero-section1"
 
 export default function HomePage() {
   return (
@@ -28,42 +31,14 @@ export default function HomePage() {
       <MainHeader />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-teal-600/90 to-blue-600/90 z-10" />
-          <Image
-            src="/placeholder.svg?height=600&width=1600"
-            alt="Medical background"
-            width={1600}
-            height={600}
-            className="w-full h-[500px] object-cover"
-          />
-          <div className="container relative z-20 py-20 text-white  mx-auto">
-            <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                Nền tảng y tế chăm sóc sức khỏe toàn diện
-              </h1>
-              <p className="text-lg md:text-xl">Đặt lịch khám bệnh, tư vấn sức khỏe trực tuyến với bác sĩ uy tín</p>
-
-              <div className="bg-white rounded-lg p-4 mt-8 shadow-lg">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                    <Input placeholder="Tìm bác sĩ, chuyên khoa, bệnh viện..." className="pl-10 h-12 bg-background" />
-                  </div>
-                  <Button className="h-12 px-8 bg-teal-600 hover:bg-teal-700 text-white">Tìm kiếm</Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HeroSection1/>
 
         <section className="py-16 bg-slate-50 px-16">
-           <PopularSpecialties/>
+          <PopularSpecialties />
         </section>
 
         <section className="py-16 px-16">
-          <PopularDoctors/>
+          <PopularDoctors />
         </section>
 
         <section className="py-16 bg-slate-50 px-16">
@@ -153,7 +128,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   )
 }

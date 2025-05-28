@@ -4,9 +4,12 @@ import { persist } from "zustand/middleware";
 
 interface AuthState {
     id: number | null;
-    name: string | null;
+    role: string | null;
     isLoggedIn: boolean;
-    logIn: (params: { id: number; name: string; }) => void;
+    token: string | null;
+    hasHydrated: boolean;
+    setHasHydrated: (state: boolean) => void;
+    logIn: (params: { id: number; token: string; role: string }) => void;
     logOut: () => void;
 }
 
@@ -15,15 +18,24 @@ const useAuthStore = create(
         (set) => ({
             id: null,
             name: null,
+            code: null,
             isLoggedIn: false,
-            fId: null,
-            logIn: ({ id, name}) =>
-                set({ id, name, isLoggedIn: true }),
+            token: null,
+            role: null,
+            hasHydrated: false,
+            setHasHydrated: (state) => set({ hasHydrated: state }),
+            logIn: ({ id, token, role }) =>
+                set({ id, isLoggedIn: true, token, role }),
             logOut: () =>
-                set({ id: null, name: null, isLoggedIn: false }),
+                set({ id: null, isLoggedIn: false, role: null, token: null }),
         }),
         {
             name: "auth-session",
+            onRehydrateStorage: () => (state) => {
+                if (state) {
+                    state.setHasHydrated(true);
+                }
+            },
 
         }
     )

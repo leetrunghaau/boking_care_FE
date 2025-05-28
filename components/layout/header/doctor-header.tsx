@@ -4,20 +4,9 @@ import Link from "next/link";
 import { Stethoscope } from "lucide-react";
 import { useState } from "react";
 import DoctorDropdown from "./doctor-dropdown";
+import useAuthStore from "@/store/auth";
 
 export default function DoctorHeader() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Giả sử trạng thái đăng nhập
-  const [userInfo, setUserInfo] = useState({
-    name: "Nguyễn Văn A", // Tên người dùng
-    avatar: "/placeholder.svg", // Ảnh đại diện mặc định
-  });
-
-  const handleLogout = () => {
-    // Xử lý đăng xuất (ví dụ xóa token, hoặc session)
-    setIsLoggedIn(false);
-    alert("Đã đăng xuất!");
-  };
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -68,9 +57,7 @@ export default function DoctorHeader() {
 
         {/* Actions */}
         <div className="flex items-center gap-5">
-          <>
-            <DoctorDropdown user={userInfo} />
-          </>
+          <DoctorDropdown />
         </div>
       </div>
     </header>

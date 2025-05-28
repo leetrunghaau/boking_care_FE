@@ -24,7 +24,7 @@ export default function AccountSettingsPage() {
         if (newPassword !== confirmPassword) {
             // alert("Mật khẩu không khớp")
             toast({
-                
+
                 title: "Thành công!",
                 description: "Bạn đã lưu thông tin thành công.",
                 action: (
@@ -33,7 +33,7 @@ export default function AccountSettingsPage() {
                     </Button>
                 ),
                 variant: "success",
-                 duration: 2000, 
+                duration: 2000,
 
             })
             return

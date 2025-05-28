@@ -61,10 +61,10 @@ export default function AdminHeader() {
                   Hỗ trợ
                 </Link>
             {isLoggedIn ? (
-              <UserDropdown user={userInfo} />
+              // <UserDropdown user={userInfo} />
+              <></>
             ) : (
               <>
-                
                 <Link
                   href="/xac-thuc/dang-nhap">
                   <Button variant="outline" className="hidden md:inline-flex">

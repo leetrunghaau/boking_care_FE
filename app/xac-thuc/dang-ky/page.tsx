@@ -113,6 +113,7 @@ export default function RegisterPage() {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
+      console.log("dataa",formData )
 
       toast({
         title: "Đăng ký thành công",

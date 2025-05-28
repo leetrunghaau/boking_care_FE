@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
+import http from "@/helper/axios"
+import useAuthStore from "@/store/auth"
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -25,8 +27,8 @@ export default function LoginPage() {
     email: "",
     password: "",
   })
-  const router = useRouter()
   const { toast } = useToast()
+  const { logIn } = useAuthStore()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -75,19 +77,25 @@ export default function LoginPage() {
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
+      const rs = await http.post<any>("/sig/login", formData)
       toast({
-        title: "Đăng nhập thành công",
-        description: "Chào mừng bạn quay trở lại BookingCare",
+        title: "Thành công!",
+        description: "Bạn đã đăng nhập thành công.",
+        variant: "success",
+        duration: 2000,
       })
-
-      router.push("/")
-    } catch (error) {
+      logIn({
+        id: rs.id,
+        token: rs.token,
+        role: rs.role
+      })
+    } catch (err) {
+      const e = err as Error;
       toast({
         title: "Đăng nhập thất bại",
-        description: "Email/số điện thoại hoặc mật khẩu không chính xác",
-        variant: "destructive",
+        description: e.message || "Đã có lỗi xảy ra",
+        variant: "warning",
+        duration: 2000
       })
     } finally {
       setIsLoading(false)

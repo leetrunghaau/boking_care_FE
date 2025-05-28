@@ -38,7 +38,7 @@ export default function DoctorFAQ({ slug }: Pops) {
   return (
     <div className="space-y-6">
       {/* Tiêu đề */}
-      <h2 className="text-xl font-bold mb-4">Câu hỏi thường gặp</h2>
+      <h2 className="text-xl font-bold mb-4">Hỏi đáp cùng bác sĩ</h2>
 
       {/* Danh sách các câu hỏi thường gặp */}
       <div className="space-y-4">
