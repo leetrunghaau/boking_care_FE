@@ -75,16 +75,7 @@ export default function DoctorDetailPage() {
                           className="object-cover"
                         />
                       </div>
-                      <div className="mt-4 flex justify-center md:justify-start gap-2">
-                        <Button variant="outline" size="icon" className="rounded-full h-9 w-9">
-                          <Heart className="h-4 w-4" />
-                          <span className="sr-only">Yêu thích</span>
-                        </Button>
-                        <Button variant="outline" size="icon" className="rounded-full h-9 w-9">
-                          <Share2 className="h-4 w-4" />
-                          <span className="sr-only">Chia sẻ</span>
-                        </Button>
-                      </div>
+
                     </div>
 
                     <div className="flex-1 text-center md:text-left">
@@ -94,19 +85,19 @@ export default function DoctorDetailPage() {
                       <div className="flex items-center gap-1 mt-2 justify-center md:justify-start">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="font-medium">{doctor?.rating}</span>
-                        <span className="text-muted-foreground">({doctor?.reviewCount} đánh giá)</span>
+                        <span className="text-muted-foreground">({doctor?.reviews} đánh giá)</span>
                       </div>
 
                       <div className="mt-4 space-y-2">
                         <div className="flex items-start gap-2 justify-center md:justify-start">
                           <Briefcase className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
                           <span>
-                            Chuyên khoa {doctor?.specialty?.name}
+                            {doctor?.specialty?.name ?? "Bác sĩ tổng hợp"}
                           </span>
                         </div>
                         <div className="flex items-start gap-2 justify-center md:justify-start">
                           <MapPin className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                          <span>{doctor?.hospital?.name}</span>
+                          <span>{doctor?.hospital?.address ?? (doctor?.address ?? "không có thông tin")}</span>
                         </div>
                         <div className="flex items-start gap-2 justify-center md:justify-start">
                           <Phone className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
@@ -133,15 +124,15 @@ export default function DoctorDetailPage() {
 
               {/* Tabs Section */}
               <Tabs defaultValue="about" className="mb-8">
-                <TabsList className="grid grid-cols-4 mb-6">
+                <TabsList className="grid grid-cols-3 mb-6">
                   <TabsTrigger value="about">Giới thiệu</TabsTrigger>
                   <TabsTrigger value="experience">Kinh nghiệm</TabsTrigger>
                   <TabsTrigger value="reviews">Đánh giá</TabsTrigger>
-                  <TabsTrigger value="faq">Câu hỏi</TabsTrigger>
+                  {/* <TabsTrigger value="faq">Câu hỏi</TabsTrigger> */}
                 </TabsList>
 
                 <TabsContent value="about" className="space-y-6">
-                  <DoctorAbout doctor={doctor}/>
+                  <DoctorAbout doctor={doctor} />
                 </TabsContent>
 
                 <TabsContent value="experience" className="space-y-6">
@@ -153,9 +144,9 @@ export default function DoctorDetailPage() {
                   <DoctorReviews slug={slug} />
                 </TabsContent>
 
-                <TabsContent value="faq">
-                  <DoctorFAQ slug={slug} />
-                </TabsContent>
+                {/* <TabsContent value="faq">
+                  <DoctorFAQ doctor={doctor}/>
+                </TabsContent> */}
               </Tabs>
 
               {/* Similar Doctors */}
@@ -204,39 +195,8 @@ export default function DoctorDetailPage() {
 
             {/* Sidebar */}
             <div className="flex flex-col gap-6">
-              <Card >
-                <CardContent className="p-6">
-                  <h2 className="text-lg font-bold mb-4">Đặt lịch khám</h2>
-
-                  <div className="space-y-4 mb-6">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Giá khám:</span>
-                      <span className="font-medium">{doctor?.price} đ</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Thời gian:</span>
-                      <span className="font-medium">30 phút</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Địa điểm:</span>
-                      <span className="font-medium">{doctor?.hospital?.name}</span>
-                    </div>
-                  </div>
-
-                  {/* <DoctorSchedule slug={slug} /> */}
-
-                  <div className="mt-6">
-                    <Button className="w-full bg-teal-600 hover:bg-teal-700">Đặt lịch khám</Button>
-                    <p className="text-xs text-center text-muted-foreground mt-2">
-                      Miễn phí đặt lịch, không mất phí khi hủy trước 24 giờ
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <HospitalInfo slug={slug} />
+             <DoctorSchedule slug={slug} />
+              <HospitalInfo doctor={doctor} />
 
             </div>
           </div>

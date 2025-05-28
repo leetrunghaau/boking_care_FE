@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-const steps = ["CHuyên khoa", "Bác sĩ", "Thời gian", "Thông tin", "Xác nhận"]
+const steps = ["Triệu chứng", "Bác sĩ", "Thời gian", "Thông tin", "Xác nhận"]
 
 interface StepperProps {
   currentStep: number;

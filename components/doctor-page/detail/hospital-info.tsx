@@ -10,43 +10,13 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 
-interface Hospital {
-    id: number
-    name: string
-    address: string
-    img: string
-    slug: string
-    times: {
-        weekend: number
-        timeStart: number
-        timeEnd: number
-    }[]
-}
+
 
 interface Pops {
-    slug: string
+    doctor: any
 }
 
-export default function HospitalInfo({ slug }: Pops) {
-    const [hospital, setHospital] = useState<Hospital | null>(null)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                const res = await http.get<Hospital>(`/doctor-site/doctor/${slug}/hospital`)
-                setHospital(res);
-                console.log("fetch Hospital", res)
-            } catch (err) {
-                console.error("Failed to fetch Hospital:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [])
+export default function HospitalInfo({ doctor }: Pops) {
 
     return (
 
@@ -57,15 +27,15 @@ export default function HospitalInfo({ slug }: Pops) {
                 <div className="flex items-start gap-3 mb-4">
                     <div className="w-16 h-16 relative rounded overflow-hidden">
                         <Image
-                            src={hospital?.img ?? "/placeholder.svg?height=100&width=100&text=BV"}
-                            alt={hospital?.name ?? "Benh vien"}
+                            src={doctor?.hospital?.thumbnail ?? "/placeholder.svg?height=100&width=100&text=BV"}
+                            alt={doctor?.hospital?.name ?? "Benh vien"}
                             fill
                             className="object-cover"
                         />
                     </div>
                     <div>
-                        <h3 className="font-medium">{hospital?.name}</h3>
-                        <p className="text-sm text-muted-foreground">{hospital?.address}</p>
+                        <h3 className="font-medium">{doctor?.hospital?.name}</h3>
+                        <p className="text-sm text-muted-foreground">{doctor?.hospital?.address}</p>
                     </div>
                 </div>
 
@@ -75,7 +45,7 @@ export default function HospitalInfo({ slug }: Pops) {
                         <div>
                             <p className="font-medium">Giờ làm việc</p>
                             {
-                                getReadableTimeRanges(hospital?.times ?? []).map((time, i) => (
+                                getReadableTimeRanges(doctor?.hospital?.time ?? []).map((time, i) => (
                                     <p className="text-sm text-muted-foreground" key={i}>{time}</p>
                                 ))
                             }
@@ -92,7 +62,7 @@ export default function HospitalInfo({ slug }: Pops) {
                 </div>
 
                 <div className="mt-4">
-                    <Link href={`/co-so-y-te/${hospital?.slug}`}>
+                    <Link href={`/co-so-y-te/${doctor?.hospital?.slug}`}>
                         <Button variant="outline" className="w-full">
                             Xem thông tin bệnh viện
                         </Button>

@@ -50,7 +50,7 @@ export default function PopularDoctors() {
                         </div>
                         <CardContent className="p-4">
                             <h3 className="font-bold text-lg mb-1">Bác sĩ {doctor.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">{doctor.specialty.name}</p>
+                            <p className="text-sm text-muted-foreground mb-2">{doctor.specialty ?doctor.specialty.name: "Bác sĩ tự do" }</p>
                             <div className="flex items-center gap-1 mb-3">
                                 {Array(5)
                                     .fill(0)

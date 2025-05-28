@@ -6,7 +6,7 @@ import SubHeader from "@/components/sub-header";
 import Summary from "@/components/booking/summary";
 import SelectTime from "@/components/booking/select-time";
 import { BookingData } from "@/components/booking/type";
-import SelectSpecialty from "@/components/booking/select-specialty";
+import SelectSpecialty from "@/components/booking/symptom-input";
 import { SelectDoctor } from "@/components/booking/select-doctor";
 import PatientInformation from "@/components/booking/patient-info";
 
@@ -49,7 +49,7 @@ export default function BookingPage() {
   const canProceed = () => {
     switch (step) {
       case 0:
-        return bookingData.specialty !== null;
+        return true;
       case 1:
         return bookingData.doctor !== null;
       case 2:
@@ -69,15 +69,11 @@ export default function BookingPage() {
     switch (step) {
       case 0:
         return (
-          <SelectSpecialty
-            selectedSpecialty={bookingData.specialty}
-            onSpecialtySelect={(specialty) => updateBookingData({ specialty })}
-          />
+          <SelectSpecialty/>
         );
       case 1:
         return (
           <SelectDoctor
-            specialty={bookingData.specialty}
             selectedDoctor={bookingData.doctor}
             onDoctorSelect={(doctor) => updateBookingData({ doctor })}
           />
@@ -109,19 +105,8 @@ export default function BookingPage() {
 
   return (
     <>
-      <section className="my-10">
-        <div className="container mx-auto px-6">
-          <SubHeader
-            title="Đặt lịch khám trực tuyến"
-            breadcrumbs={[
-              { label: "Trang chủ", href: "/" },
-              { label: "Đặt lịch khám", href: "/dat-lich-kham" },
-            ]}
-          />
-        </div>
-      </section>
 
-      <section>
+      <section className="mt-10">
         <Stepper currentStep={step} stepClick={(i) => setStep(i)} />
       </section>
 

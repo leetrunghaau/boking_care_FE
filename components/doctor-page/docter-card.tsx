@@ -30,7 +30,7 @@ export default function DoctorCard({ doctor }: Pops) {
                   {doctor.name}
                 </Link>
               </h3>
-              <p className="text-sm text-muted-foreground">{doctor.specialty.name}</p>
+              <p className="text-sm text-muted-foreground">{doctor.specialty?.name ?? "Bác sĩ tổng hợp"}</p>
             </div>
           </div>
           
@@ -45,11 +45,11 @@ export default function DoctorCard({ doctor }: Pops) {
             </div>
             
             <div className="text-sm mb-2">
-              <span className="font-medium">Bệnh viện:</span> {doctor.hospital.name}
+              <span className="font-medium">Bệnh viện:</span> {doctor.hospital?.name ?? "Bác sĩ tư nhân"}
             </div>
             
             <div className="text-sm">
-              <span className="font-medium">Địa điểm:</span> {doctor.hospital.address}
+              <span className="font-medium">Địa điểm:</span> {doctor?.hospital?.address ?? (doctor?.address ?? "không có thông tin")}
             </div>
             
             <div className="mt-4">

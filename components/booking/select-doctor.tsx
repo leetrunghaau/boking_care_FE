@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { Briefcase, Clock, ListChecks, MapPin, Phone, Star, Stethoscope } from 'lucide-react';
+import { Briefcase, ChevronRight, Clock, ListChecks, MapPin, Phone, Star, Stethoscope } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { CardLoading } from '@/components/ui/loading';
@@ -19,26 +19,25 @@ import { Doctor, Hospital, Specialty } from './type';
 
 
 interface Pops {
-    specialty: Specialty | null
     onDoctorSelect: (doctorId: Doctor) => void
-    selectedDoctor?: Doctor | null
-
+    selectedDoctor?: any | null
 }
 
+export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
 
-export function SelectDoctor({ specialty, onDoctorSelect, selectedDoctor }: Pops) {
 
-    const [hospitals, setHospitals] = useState<Hospital[]>([])
-    const [hospital, setHospital] = useState<Hospital | null>(null)
-    const [doctors, setDoctors] = useState<Doctor[]>([])
+    const [hospitals, setHospitals] = useState<any[]>([])
+    const [hospital, setHospital] = useState<any | null>(null)
+    const [doctors, setDoctors] = useState<any[]>([])
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchSpecialties = async () => {
             setLoading(true);
             try {
-                const resDoctors = await http.get<Doctor[]>(`/booking/doctors`);
-                setDoctors(resDoctors);
+                const rs = await http.get<Doctor[]>(`/booking/doctors`);
+                console.log(" doctors", rs)
+                setDoctors(rs);
             } catch (err) {
                 console.error("Failed to fetch doctors:", err);
             } finally {
@@ -50,7 +49,7 @@ export function SelectDoctor({ specialty, onDoctorSelect, selectedDoctor }: Pops
 
 
 
-    const doctorCard = (dt: Doctor) => {
+    const doctorCard = (dt: any) => {
         return (
             <Card
                 key={dt.id}
@@ -58,7 +57,7 @@ export function SelectDoctor({ specialty, onDoctorSelect, selectedDoctor }: Pops
                     ? "border-2 border-teal-600"
                     : "border border-gray-200"
                     }`}
-                onClick={() =>onDoctorSelect(dt)}
+                onClick={() => onDoctorSelect(dt)}
             >
                 <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row gap-4">
@@ -101,16 +100,16 @@ export function SelectDoctor({ specialty, onDoctorSelect, selectedDoctor }: Pops
 
                             <div className="mt-2">
                                 {
-                                    specialty &&
+                                    dt.specialty &&
                                     <div className="flex items-start gap-2 justify-center md:justify-start mb-1">
                                         <Briefcase className="h-4 w-4 text-teal-600 flex-shrink-0 " />
                                         <span className='text-sm text-gray-600 ml-2'>
-                                            Chuyên khoa {specialty.name} • {dt?.experience} kinh nghiệm
+                                            Chuyên khoa {dt.specialty.name}
                                         </span>
                                     </div>
                                 }
                                 {
-                                    dt?.hospital?.name &&
+                                    dt.hospital &&
                                     <div className="flex items-start gap-2 justify-center md:justify-start mb-1">
                                         <Stethoscope className="h-4 w-4 text-teal-600 flex-shrink-0 " />
                                         <span className='text-sm text-gray-600 ml-2'>{dt.hospital.name}</span>
@@ -132,74 +131,78 @@ export function SelectDoctor({ specialty, onDoctorSelect, selectedDoctor }: Pops
         )
     }
 
-    const hospitalCard = (hpt: Hospital) => {
+    const hospitalCard = (hpt: any) => {
         return (
-            <Card>
-                <CardHeader>
-                    <h2 className="text-lg font-bold mb-4">Thông tin cơ sở y tế</h2>
-                </CardHeader>
-                <CardContent className="p-6">
+            <>
+                <div className='mb-3'>
+                    <h3 className="font-medium">{hpt?.name}</h3>
+                    <p className="text-sm text-muted-foreground">{hpt?.address}</p>
+                </div>
 
-                    <div className="flex flex-col items-start gap-3 mb-4">
-                        <div className="w-full h-32 relative rounded overflow-hidden">
-                            <Image
-                                src={hpt?.img ?? "/placeholder.svg?height=100&width=100&text=BV"}
-                                alt={hpt?.name ?? "Benh vien"}
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
+                <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                        <Clock className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
                         <div>
-                            <h3 className="font-medium">{hpt?.name}</h3>
-                            <p className="text-sm text-muted-foreground">{hpt?.address}</p>
+                            <p className="font-medium">Giờ làm việc</p>
+                            {
+                                getReadableTimeRanges(hpt?.time ?? []).map((time, i) => (
+                                    <p className="text-sm text-muted-foreground" key={i}>{time}</p>
+                                ))
+                            }
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <div className="flex items-start gap-2">
-                            <Clock className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <p className="font-medium">Giờ làm việc</p>
-                                {
-                                    getReadableTimeRanges(hpt?.times ?? []).map((time, i) => (
-                                        <p className="text-sm text-muted-foreground" key={i}>{time}</p>
-                                    ))
-                                }
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-2">
-                            <Phone className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <p className="font-medium">Liên hệ</p>
-                                <p className="text-sm text-muted-foreground"> {formatPhoneNumber(hpt.phone)}</p>
-                            </div>
+                    <div className="flex items-start gap-2">
+                        <Phone className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="font-medium">Liên hệ</p>
+                            <p className="text-sm text-muted-foreground"> {formatPhoneNumber(hpt.phone)}</p>
                         </div>
                     </div>
+                </div>
 
-                    <div className="mt-4">
-                        <Link href={`/co-so-y-te/${hospital?.slug}`}>
-                            <Button variant="outline" className="w-full">
-                                Xem thông tin bệnh viện
-                            </Button>
-                        </Link>
-                    </div>
-                </CardContent>
-            </Card>
+                <div className="mt-4">
+                    <Link href={`/co-so-y-te/${hospital?.slug}`}>
+                        <Button variant="outline" className="w-full">
+                            Xem thông tin bệnh viện
+                        </Button>
+                    </Link>
+                </div>
+            </>
 
         )
 
     }
 
+    const specialtyCard = (spt: any) => {
+        const Icon = getIconByName(spt.icon)
+        return (
+            <div className='flex gap-4 justify-around items-center'>
+                <div className="w-14 h-14 flex items-center justify-center rounded-full bg-teal-50">
+                    <Icon className="w-7 h-7 text-teal-600" />
+                </div>
+                <div>
 
+                    <h3 className="text-lg font-semibold text-slate-800">{spt.name}</h3>
+                    <p className="text-sm text-gray-600 mb-2">{spt.title}</p>
+
+                    <div className="flex items-center w-full mx-auto gap-1 text-teal-600 text-sm mt-2 group-hover:underline">
+                        Xem chi tiết <ChevronRight className="w-4 h-4" />
+                    </div>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="grid md:grid-col-2 lg:grid-cols-3 mx-auto w-11/12 mb-6  gap-3">
-            <Card className="col-span-2 ">
-                <CardHeader> <h2 className="text-xl font-semibold"> Bác sĩ</h2></CardHeader>
-                <CardContent >
-                    <div className='grid grid-cols-5 gap-3'>
-                        <Input className="col-span-2 mb-3" placeholder='Tên bác sĩ' />
+            <Card className="col-span-2 row-span-2">
+                <CardHeader >
+                    <div className="flex gap-4 justify-around items-center ">
+                        <Input className="col-span-2 mb-3" placeholder='Nhập tên bác sĩ' />
                     </div>
+                </CardHeader>
+                <CardContent >
+
                     <ScrollArea className="h-96 flex flex-col gap-3">
                         <div className=" flex flex-col gap-4 mr-3">
                             {doctors.map(item => doctorCard(item))}
@@ -210,11 +213,36 @@ export function SelectDoctor({ specialty, onDoctorSelect, selectedDoctor }: Pops
                 </CardContent>
             </Card>
 
-            {
-                selectedDoctor
-                    ? hospitalCard(selectedDoctor.hospital)
-                    : <CardLoading />
-            }
+
+            <Card>
+                <CardHeader>
+                    <h2 className="text-lg font-bold ">Thông tin cơ sở y tế</h2>
+                </CardHeader>
+                <CardContent className="px-6 pb-0 gap-3">
+                    {
+                        selectedDoctor ? (
+                            selectedDoctor.hospital
+                                ? hospitalCard(selectedDoctor.hospital)
+                                : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Không có thông tin bệnh viện của bác sĩ.</p>
+                        ) : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Vui lòng chọn bác sĩ để xem thông tin.</p>
+                    }
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <h2 className="text-lg font-bold ">Thông tin chuyên khoa</h2>
+                </CardHeader>
+                <CardContent className="px-6  gap-3">
+                    {
+                        selectedDoctor ? (
+                            selectedDoctor.specialty
+                                ? specialtyCard(selectedDoctor.specialty)
+                                : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Không có thông tin chuyên khoa của bác sĩ.</p>
+                        ) : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Vui lòng chọn bác sĩ để xem thông tin.</p>
+
+                    }
+                </CardContent>
+            </Card>
         </div>
     )
 }
