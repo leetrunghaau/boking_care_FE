@@ -3,40 +3,74 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import http from '@/helper/axios';
 import { getIconByName } from '@/helper/icon-map';
 import { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { Briefcase, ChevronRight, Clock, ListChecks, MapPin, Phone, Star, Stethoscope } from 'lucide-react';
+import { Briefcase, ChevronRight, Clock, MapPin, Phone, Star, Stethoscope } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { CardLoading } from '@/components/ui/loading';
 import Link from 'next/link';
 import { getReadableTimeRanges } from '@/helper/time';
 import { Button } from '@/components/ui/button';
 import { formatPhoneNumber } from '@/helper/customNumView';
-import { Doctor, Hospital, Specialty } from './type';
+import BookingStore from '@/store/booking';
+import { Select, SelectContent, SelectValue } from '@/components/ui/select';
+import { SelectTrigger } from '@/components/ui/select';
+import { SelectItem } from '@/components/ui/select';
+import { TestTubeDiagonal } from 'lucide-react';
 
 
 interface Pops {
-    onDoctorSelect: (doctorId: Doctor) => void
-    selectedDoctor?: any | null
+    stepClick: (nextStep: boolean) => void
 }
 
-export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
-
-
-    const [hospitals, setHospitals] = useState<any[]>([])
-    const [hospital, setHospital] = useState<any | null>(null)
+export function SelectDoctor({ stepClick }: Pops) {
+    const { doctorsId, symptoms, isLoaded, setBooking } = BookingStore()
     const [doctors, setDoctors] = useState<any[]>([])
+    const [doctor, setDoctor] = useState<any | null>(null)
     const [loading, setLoading] = useState(false);
+    const [doctorLoad, setDoctorLoad] = useState<boolean>(false)
+
+    /// search state
+    const [specialties, setSpecialties] = useState<any[]>([])
+    const [specialty, setSpecialty] = useState<string>("all")
+    const [addresses, setAddreses] = useState<any[]>([])
+    const [address, setAddres] = useState<string>("all")
+
 
     useEffect(() => {
+        if (!isLoaded) return;
+        updateDoctor(doctorsId)
         const fetchSpecialties = async () => {
             setLoading(true);
             try {
-                const rs = await http.get<Doctor[]>(`/booking/doctors`);
-                console.log(" doctors", rs)
+                const query = symptoms.trim() && new URLSearchParams({ symptoms }).toString();
+                const rss = await http.get<any[]>(`/booking/specialties${query ? `?${query}` : ""}`);
+                const rsa = await http.get<any[]>(`/booking/addresses`);
+                setAddreses(rsa);
+                setSpecialties(rss);
+            } catch (err) {
+                console.error("Failed to fetch doctors:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSpecialties();
+    }, [isLoaded]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                setBooking({ doctorsId: null })
+
+                const queryParams = new URLSearchParams();
+                if (symptoms.trim()) queryParams.set("symptoms", symptoms.trim());
+                if (specialty !== "all") queryParams.set("specialty", specialty);
+                if (address !== "all") queryParams.set("address", address);
+                const queryString = queryParams.toString();
+                const url = `/booking/doctors${queryString ? `?${queryString}` : ""}`;
+                const rs = await http.get<any[]>(url);
+                console.log("url ========>", rs)
                 setDoctors(rs);
             } catch (err) {
                 console.error("Failed to fetch doctors:", err);
@@ -44,8 +78,34 @@ export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
                 setLoading(false);
             }
         };
-        fetchSpecialties();
-    }, []);
+
+        fetchData();
+    }, [ specialty, address]);
+
+
+
+    const updateDoctor = (id: number | null) => {
+        const fetchDoctor = async () => {
+            setDoctorLoad(true);
+            try {
+                const rs = await http.get<any>(`/booking/doctor/${id}`);
+                setDoctor(rs);
+            } catch (err) {
+                console.error("Failed to fetch doctors:", err);
+            } finally {
+                setDoctorLoad(false);
+                setBooking({ doctorsId: id })
+            }
+        };
+        if (id) {
+            fetchDoctor()
+        } else {
+            setDoctor(null)
+            setBooking({ doctorsId: null })
+        }
+    }
+
+
 
 
 
@@ -53,11 +113,11 @@ export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
         return (
             <Card
                 key={dt.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${selectedDoctor?.id === dt.id
+                className={`cursor-pointer transition-all hover:shadow-md ${doctor?.id == dt.id
                     ? "border-2 border-teal-600"
                     : "border border-gray-200"
                     }`}
-                onClick={() => onDoctorSelect(dt)}
+                onClick={() => { updateDoctor(dt.id) }}
             >
                 <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row gap-4">
@@ -162,7 +222,7 @@ export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
                 </div>
 
                 <div className="mt-4">
-                    <Link href={`/co-so-y-te/${hospital?.slug}`}>
+                    <Link href={`/co-so-y-te/${hpt?.slug}`}>
                         <Button variant="outline" className="w-full">
                             Xem thông tin bệnh viện
                         </Button>
@@ -193,12 +253,69 @@ export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
             </div>
         )
     }
+
+
     return (
         <div className="grid md:grid-col-2 lg:grid-cols-3 mx-auto w-11/12 mb-6  gap-3">
             <Card className="col-span-2 row-span-2">
                 <CardHeader >
-                    <div className="flex gap-4 justify-around items-center ">
-                        <Input className="col-span-2 mb-3" placeholder='Nhập tên bác sĩ' />
+                    <div className="grid md:grid-cols-2 gap-4  ">
+                        <Select value={specialty} onValueChange={(value) => {
+                            setSpecialty(value)
+                            updateDoctor(null)
+
+                        }} >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Chuyên khoa" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    <div className="flex gap-3 items-center">
+                                        <div className="w-7 h-7 flex items-center justify-center rounded-full bg-teal-50">
+                                            <TestTubeDiagonal className="w-5 h-5 text-teal-600" />
+                                        </div>
+                                        <p className=" text-slate-800">Tất cả chuyên khoa</p>
+                                    </div>
+                                </SelectItem>
+                                {specialties.map((item) => {
+                                    const Icon = getIconByName(item.icon)
+                                    return (
+
+                                        <SelectItem key={item.slug} value={String(item.id)}>
+                                            <div className="flex gap-3 items-center">
+                                                <div className="w-7 h-7 flex items-center justify-center rounded-full bg-teal-50">
+                                                    <Icon className="w-5 h-5 text-teal-600" />
+                                                </div>
+                                                <p className=" text-slate-800">{item.name}</p>
+                                            </div>
+                                        </SelectItem>
+                                    )
+                                }
+                                )}
+                            </SelectContent>
+                        </Select>
+
+                        <Select value={address} onValueChange={(value) => {
+                            setAddres(value)
+                            updateDoctor(null)
+                        }} >
+                            <SelectTrigger>
+                                <div className="flex gap-3 items-center">
+                                    <div className="w-7 h-7 flex items-center justify-center rounded-full bg-teal-50">
+                                        <MapPin className="w-5 h-5 text-teal-600" />
+                                    </div>
+                                    <SelectValue placeholder="Địa điểm" />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Tất cả địa điểm</SelectItem>
+                                {addresses.map((item: string, index: number) => (
+                                    <SelectItem key={index} value={item}>
+                                        {item}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </CardHeader>
                 <CardContent >
@@ -220,9 +337,9 @@ export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
                 </CardHeader>
                 <CardContent className="px-6 pb-0 gap-3">
                     {
-                        selectedDoctor ? (
-                            selectedDoctor.hospital
-                                ? hospitalCard(selectedDoctor.hospital)
+                        doctor ? (
+                            doctor.hospital
+                                ? hospitalCard(doctor.hospital)
                                 : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Không có thông tin bệnh viện của bác sĩ.</p>
                         ) : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Vui lòng chọn bác sĩ để xem thông tin.</p>
                     }
@@ -234,15 +351,33 @@ export function SelectDoctor({ onDoctorSelect, selectedDoctor }: Pops) {
                 </CardHeader>
                 <CardContent className="px-6  gap-3">
                     {
-                        selectedDoctor ? (
-                            selectedDoctor.specialty
-                                ? specialtyCard(selectedDoctor.specialty)
+                        doctor ? (
+                            doctor.specialty
+                                ? specialtyCard(doctor.specialty)
                                 : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Không có thông tin chuyên khoa của bác sĩ.</p>
                         ) : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Vui lòng chọn bác sĩ để xem thông tin.</p>
 
                     }
                 </CardContent>
             </Card>
+
+            <div className="flex justify-between col-span-3">
+                <button
+                    onClick={() => {
+                        stepClick(false)
+                    }}
+                    className="text-gray-600 px-4 py-2 disabled:opacity-50"
+                >
+                    Quay lại
+                </button>
+                <button
+                    disabled={!doctor}
+                    onClick={() => { stepClick(true) }}
+                    className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Tiếp tục
+                </button>
+            </div>
         </div>
     )
 }

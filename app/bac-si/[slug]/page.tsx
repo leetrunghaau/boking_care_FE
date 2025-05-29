@@ -195,7 +195,7 @@ export default function DoctorDetailPage() {
 
             {/* Sidebar */}
             <div className="flex flex-col gap-6">
-             <DoctorSchedule slug={slug} />
+             <DoctorSchedule slug={slug}/>
               <HospitalInfo doctor={doctor} />
 
             </div>

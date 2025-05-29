@@ -34,14 +34,10 @@ export default function DoctorsPage() {
 
   return (
     <>
-      <section className="my-10">
+      <section className="m-10">
         <div className="container justify-center mx-auto">
           <SubHeader
             title="Bác sĩ"
-            breadcrumbs={[
-              { label: "Trang chủ", href: "/" },
-              { label: "Bác sĩ", href: "/bac-si" },
-            ]}
           />
         </div>
       </section>

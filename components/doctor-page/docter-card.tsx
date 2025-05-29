@@ -1,8 +1,11 @@
+'use client'
 import Link from "next/link"
 import { Card, CardContent } from "../ui/card"
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import  BookingStore  from '@/store/booking';
+import { useRouter } from "next/navigation";
 
 
 
@@ -11,6 +14,8 @@ interface Pops {
 }
 
 export default function DoctorCard({ doctor }: Pops) {
+  const {setBooking} = BookingStore()
+   const router = useRouter();
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <CardContent className="p-0">
@@ -56,7 +61,12 @@ export default function DoctorCard({ doctor }: Pops) {
               <Link href={`/bac-si/${doctor.slug}`}>
               <Button variant="outline" size="sm" className="mr-2">Xem hồ sơ</Button>
               </Link>
-              <Button size="sm">Đặt lịch khám</Button>
+              <Button size="sm" onClick={()=>{
+                setBooking({doctorsId: doctor.id, stepStore: 2})
+                router.push("/dat-lich-kham")
+              }}>
+                Đặt lịch khám
+                </Button>
             </div>
           </div>
         </div>

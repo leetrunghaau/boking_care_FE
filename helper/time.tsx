@@ -53,7 +53,7 @@ export function getReadableTimeRanges(times: TimeRange[]): string[] {
             range = `${dayNames[days[0]]} - ${dayNames[days[days.length - 1]]}`;
         }
 
-            console.log(`${range}: ${getTimeFormat(start)} - ${getTimeFormat(end)}`)
+            // console.log(`${range}: ${getTimeFormat(start)} - ${getTimeFormat(end)}`)
         result.push(`${range}: ${getTimeFormat(start)} - ${getTimeFormat(end)}`);
     }
     

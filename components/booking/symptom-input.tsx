@@ -8,12 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import BookingStore from "@/store/booking";
 
-export default function SymptomInput() {
+interface Pops {
+    stepClick: (step: boolean) => void
+}
+export default function SymptomInput({ stepClick }: Pops) {
     const [symptomList, setSymptomList] = useState<any[]>([]);
-    const [symptom, setSymptom] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
-    const {symptoms} = BookingStore();
+    const { symptoms, setBooking, isLoaded } = BookingStore();
+    const [symptom, setSymptom] = useState<string>('');
 
     useEffect(() => {
         const fetchSpecialties = async () => {
@@ -38,6 +41,12 @@ export default function SymptomInput() {
 
         fetchSpecialties();
     }, []);
+
+    useEffect(() => {
+        if (isLoaded) {
+            setSymptom(symptoms); 
+        }
+    }, [isLoaded, symptoms]);
 
     const handleAddDisease = (disease: string) => {
         const normalized = symptom
@@ -92,6 +101,18 @@ export default function SymptomInput() {
                         </Badge>
                     ))}
                 </div>
+            </div>
+            <div className="flex justify-end md:max-w-[600px] lg:max-w-[900px] mx-auto">
+                <button
+                    onClick={() => {
+                        setBooking({ symptoms: symptom })
+                        stepClick(true)
+                    }}
+                    className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+
+                >
+                    Tiếp tục
+                </button>
             </div>
         </div>
     );

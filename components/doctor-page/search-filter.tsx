@@ -3,20 +3,13 @@
 import http from "@/helper/axios";
 import { useEffect, useState } from "react";
 import { Input } from '@/components/ui/input';
-import { Search } from "lucide-react";
+import { MapPin, Search, TestTubeDiagonal } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { getIconByName } from "@/helper/icon-map";
 
 
-interface Specialty {
-  slug: string;
-  name: string;
-}
 
-interface Address {
-  slug: string;
-  name: string;
-}
 interface Props {
   onSearch: (query: string) => void;
 }
@@ -25,17 +18,16 @@ export default function DoctorSearchFilter({ onSearch }: Props) {
   const [search, setSearch] = useState<string>("");
   const [specialty, setSpecialty] = useState<string>("");
   const [address, setAddress] = useState<string>("");
-
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [specialties, setSpecialties] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const specialties = await http.get<Specialty[]>("/doctor-site/specialties");
-        const address = await http.get<Specialty[]>("/doctor-site/address");
-        setSpecialties(specialties);
-        setAddresses(address);
+        const spts = await http.get<any[]>("/doctor-site/specialties");
+        const ars = await http.get<any[]>("/doctor-site/address");
+        setSpecialties(spts);
+        setAddresses(ars);
       } catch (err) {
         console.error("Failed to fetch filters:", err);
       }
@@ -50,6 +42,7 @@ export default function DoctorSearchFilter({ onSearch }: Props) {
     if (specialty) params.set("specialty", specialty);
     if (address) params.set("address", address);
     const query = params.toString() ? `?${params.toString()}` : "";
+    console.log(query)
     onSearch(query);
   };
 
@@ -73,24 +66,47 @@ export default function DoctorSearchFilter({ onSearch }: Props) {
               <SelectValue placeholder="Chuyên khoa" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả chuyên khoa</SelectItem>
-              {specialties.map((item) => (
-                <SelectItem key={item.slug} value={item.slug}>
-                  {item.name}
-                </SelectItem>
-              ))}
+              <SelectItem value="all">
+                <div className="flex gap-3 items-center">
+                  <div className="w-7 h-7 flex items-center justify-center rounded-full bg-teal-50">
+                    <TestTubeDiagonal className="w-5 h-5 text-teal-600" />
+                  </div>
+                  <p className=" text-slate-800">Tất cả chuyên khoa</p>
+                </div>
+              </SelectItem>
+              {specialties.map((item) => {
+                const Icon = getIconByName(item.icon)
+                return (
+
+                  <SelectItem key={item.slug} value={item.slug}>
+                    <div className="flex gap-3 items-center">
+                      <div className="w-7 h-7 flex items-center justify-center rounded-full bg-teal-50">
+                        <Icon className="w-5 h-5 text-teal-600" />
+                      </div>
+                      <p className=" text-slate-800">{item.name}</p>
+                    </div>
+                  </SelectItem>
+                )
+              }
+              )}
             </SelectContent>
           </Select>
 
-          <Select value={address} onValueChange={setAddress}>
+          <Select value={address} onValueChange={setAddress} >
             <SelectTrigger>
-              <SelectValue placeholder="Địa điểm" />
+              <div className="flex gap-3 items-center">
+                <div className="w-7 h-7 flex items-center justify-center rounded-full bg-teal-50">
+                  <MapPin className="w-5 h-5 text-teal-600" />
+                </div>
+                <SelectValue placeholder="Địa điểm" />
+              </div>
+
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả địa điểm</SelectItem>
-              {addresses.map((item) => (
-                <SelectItem key={item.slug} value={item.slug}>
-                  {item.name}
+              {addresses.map((item: string, index: number) => (
+                <SelectItem key={index} value={item}>
+                  {item}
                 </SelectItem>
               ))}
             </SelectContent>

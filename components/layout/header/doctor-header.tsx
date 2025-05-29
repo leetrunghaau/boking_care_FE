@@ -14,7 +14,7 @@ export default function DoctorHeader() {
         <div className="flex items-center gap-2">
           <Link href="/doctor" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
-            <span className="text-xl font-bold text-teal-600">BookingCare</span>
+            <span className="text-xl font-bold text-teal-600">Doctor.BookingCare</span>
           </Link>
         </div>
 

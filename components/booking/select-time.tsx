@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { format, addDays, isSameDay } from "date-fns"
 import { vi } from "date-fns/locale"
-import { Calendar, CalendarIcon, Clock, MapPin, User } from "lucide-react"
+import { Calendar, CalendarIcon, Clock, MapPin, User, Wallet, Hourglass } from "lucide-react"
 import { cn } from "@/lib/utils"
 import http from "@/helper/axios"
 import { getTimeFormat } from "@/helper/time"
@@ -11,30 +11,28 @@ import { CardLoading } from "@/components/ui/loading"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Doctor, DoctorTime, Specialty } from "./type"
+import BookingStore from '@/store/booking';
+import { formatCurrencyVND } from "@/helper/customNumView"
 
 
 
 interface Pops {
-  doctor: Doctor | null
-  specialty: Specialty | null
-  selectedDate: Date | null
-  selectedTime: number | null
-  timeChange: (time: number | null) => void
-  dateChange: (date: Date | null) => void
+  stepClick: (nextStep: boolean) => void
 }
-export default function SelectTime({ doctor, timeChange, dateChange, specialty, selectedDate, selectedTime }: Pops) {
-  const [availableTimes, setAvailableTimes] = useState<DoctorTime[]>([])
-
+export default function SelectTime({ stepClick }: Pops) {
+  const { date, time, isLoaded, doctorsId, setBooking } = BookingStore()
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [availableTimes, setAvailableTimes] = useState<any[]>([])
+  const [doctor, setDoctor] = useState<any | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [doctorLoad, setDoctorLoad] = useState<boolean>(false)
 
-
-
-  //đổi list time khi nhấn chọn ngày
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<DoctorTime[]>(`/booking/doctor/${doctor?.id}/schedule/${selectedDate}`)
+        const res = await http.get<any[]>(`/doctor-site/doctor/${doctor.slug}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
         setAvailableTimes(res);
         console.log("fetch Hospital", res)
       } catch (err) {
@@ -43,9 +41,33 @@ export default function SelectTime({ doctor, timeChange, dateChange, specialty, 
         setIsLoading(false);
       }
     };
+    if (selectedDate && doctor && isLoaded) {
 
+      fetchData();
+    }
+  }, [selectedDate, doctor, isLoaded])
+
+  useEffect(() => {
+    if (!isLoaded) return
+    if(!doctorsId) return
+    const fetchData = async () => {
+      setDoctorLoad(true);
+      setSelectedDate(date?? selectedDate)
+      setSelectedTime(time)
+      try {
+        const rs = await http.get<any>(`/booking/doctor/${doctorsId}`);
+        console.log(" doctors", rs)
+        setDoctor(rs);
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setDoctorLoad(false);
+      }
+    };
     fetchData();
-  }, [selectedDate])
+  }, [isLoaded])
+
+
 
   const dateCard = () => {
     const dates = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i))
@@ -63,8 +85,9 @@ export default function SelectTime({ doctor, timeChange, dateChange, specialty, 
             <button
               key={index}
               onClick={() => {
-                dateChange(date)
-                timeChange(null)
+                setSelectedDate(date)
+                setSelectedTime(null)
+                setBooking({ date: date, time: null })
               }}
               className={cn(
                 "flex flex-col items-center min-w-[4.5rem] mx-1 p-2 rounded-md border transition-colors",
@@ -101,18 +124,22 @@ export default function SelectTime({ doctor, timeChange, dateChange, specialty, 
                 <button
                   key={index}
                   disabled={!slot.available}
-                  onClick={() => timeChange(slot.time)}
+                  onClick={() => {
+                    setSelectedTime(slot.start)
+                    setBooking({ time: slot.start })
+
+                  }}
                   className={cn(
                     "py-2 px-1 text-sm rounded-md border transition-colors",
                     !slot.available && "opacity-50 cursor-not-allowed bg-slate-50",
-                    selectedTime === slot.time
+                    selectedTime === slot.start
                       ? "bg-teal-50 border-teal-200 text-teal-700"
                       : slot.available
                         ? "hover:bg-slate-50"
                         : "",
                   )}
                 >
-                  {getTimeFormat(slot.time)}
+                  {slot.start}
                 </button>
               )) :
                 <>
@@ -149,12 +176,12 @@ export default function SelectTime({ doctor, timeChange, dateChange, specialty, 
                   </Avatar>
                   <div>
                     <h3 className="font-semibold text-lg">{doctor.name}</h3>
-                    <p className="text-teal-600 font-medium">{specialty?.name}</p>
+                    <p className="text-teal-600 font-medium">{doctor.specialty?.name ?? "Bác sĩ tổng hợp"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="h-4 w-4 text-teal-600" />
-                  <span className="text-sm">{doctor.hospital.address} {doctor.room ?? ` - ${doctor.room}`}</span>
+                  <span className="text-sm">{doctor.hospital?.address ?? (doctor.address ?? "không có thông tin")}</span>
                 </div>
               </>
               :
@@ -182,8 +209,24 @@ export default function SelectTime({ doctor, timeChange, dateChange, specialty, 
           )}
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-teal-600" />
-            <span className="text-sm">{selectedTime ? getTimeFormat(selectedTime) : "Chưa chọn giờ"}</span>
+            <span className="text-sm">{selectedTime ?? "Chưa chọn giờ"}</span>
           </div>
+          {
+            doctor && (
+              <div className="flex items-center gap-2">
+                <Hourglass className="h-4 w-4 text-teal-600" />
+                <span className="text-sm">{doctor.duration ? `Thời gian khám: ${doctor.duration} phút` : "Không có thông tin"}</span>
+              </div>
+            )
+          }
+          {
+            doctor && (
+              <div className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-teal-600" />
+                <span className="text-sm">{doctor.price ? `Phí khám: ${formatCurrencyVND(doctor.price)}` : "Không có thông tin"}</span>
+              </div>
+            )
+          }
         </CardContent>
       </Card>
     )
@@ -199,6 +242,23 @@ export default function SelectTime({ doctor, timeChange, dateChange, specialty, 
       <div className="space-y-4 col-span-2">
         {dateCard()}
         {timeCard()}
+      </div>
+      <div className="flex justify-between col-span-3">
+        <button
+          onClick={() => {
+            stepClick(false)
+          }}
+          className="text-gray-600 px-4 py-2 disabled:opacity-50"
+        >
+          Quay lại
+        </button>
+        <button
+          disabled={!selectedTime}
+          onClick={() => { stepClick(true) }}
+          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Tiếp tục
+        </button>
       </div>
     </div>
 

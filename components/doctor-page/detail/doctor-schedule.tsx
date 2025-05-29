@@ -11,25 +11,28 @@ import { CardLoading } from "@/components/ui/loading"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+import BookingStore from "@/store/booking"
 
 
 interface Pops {
-  slug: string
+  slug: string,
 }
 
 export default function DoctorSchedule({ slug }: Pops) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [selectedTime, setSelectedTime] = useState<number | null>(null)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [availableTimes, setAvailableTimes] = useState<any[]>([])
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const router = useRouter()
+  const {setBooking} = BookingStore()
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const res = await http.get<any[]>(`/doctor-site/doctor/${slug}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
-        console.log(`/doctor-site/doctor/${slug}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
         setAvailableTimes(res);
         console.log("fetch Hospital", res)
       } catch (err) {
@@ -105,18 +108,18 @@ export default function DoctorSchedule({ slug }: Pops) {
                   <button
                     key={index}
                     disabled={!slot.available}
-                    onClick={() => setSelectedTime(slot.time)}
+                    onClick={() => setSelectedTime(slot.start )}
                     className={cn(
                       "py-2 px-1 text-sm rounded-md border transition-colors",
                       !slot.available && "opacity-50 cursor-not-allowed bg-slate-50",
-                      selectedTime === slot.time
+                      selectedTime === slot.start
                         ? "bg-teal-50 border-teal-200 text-teal-700"
                         : slot.available
                           ? "hover:bg-slate-50"
                           : "",
                     )}
                   >
-                    {getTimeFormat(slot.time)}
+                    {slot.start}
                   </button>
                 )) :
                   <>
@@ -130,7 +133,14 @@ export default function DoctorSchedule({ slug }: Pops) {
         </div>
 
         <div className="mt-6">
-          <Button className="w-full bg-teal-600 hover:bg-teal-700">Đặt lịch khám</Button>
+          <Button className="w-full bg-teal-600 hover:bg-teal-700"
+          disabled={!(selectedDate && selectedTime)}
+          onClick={()=>{
+            console.log({selectedDate, selectedTime})
+            setBooking({doctorsId: , stepStore: 3, date: selectedDate, time: selectedTime})
+            router.push("/dat-lich-kham")
+          }}
+          >Đặt lịch khám</Button>
           <p className="text-xs text-center text-muted-foreground mt-2">
             Miễn phí đặt lịch, không mất phí khi hủy trước 24 giờ
           </p>
