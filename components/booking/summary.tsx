@@ -1,3 +1,4 @@
+"use client"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { Card, CardContent } from "@/components/ui/card"
@@ -5,15 +6,76 @@ import { CheckCircle2, Calendar, Clock, User, Phone, FileText } from 'lucide-rea
 import { BookingData } from "./type"
 import { getIconByName } from "@/helper/icon-map"
 import { formatCurrencyVND } from "@/helper/customNumView"
+import { useEffect, useState } from "react"
+import BookingStore from "@/store/booking"
+import http from "@/helper/axios"
+import useAuthStore from "@/store/auth"
 
-interface Pops {
-  bookingData: BookingData
-}
 
-export default function Summary({ bookingData }: Pops) {
-  const Icon = getIconByName(bookingData?.specialty?.icon ?? "unKnown")
+
+
+export default function Summary() {
+  const { isLoggedIn, hasHydrated } = useAuthStore()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [doctor, setDoctor] = useState<any | null>(null)
+  const [patient, setPatient] = useState<any | null>(null)
+  const [fromData, setFormData] = useState({
+    patientId: null,
+    doctorId: null,
+    bookingDate: null,
+    bookingTime: null,
+    price: null,
+    notes: null,
+  })
+
+  useEffect(() => {
+    if (!hasHydrated || isLoggedIn) return;
+
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const rs = await http.get<any | null>(`/sig/info`);
+        console.warn(rs)
+        if (rs) {
+          setPatient(rs);
+          setFormData(prev => ({
+            ...prev,
+            patientId: rs.id,
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [hasHydrated, isLoggedIn]); // 👈 giữ nguyên thứ tự và số lượng deps
+
+
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const rs = await http.get<any | null>(`/booking/doctor/:id${doctorsId}`)
+  //       setDoctor(rs)
+  //       if (rs) setFormData(prev => ({ ...prev, doctord: rs.id, price: rs.price })),
+  //         console.log(rs)
+  //     } catch (err) {
+  //       console.error(err);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //     loadData()
+
+  //   }
+
+  // }, [isLoaded])
+
+  // const Icon = getIconByName(bookingData?.specialty?.icon ?? "unKnown")
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:max-w-[600px] lg:max-w-[900px] mx-auto">
       <h2 className="text-xl font-semibold">Xác nhận thông tin đặt lịch</h2>
 
       <div className="bg-green-50 p-4 rounded-md flex items-start space-x-3">
@@ -25,7 +87,7 @@ export default function Summary({ bookingData }: Pops) {
         </div>
       </div>
 
-      <Card>
+      <Card >
         <CardContent className="p-6">
           <div className="space-y-6">
             <div>
@@ -33,11 +95,11 @@ export default function Summary({ bookingData }: Pops) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-start space-x-3">
                   <div className="w-5 h-5 mt-0.5 text-teal-600">
-                    <Icon />
+                    {/* <Icon /> */}
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Chuyên khoa</p>
-                    <p className="font-medium">{bookingData.specialty?.name || "Chưa chọn"}</p>
+                    <p className="font-medium">{doctor?.specialty?.name || "Chưa chọn"}</p>
                   </div>
                 </div>
 
@@ -45,8 +107,8 @@ export default function Summary({ bookingData }: Pops) {
                   <User className="w-5 h-5 mt-0.5 text-teal-600" />
                   <div>
                     <p className="text-sm text-gray-500">Bác sĩ</p>
-                    <p className="font-medium">{bookingData.doctor?.name || "Chưa chọn"}</p>
-                    {bookingData.doctor && <p className="text-sm text-gray-500">{bookingData.doctor?.title}</p>}
+                    <p className="font-medium">{doctor?.name || "Chưa chọn"}</p>
+                    {doctor && <p className="text-sm text-gray-500">{doctor?.title}</p>}
                   </div>
                 </div>
 
@@ -55,7 +117,7 @@ export default function Summary({ bookingData }: Pops) {
                   <div>
                     <p className="text-sm text-gray-500">Ngày khám</p>
                     <p className="font-medium">
-                      {bookingData.date ? format(bookingData.date, "EEEE, dd/MM/yyyy", { locale: vi }) : "Chưa chọn"}
+                      {/* {date ? format(date, "EEEE, dd/MM/yyyy", { locale: vi }) : "Chưa chọn"} */}
                     </p>
                   </div>
                 </div>
@@ -64,7 +126,7 @@ export default function Summary({ bookingData }: Pops) {
                   <Clock className="w-5 h-5 mt-0.5 text-teal-600" />
                   <div>
                     <p className="text-sm text-gray-500">Giờ khám</p>
-                    <p className="font-medium">{bookingData.time || "Chưa chọn"}</p>
+                    {/* <p className="font-medium">{time || "Chưa chọn"}</p> */}
                   </div>
                 </div>
               </div>
@@ -75,32 +137,32 @@ export default function Summary({ bookingData }: Pops) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Họ và tên</p>
-                  <p className="font-medium">{bookingData.patient.name || "Chưa nhập"}</p>
+                  <p className="font-medium">{patient?.name ?? "Chưa nhập"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Số điện thoại</p>
-                  <p className="font-medium">{bookingData.patient.phone || "Chưa nhập"}</p>
+                  <p className="font-medium">{patient?.phone ?? "Chưa nhập"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{bookingData.patient.email || "Không có"}</p>
+                  <p className="font-medium">{patient?.email ?? "Không có"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Ngày sinh</p>
-                  <p className="font-medium">{bookingData.patient?.dob ? format(bookingData.patient.dob, "dd-MM-yyyy", { locale: vi }) : "Không có"}</p>
+                  <p className="font-medium">{patient?.dob ? format(patient.dob, "dd-MM-yyyy", { locale: vi }) : "Không có"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Giới tính</p>
                   <p className="font-medium">
-                    {bookingData.patient.gender == "male"
+                    {patient?.gender == "male"
                       ? "Nam"
-                      : bookingData.patient.gender == "female"
+                      : patient?.gender == "female"
                         ? "Nữ"
-                        : bookingData.patient.gender == "other"
+                        : patient?.gender == "other"
                           ? "Khác"
                           : "Không có"}
                   </p>
@@ -108,7 +170,7 @@ export default function Summary({ bookingData }: Pops) {
 
                 <div>
                   <p className="text-sm text-gray-500">Địa chỉ</p>
-                  <p className="font-medium">{bookingData.patient.address || "Không có"}</p>
+                  <p className="font-medium">{patient?.address ?? "Không có"}</p>
                 </div>
 
                 {/* <div className="md:col-span-2">
@@ -130,7 +192,7 @@ export default function Summary({ bookingData }: Pops) {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Phí khám</span>
-                  <span>{formatCurrencyVND(bookingData.doctor?.price ?? 0)}</span>
+                  <span>{formatCurrencyVND(doctor?.price ?? 0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Phí đặt lịch</span>
@@ -138,7 +200,7 @@ export default function Summary({ bookingData }: Pops) {
                 </div>
                 <div className="flex justify-between font-medium text-lg pt-2 border-t">
                   <span>Tổng cộng</span>
-                  <span className="text-teal-600">{formatCurrencyVND( bookingData.doctor?.price || 0)}</span>
+                  <span className="text-teal-600">{formatCurrencyVND(doctor?.price || 0)}</span>
                 </div>
               </div>
             </div>

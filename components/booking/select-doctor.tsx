@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import http from '@/helper/axios';
 import { getIconByName } from '@/helper/icon-map';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, ChevronRight, Clock, MapPin, Phone, Star, Stethoscope } from 'lucide-react';
@@ -11,19 +11,21 @@ import Link from 'next/link';
 import { getReadableTimeRanges } from '@/helper/time';
 import { Button } from '@/components/ui/button';
 import { formatPhoneNumber } from '@/helper/customNumView';
-import BookingStore from '@/store/booking';
 import { Select, SelectContent, SelectValue } from '@/components/ui/select';
 import { SelectTrigger } from '@/components/ui/select';
 import { SelectItem } from '@/components/ui/select';
 import { TestTubeDiagonal } from 'lucide-react';
+import { useBookingStore } from '@/store/booking';
+import { BookingInfo } from '@/types/booking';
 
 
-interface Pops {
-    stepClick: (nextStep: boolean) => void
+interface Props {
+    stepClick: (nextStep: boolean) => void;
 }
 
-export function SelectDoctor({ stepClick }: Pops) {
-    const { doctorsId, symptoms, isLoaded, setBooking } = BookingStore()
+export function SelectDoctor({ stepClick }: Props) {
+
+    const { hasHydrated, bookingInfo, setBooking: setBookingStore } = useBookingStore()
     const [doctors, setDoctors] = useState<any[]>([])
     const [doctor, setDoctor] = useState<any | null>(null)
     const [loading, setLoading] = useState(false);
@@ -31,21 +33,55 @@ export function SelectDoctor({ stepClick }: Pops) {
 
     /// search state
     const [specialties, setSpecialties] = useState<any[]>([])
-    const [specialty, setSpecialty] = useState<string>("all")
-    const [addresses, setAddreses] = useState<any[]>([])
-    const [address, setAddres] = useState<string>("all")
+    const [specialtySelected, setSpecialtySelected] = useState<string>("all")
+    const [addresses, setAddresses] = useState<any[]>([]);
+    const [addressSelected, setAddresSelected] = useState<string>("all")
 
+    // local state
+    const [booking, setBooking] = useState<BookingInfo>({
+        currStep: 0,
+        symptoms: "",
+        doctorId: null,
+        date: null,
+        time: null,
+        name: "",
+        phone: "",
+        email: "",
+        dob: new Date(),
+        gender: "",
+        address: "",
+        allergies: "",
+        medicalHistory: "",
+    });
 
+    const bookingRef = useRef<BookingInfo>(booking);
     useEffect(() => {
-        if (!isLoaded) return;
-        updateDoctor(doctorsId)
+        bookingRef.current = booking;
+    }, [booking]);
+
+    // Cleanup khi component unmount
+    useEffect(() => {
+        return () => {
+            setBookingStore({doctorId:bookingRef.current.doctorId});
+        };
+    }, []);
+    useEffect(() => {
+        if (!hasHydrated) return;
+        const updatedBooking = { ...bookingInfo, currStep: 0 };
+        setBooking(updatedBooking);
+        bookingRef.current = updatedBooking;
+
         const fetchSpecialties = async () => {
             setLoading(true);
             try {
-                const query = symptoms.trim() && new URLSearchParams({ symptoms }).toString();
-                const rss = await http.get<any[]>(`/booking/specialties${query ? `?${query}` : ""}`);
+                const queryParams = new URLSearchParams();
+                if (bookingInfo.symptoms.trim()) {
+                    queryParams.set("symptoms", bookingInfo.symptoms.trim());
+                }
+                const queryString = queryParams.toString();
+                const rss = await http.get<any[]>(`/booking/specialties${queryString ? `?${queryString}` : ""}`);
                 const rsa = await http.get<any[]>(`/booking/addresses`);
-                setAddreses(rsa);
+                setAddresses(rsa);
                 setSpecialties(rss);
             } catch (err) {
                 console.error("Failed to fetch doctors:", err);
@@ -55,22 +91,20 @@ export function SelectDoctor({ stepClick }: Pops) {
         };
 
         fetchSpecialties();
-    }, [isLoaded]);
+    }, [hasHydrated]);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                setBooking({ doctorsId: null })
-
+                setBooking(prev => ({ ...prev, doctorId: null }))
                 const queryParams = new URLSearchParams();
-                if (symptoms.trim()) queryParams.set("symptoms", symptoms.trim());
-                if (specialty !== "all") queryParams.set("specialty", specialty);
-                if (address !== "all") queryParams.set("address", address);
+                if (booking.symptoms.trim()) queryParams.set("symptoms", booking.symptoms.trim());
+                if (specialtySelected !== "all") queryParams.set("specialty", specialtySelected);
+                if (addressSelected !== "all") queryParams.set("address", addressSelected);
                 const queryString = queryParams.toString();
                 const url = `/booking/doctors${queryString ? `?${queryString}` : ""}`;
                 const rs = await http.get<any[]>(url);
-                console.log("url ========>", rs)
                 setDoctors(rs);
             } catch (err) {
                 console.error("Failed to fetch doctors:", err);
@@ -80,32 +114,29 @@ export function SelectDoctor({ stepClick }: Pops) {
         };
 
         fetchData();
-    }, [ specialty, address]);
+    }, [specialtySelected, addressSelected]);
 
 
+    useEffect(() => {
+        if (!booking.doctorId) {
+            setDoctor(null);
+            return;
+        }
 
-    const updateDoctor = (id: number | null) => {
         const fetchDoctor = async () => {
             setDoctorLoad(true);
             try {
-                const rs = await http.get<any>(`/booking/doctor/${id}`);
+                const rs = await http.get<any>(`/booking/doctor/${booking.doctorId}`);
                 setDoctor(rs);
             } catch (err) {
-                console.error("Failed to fetch doctors:", err);
+                console.error("Failed to fetch doctor:", err);
             } finally {
                 setDoctorLoad(false);
-                setBooking({ doctorsId: id })
             }
         };
-        if (id) {
-            fetchDoctor()
-        } else {
-            setDoctor(null)
-            setBooking({ doctorsId: null })
-        }
-    }
 
-
+        fetchDoctor();
+    }, [booking.doctorId]);
 
 
 
@@ -117,7 +148,7 @@ export function SelectDoctor({ stepClick }: Pops) {
                     ? "border-2 border-teal-600"
                     : "border border-gray-200"
                     }`}
-                onClick={() => { updateDoctor(dt.id) }}
+                onClick={() => { setBooking(prev => ({ ...prev, doctorId: dt.id })) }}
             >
                 <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row gap-4">
@@ -260,10 +291,8 @@ export function SelectDoctor({ stepClick }: Pops) {
             <Card className="col-span-2 row-span-2">
                 <CardHeader >
                     <div className="grid md:grid-cols-2 gap-4  ">
-                        <Select value={specialty} onValueChange={(value) => {
-                            setSpecialty(value)
-                            updateDoctor(null)
-
+                        <Select value={specialtySelected} onValueChange={(value) => {
+                            setSpecialtySelected(value)
                         }} >
                             <SelectTrigger>
                                 <SelectValue placeholder="Chuyên khoa" />
@@ -295,9 +324,8 @@ export function SelectDoctor({ stepClick }: Pops) {
                             </SelectContent>
                         </Select>
 
-                        <Select value={address} onValueChange={(value) => {
-                            setAddres(value)
-                            updateDoctor(null)
+                        <Select value={addressSelected} onValueChange={(value) => {
+                            setAddresSelected(value)
                         }} >
                             <SelectTrigger>
                                 <div className="flex gap-3 items-center">

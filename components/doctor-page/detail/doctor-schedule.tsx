@@ -12,7 +12,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import BookingStore from "@/store/booking"
+import { formatCurrencyVND } from "@/helper/customNumView"
+import { useBookingStore } from "@/store/booking"
 
 
 interface Pops {
@@ -23,10 +24,28 @@ export default function DoctorSchedule({ slug }: Pops) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [availableTimes, setAvailableTimes] = useState<any[]>([])
+  const [doctor, setDoctor] = useState<any | null>(null)
+
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
-  const {setBooking} = BookingStore()
+  const { setBooking } = useBookingStore()
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(false);
+      try {
+        const rs = await http.get(`/doctor-site/doctor/${slug}`)
+        setDoctor(rs)
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+
+    }
+    loadData()
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,12 +55,11 @@ export default function DoctorSchedule({ slug }: Pops) {
         setAvailableTimes(res);
         console.log("fetch Hospital", res)
       } catch (err) {
-        console.error("Failed to fetch Hospital:", err);
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, [selectedDate])
 
@@ -52,22 +70,22 @@ export default function DoctorSchedule({ slug }: Pops) {
       <CardContent className="p-6">
         <h2 className="text-lg font-bold mb-4">Đặt lịch khám</h2>
 
-        {/* <div className="space-y-4 mb-6">
+        <div className="space-y-4 mb-6">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Giá khám:</span>
-            <span className="font-medium">{doctor?.price} đ</span>
+            <span className="font-medium">{doctor?.price ? formatCurrencyVND(doctor.price) : "Không có thông tin"} </span>
           </div>
           <Separator />
           <div className="flex justify-between">
             <span className="text-muted-foreground">Thời gian:</span>
-            <span className="font-medium">30 phút</span>
+            <span className="font-medium">{doctor?.duration ? `${doctor.duration} phút` : "Không có thông tin"}</span>
           </div>
           <Separator />
           <div className="flex justify-between">
             <span className="text-muted-foreground">Địa điểm:</span>
-            <span className="font-medium">{doctor?.hospital?.name}</span>
+            <span className="font-medium">{doctor?.hospital?.name ?? "Không có thông tin"}</span>
           </div>
-        </div> */}
+        </div>
 
         <div className="space-y-4">
           <div>
@@ -108,7 +126,7 @@ export default function DoctorSchedule({ slug }: Pops) {
                   <button
                     key={index}
                     disabled={!slot.available}
-                    onClick={() => setSelectedTime(slot.start )}
+                    onClick={() => setSelectedTime(slot.start)}
                     className={cn(
                       "py-2 px-1 text-sm rounded-md border transition-colors",
                       !slot.available && "opacity-50 cursor-not-allowed bg-slate-50",
@@ -134,12 +152,12 @@ export default function DoctorSchedule({ slug }: Pops) {
 
         <div className="mt-6">
           <Button className="w-full bg-teal-600 hover:bg-teal-700"
-          disabled={!(selectedDate && selectedTime)}
-          onClick={()=>{
-            console.log({selectedDate, selectedTime})
-            setBooking({doctorsId: , stepStore: 3, date: selectedDate, time: selectedTime})
-            router.push("/dat-lich-kham")
-          }}
+            disabled={!(selectedDate && selectedTime)}
+            onClick={() => {
+              console.log({ selectedDate, selectedTime })
+              setBooking({ doctorId: doctor.id, currStep: 3, date: selectedDate, time: selectedTime })
+              router.push("/dat-lich-kham")
+            }}
           >Đặt lịch khám</Button>
           <p className="text-xs text-center text-muted-foreground mt-2">
             Miễn phí đặt lịch, không mất phí khi hủy trước 24 giờ

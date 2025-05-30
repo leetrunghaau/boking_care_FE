@@ -6,13 +6,11 @@ import { vi } from "date-fns/locale"
 import { Calendar, CalendarIcon, Clock, MapPin, User, Wallet, Hourglass } from "lucide-react"
 import { cn } from "@/lib/utils"
 import http from "@/helper/axios"
-import { getTimeFormat } from "@/helper/time"
 import { CardLoading } from "@/components/ui/loading"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Doctor, DoctorTime, Specialty } from "./type"
-import BookingStore from '@/store/booking';
 import { formatCurrencyVND } from "@/helper/customNumView"
+import { useBookingStore } from "@/store/booking"
 
 
 
@@ -20,7 +18,7 @@ interface Pops {
   stepClick: (nextStep: boolean) => void
 }
 export default function SelectTime({ stepClick }: Pops) {
-  const { date, time, isLoaded, doctorsId, setBooking } = BookingStore()
+  const { hasHydrated, bookingInfo, setBooking: setBookingStore } = useBookingStore()
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [availableTimes, setAvailableTimes] = useState<any[]>([])
@@ -28,11 +26,14 @@ export default function SelectTime({ stepClick }: Pops) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [doctorLoad, setDoctorLoad] = useState<boolean>(false)
 
+
+
   useEffect(() => {
+    if (!hasHydrated) return
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<any[]>(`/doctor-site/doctor/${doctor.slug}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
+        const res = await http.get<any[]>(`/booking/doctor/${bookingInfo.doctorId}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
         setAvailableTimes(res);
         console.log("fetch Hospital", res)
       } catch (err) {
@@ -41,22 +42,17 @@ export default function SelectTime({ stepClick }: Pops) {
         setIsLoading(false);
       }
     };
-    if (selectedDate && doctor && isLoaded) {
-
-      fetchData();
-    }
-  }, [selectedDate, doctor, isLoaded])
+    fetchData();
+  }, [hasHydrated])
 
   useEffect(() => {
-    if (!isLoaded) return
-    if(!doctorsId) return
     const fetchData = async () => {
       setDoctorLoad(true);
-      setSelectedDate(date?? selectedDate)
-      setSelectedTime(time)
+      setSelectedDate(bookingInfo.date ?? selectedDate)
+      setSelectedTime(bookingInfo.time)
       try {
-        const rs = await http.get<any>(`/booking/doctor/${doctorsId}`);
-        console.log(" doctors", rs)
+        const rs = await http.get<any>(`/booking/doctor/${bookingInfo.doctorId}`);
+        // console.log(" doctors", rs)
         setDoctor(rs);
       } catch (err) {
         console.error("Failed to fetch doctors:", err);
@@ -65,7 +61,7 @@ export default function SelectTime({ stepClick }: Pops) {
       }
     };
     fetchData();
-  }, [isLoaded])
+  }, [hasHydrated])
 
 
 
@@ -87,7 +83,6 @@ export default function SelectTime({ stepClick }: Pops) {
               onClick={() => {
                 setSelectedDate(date)
                 setSelectedTime(null)
-                setBooking({ date: date, time: null })
               }}
               className={cn(
                 "flex flex-col items-center min-w-[4.5rem] mx-1 p-2 rounded-md border transition-colors",
@@ -126,7 +121,6 @@ export default function SelectTime({ stepClick }: Pops) {
                   disabled={!slot.available}
                   onClick={() => {
                     setSelectedTime(slot.start)
-                    setBooking({ time: slot.start })
 
                   }}
                   className={cn(
