@@ -113,7 +113,7 @@ export default function SymptomInput() {
         </div>
       </div>
 
-      <div className="flex justify-end md:max-w-[600px] lg:max-w-[900px] mx-auto">
+      <div className="flex justify-end md:max-w-[600px] lg:max-w-[900px] mx-auto pb-10">
         <button
           onClick={handleNextStep}
           className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">

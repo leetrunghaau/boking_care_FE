@@ -7,13 +7,13 @@ import { getIconByName } from "@/helper/icon-map"
 import { formatCurrencyVND } from "@/helper/customNumView"
 import { useEffect, useState } from "react"
 import http from "@/helper/axios"
-import { useSearchParams } from "next/navigation"
-import { any } from "zod"
+import { useRouter, useSearchParams } from "next/navigation"
 
 
 
 
 export default function Summary() {
+  const router = useRouter()
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [doctor, setDoctor] = useState<any | null>(null)
@@ -67,7 +67,28 @@ export default function Summary() {
     loadData();
   }, []);
 
+  const handleBackStep = () => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    currentParams.set("curStep", `${formData.patientId ? '2' : '3'}`);
+    const queryString = currentParams.toString();
+    router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+  };
 
+
+  const handleNextStep = () => {
+    const postData = async () => {
+      setIsLoading(true)
+      try {
+
+        const rs = await http.post("/booking/up", formData)
+      } catch (err) {
+        console.log(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    postData()
+  }
 
   // const Icon = getIconByName(bookingData?.specialty?.icon ?? "unKnown")
   return (
@@ -208,6 +229,21 @@ export default function Summary() {
         <p className="text-yellow-800 text-sm">
           <strong>Lưu ý:</strong> Vui lòng đến trước giờ hẹn 15 phút để hoàn tất thủ tục. Mang theo giấy tờ tùy thân và thẻ bảo hiểm y tế (nếu có).
         </p>
+      </div>
+
+      <div className="flex justify-between pb-10">
+        <button
+          onClick={handleBackStep}
+          className="text-gray-600 px-4 py-2 disabled:opacity-50"
+        >
+          Quay lại
+        </button>
+        <button
+          onClick={handleNextStep}
+          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Xác nhận
+        </button>
       </div>
     </div>
   )

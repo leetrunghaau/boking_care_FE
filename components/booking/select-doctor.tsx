@@ -349,7 +349,7 @@ export function SelectDoctor() {
                 </CardContent>
             </Card>
 
-            <div className="flex justify-between col-span-3">
+            <div className="flex justify-between col-span-3 pb-10">
                 <button
                     onClick={handleBackStep}
                     className="text-gray-600 px-4 py-2 disabled:opacity-50"
