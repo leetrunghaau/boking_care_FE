@@ -3,45 +3,59 @@ import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle2, Calendar, Clock, User, Phone, FileText } from 'lucide-react'
-import { BookingData } from "./type"
 import { getIconByName } from "@/helper/icon-map"
 import { formatCurrencyVND } from "@/helper/customNumView"
 import { useEffect, useState } from "react"
-import BookingStore from "@/store/booking"
 import http from "@/helper/axios"
-import useAuthStore from "@/store/auth"
+import { useSearchParams } from "next/navigation"
+import { any } from "zod"
 
 
 
 
 export default function Summary() {
-  const { isLoggedIn, hasHydrated } = useAuthStore()
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [doctor, setDoctor] = useState<any | null>(null)
   const [patient, setPatient] = useState<any | null>(null)
-  const [fromData, setFormData] = useState({
-    patientId: null,
-    doctorId: null,
-    bookingDate: null,
-    bookingTime: null,
-    price: null,
-    notes: null,
-  })
-
+  const [formData, setFormData] = useState({
+    patientId: Number(searchParams.get("patientId")) || null,
+    doctorId: Number(searchParams.get("doctorId")) || null,
+    symptoms: searchParams.get("symptoms") || "",
+    date: searchParams.get("date") || "",
+    time: searchParams.get("time") || "",
+    dob: searchParams.get("dob") || "",
+    name: searchParams.get("name") || "",
+    phone: searchParams.get("phone") || "",
+    email: searchParams.get("email") || "",
+    gender: searchParams.get("gender") || "",
+    address: searchParams.get("address") || "",
+  });
   useEffect(() => {
-    if (!hasHydrated || isLoggedIn) return;
-
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const rs = await http.get<any | null>(`/sig/info`);
-        console.warn(rs)
-        if (rs) {
-          setPatient(rs);
-          setFormData(prev => ({
-            ...prev,
-            patientId: rs.id,
-          }));
+        // Nếu có thông tin bệnh nhân
+        if (formData.patientId) {
+          const rs = await http.get<any | null>(`/booking/info`);
+          if (rs) {
+            setFormData(prev => ({
+              ...prev,
+              name: rs.name,
+              phone: rs.phone || "",
+              email: rs.email || "",
+              gender: rs.gender || "",
+              address: rs.address || "",
+              dob: rs.dob || "",
+            }));
+            setPatient(rs);
+          }
+        }
+
+        // Nếu có doctorId
+        if (formData.doctorId) {
+          const rs = await http.get<any | null>(`/booking/doctor/${formData.doctorId}`);
+          setDoctor(rs);
         }
       } catch (err) {
         console.error(err);
@@ -51,27 +65,9 @@ export default function Summary() {
     };
 
     loadData();
-  }, [hasHydrated, isLoggedIn]); // 👈 giữ nguyên thứ tự và số lượng deps
+  }, []);
 
 
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const rs = await http.get<any | null>(`/booking/doctor/:id${doctorsId}`)
-  //       setDoctor(rs)
-  //       if (rs) setFormData(prev => ({ ...prev, doctord: rs.id, price: rs.price })),
-  //         console.log(rs)
-  //     } catch (err) {
-  //       console.error(err);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //     loadData()
-
-  //   }
-
-  // }, [isLoaded])
 
   // const Icon = getIconByName(bookingData?.specialty?.icon ?? "unKnown")
   return (
@@ -117,7 +113,7 @@ export default function Summary() {
                   <div>
                     <p className="text-sm text-gray-500">Ngày khám</p>
                     <p className="font-medium">
-                      {/* {date ? format(date, "EEEE, dd/MM/yyyy", { locale: vi }) : "Chưa chọn"} */}
+                      {formData.date ? format(formData.date, "EEEE, dd/MM/yyyy", { locale: vi }) : "Chưa chọn"}
                     </p>
                   </div>
                 </div>
@@ -126,7 +122,7 @@ export default function Summary() {
                   <Clock className="w-5 h-5 mt-0.5 text-teal-600" />
                   <div>
                     <p className="text-sm text-gray-500">Giờ khám</p>
-                    {/* <p className="font-medium">{time || "Chưa chọn"}</p> */}
+                    <p className="font-medium">{formData.time || "Chưa chọn"}</p>
                   </div>
                 </div>
               </div>
@@ -137,28 +133,28 @@ export default function Summary() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Họ và tên</p>
-                  <p className="font-medium">{patient?.name ?? "Chưa nhập"}</p>
+                  <p className="font-medium">{formData.name ?? "Chưa nhập"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Số điện thoại</p>
-                  <p className="font-medium">{patient?.phone ?? "Chưa nhập"}</p>
+                  <p className="font-medium">{formData?.phone ?? "Chưa nhập"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{patient?.email ?? "Không có"}</p>
+                  <p className="font-medium">{formData?.email ?? "Không có"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Ngày sinh</p>
-                  <p className="font-medium">{patient?.dob ? format(patient.dob, "dd-MM-yyyy", { locale: vi }) : "Không có"}</p>
+                  <p className="font-medium">{formData?.dob ? format(formData.dob, "dd-MM-yyyy", { locale: vi }) : "Không có"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Giới tính</p>
                   <p className="font-medium">
-                    {patient?.gender == "male"
+                    {formData?.gender == "male"
                       ? "Nam"
                       : patient?.gender == "female"
                         ? "Nữ"
@@ -170,7 +166,7 @@ export default function Summary() {
 
                 <div>
                   <p className="text-sm text-gray-500">Địa chỉ</p>
-                  <p className="font-medium">{patient?.address ?? "Không có"}</p>
+                  <p className="font-medium">{doctor?.hospital?.address ?? "Không có"}</p>
                 </div>
 
                 {/* <div className="md:col-span-2">

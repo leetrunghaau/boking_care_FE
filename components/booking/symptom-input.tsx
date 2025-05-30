@@ -1,50 +1,23 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import http from "@/helper/axios";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { useBookingStore } from "@/store/booking";
-import { BookingInfo } from "@/types/booking";
+import { useRouter, useSearchParams } from "next/navigation";
 
-interface Props {
-  stepClick: (step: boolean) => void;
-}
 
-export default function SymptomInput({ stepClick }: Props) {
+export default function SymptomInput() {
+  const searchParams = useSearchParams();
+  const symptomsQuery = searchParams.get("symptoms")
   const [symptoms, setSymptoms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  // store
-  const { hasHydrated, bookingInfo, setBooking: setBookingStore } = useBookingStore();
-
+  const router = useRouter();
   // local state
-  const [booking, setBooking] = useState<BookingInfo>({
-    currStep: 0,
-    symptoms: "",
-    doctorId: null,
-    date: null,
-    time: null,
-    name: "",
-    phone: "",
-    email: "",
-    dob: new Date(),
-    gender: "",
-    address: "",
-    allergies: "",
-    medicalHistory: "",
-  });
-
-  // ref để giữ dữ liệu booking mới nhất
-  const latestBooking = useRef<BookingInfo>(booking);
-
-  // cập nhật ref mỗi khi booking thay đổi
-  useEffect(() => {
-    latestBooking.current = booking;
-  }, [booking]);
+  const [userInput, setUserInput] = useState<string>(symptomsQuery?.toString() ?? "" );
 
   // fetch data khi mount
   useEffect(() => {
@@ -69,21 +42,10 @@ export default function SymptomInput({ stepClick }: Props) {
     };
 
     fetchData();
-
-    return () => {
-      setBookingStore({symptoms:latestBooking.current.symptoms});
-    };
   }, []);
 
-  // đồng bộ dữ liệu từ store vào local khi đã hydrate
-  useEffect(() => {
-    if (hasHydrated) {
-      setBooking({ ...bookingInfo, currStep: 0 }); // đảm bảo currStep = 0
-    }
-  }, [hasHydrated]);
-
   const handleAddDisease = (disease: string) => {
-    const normalized = (booking.symptoms || "")
+    const normalized = (userInput || "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
@@ -92,13 +54,22 @@ export default function SymptomInput({ stepClick }: Props) {
 
     const newSymptom = [...normalized, disease].join(", ");
 
-    setBooking((prev) => ({
-      ...prev,
-      symptoms: newSymptom,
-    }));
-
     setSymptoms((prev) => prev.filter((item) => item !== disease));
+    setUserInput(newSymptom);
   };
+
+  const handleNextStep = () => {
+    const queryParams = new URLSearchParams();
+    if (userInput?.trim()) {
+      queryParams.set("symptoms", userInput.trim());
+    }
+    queryParams.set("curStep", "1");
+
+    const queryString = queryParams.toString();
+    router.push(
+      `/dat-lich-kham${queryString ? `?${queryString}` : ""}`
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -107,7 +78,8 @@ export default function SymptomInput({ stepClick }: Props) {
           Bạn đang cảm thấy không khỏe ở đâu?
         </h2>
         <p className="text-gray-600">
-          Hãy chọn triệu chứng hoặc chuyên khoa phù hợp để được tư vấn chính xác nhất.
+          Hãy chọn triệu chứng hoặc chuyên khoa phù hợp để được tư vấn chính xác
+          nhất.
         </p>
       </div>
 
@@ -119,13 +91,8 @@ export default function SymptomInput({ stepClick }: Props) {
           "border-teal-200 focus-visible:ring-teal-500 transition-all duration-300",
           "md:max-w-[600px] lg:max-w-[900px] mx-auto"
         )}
-        value={booking.symptoms}
-        onChange={(e) =>
-          setBooking((prev) => ({
-            ...prev,
-            symptoms: e.target.value,
-          }))
-        }
+        value={userInput}
+        onChange={(e) => setUserInput(e.target.value)}
       />
 
       {/* Triệu chứng phổ biến */}
@@ -139,8 +106,7 @@ export default function SymptomInput({ stepClick }: Props) {
               className={cn(
                 "cursor-pointer bg-teal-50 hover:bg-teal-600 text-teal-600 hover:text-teal-50"
               )}
-              onClick={() => handleAddDisease(item)}
-            >
+              onClick={() => handleAddDisease(item)}>
               {item}
             </Badge>
           ))}
@@ -149,9 +115,8 @@ export default function SymptomInput({ stepClick }: Props) {
 
       <div className="flex justify-end md:max-w-[600px] lg:max-w-[900px] mx-auto">
         <button
-          onClick={() => stepClick(true)}
-          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          onClick={handleNextStep}
+          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Tiếp tục
         </button>
       </div>

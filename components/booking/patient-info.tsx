@@ -10,33 +10,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import http from "@/helper/axios";
+import { useRouter, useSearchParams } from "next/navigation";
 
-interface Props {
-  stepClick: (nextStep: boolean) => void;
-}
 
-export default function PatientInformation({ stepClick }: Props) {
-  const [patient, setPatient] = useState({
+
+export default function PatientInformation() {
+  const router = useRouter()
+  const searchParams = useSearchParams();
+  const symptomsQuery = searchParams.get("symptoms")
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     dob: null as string | null,
     gender: "male",
     address: "",
-    allergies: "",
-    medicalHistory: "",
   });
 
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
-  const {time, date} = BookingStore()
 
-  const handleChange = (field: keyof typeof patient, value: string) => {
-    setPatient((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+
   const handleNextStep = () => {
-    if (!patient.name || !patient.phone) {
+    if (!formData.name || !formData.phone) {
       setError("Vui lòng nhập đầy đủ Họ tên và Số điện thoại.");
       return;
     }
@@ -45,12 +47,53 @@ export default function PatientInformation({ stepClick }: Props) {
       return;
     }
     setError("");
-    stepClick(true);
+    const queryParams = new URLSearchParams(searchParams.toString());
+    queryParams.set("curStep", "4");
+    queryParams.set("name", formData.name);
+    queryParams.set("phone", formData.phone ?? "");
+    queryParams.set("dob", formData.dob ?? "");
+    queryParams.set("email", formData.email);
+    queryParams.set("gender", formData.gender);
+    queryParams.set("address", formData.address);
+    const queryString = queryParams.toString();
+    router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+
+  };
+  const handleBackStep = () => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    currentParams.set("curStep", "2");
+    const queryString = currentParams.toString();
+    router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
   };
 
-  useEffect(()=>{
-console.log("in next ", {time, date})
+
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const rs = await http.get<any | null>("/booking/info")
+        if (rs) {
+          const queryParams = new URLSearchParams(searchParams.toString());
+          queryParams.set("curStep", "4");
+          queryParams.set("patientId", rs.id.toString())
+          const queryString = queryParams.toString();
+          router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+        }
+
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [])
+
+
 
   return (
     <div className="space-y-6 mx-auto w-10/12 mb-6">
@@ -79,7 +122,7 @@ console.log("in next ", {time, date})
             </Label>
             <Input
               id="name"
-              value={patient.name}
+              value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
               placeholder="Nhập họ và tên"
               required
@@ -92,7 +135,7 @@ console.log("in next ", {time, date})
             </Label>
             <Input
               id="phone"
-              value={patient.phone}
+              value={formData.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
               placeholder="Nhập số điện thoại"
               required
@@ -104,7 +147,7 @@ console.log("in next ", {time, date})
             <Input
               id="email"
               type="email"
-              value={patient.email}
+              value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
               placeholder="Nhập email"
             />
@@ -115,7 +158,7 @@ console.log("in next ", {time, date})
             <Input
               id="dob"
               type="date"
-              value={patient.dob ?? ""}
+              value={formData.dob ?? ""}
               onChange={(e) => handleChange("dob", e.target.value)}
             />
           </div>
@@ -123,7 +166,7 @@ console.log("in next ", {time, date})
           <div className="space-y-2 md:col-span-2 lg:col-span-4">
             <Label>Giới tính</Label>
             <RadioGroup
-              value={patient.gender}
+              value={formData.gender}
               onValueChange={(value) => handleChange("gender", value)}
               className="flex space-x-4"
             >
@@ -152,7 +195,7 @@ console.log("in next ", {time, date})
             <Label htmlFor="address">Địa chỉ</Label>
             <Input
               id="address"
-              value={patient.address}
+              value={formData.address}
               onChange={(e) => handleChange("address", e.target.value)}
               placeholder="Nhập địa chỉ"
             />
@@ -160,35 +203,7 @@ console.log("in next ", {time, date})
         </CardContent>
       </Card>
 
-      {/* THÔNG TIN Y TẾ */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-xl font-semibold">Thông tin y tế</h2>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-6">
-          <div className="space-y-2 md:col-span-6 lg:col-span-3">
-            <Label htmlFor="allergies">Dị ứng</Label>
-            <Textarea
-              id="allergies"
-              value={patient.allergies}
-              onChange={(e) => handleChange("allergies", e.target.value)}
-              placeholder="Dị ứng"
-              rows={3}
-            />
-          </div>
-          <div className="space-y-2 md:col-span-6 lg:col-span-3">
-            <Label htmlFor="medicalHistory">Tiền sử bệnh</Label>
-            <Textarea
-              id="medicalHistory"
-              value={patient.medicalHistory}
-              onChange={(e) => handleChange("medicalHistory", e.target.value)}
-              placeholder="Tiền sử bệnh"
-              rows={3}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
+      
       {/* ĐIỀU KHOẢN */}
       <div className="flex items-start space-x-2 pt-4">
         <Checkbox
@@ -209,22 +224,20 @@ console.log("in next ", {time, date})
       {/* THÔNG BÁO LỖI & NÚT TIẾP */}
       {error && <p className="text-sm text-red-500">{error}</p>}
 
-       <div className="flex justify-between col-span-3">
-                <button
-                    onClick={() => {
-                        stepClick(false)
-                    }}
-                    className="text-gray-600 px-4 py-2 disabled:opacity-50"
-                >
-                    Quay lại
-                </button>
-                <button
-                    onClick={handleNextStep}
-                    className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    Tiếp tục
-                </button>
-            </div>
+      <div className="flex justify-between col-span-3">
+        <button
+          onClick={handleBackStep}
+          className="text-gray-600 px-4 py-2 disabled:opacity-50"
+        >
+          Quay lại
+        </button>
+        <button
+          onClick={handleNextStep}
+          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Tiếp tục
+        </button>
+      </div>
     </div>
   );
 }

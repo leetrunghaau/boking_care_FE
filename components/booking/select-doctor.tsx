@@ -15,19 +15,19 @@ import { Select, SelectContent, SelectValue } from '@/components/ui/select';
 import { SelectTrigger } from '@/components/ui/select';
 import { SelectItem } from '@/components/ui/select';
 import { TestTubeDiagonal } from 'lucide-react';
-import { useBookingStore } from '@/store/booking';
-import { BookingInfo } from '@/types/booking';
+import { useRouter, useSearchParams } from 'next/navigation';
 
+export function SelectDoctor() {
+    const router = useRouter()
+    const searchParams = useSearchParams();
+    const symptoms = searchParams.get("symptoms")
+    const doctorIdQuery = searchParams.get("doctorId")
 
-interface Props {
-    stepClick: (nextStep: boolean) => void;
-}
-
-export function SelectDoctor({ stepClick }: Props) {
-
-    const { hasHydrated, bookingInfo, setBooking: setBookingStore } = useBookingStore()
     const [doctors, setDoctors] = useState<any[]>([])
-    const [doctor, setDoctor] = useState<any | null>(null)
+    const [doctorIdSelected, setDoctorIdSelected] = useState<number | null>(doctorIdQuery ? Number(doctorIdQuery) : null)
+    const [doctorSelected, setDoctorSelected] = useState<any | null>(null)
+
+    // load 
     const [loading, setLoading] = useState(false);
     const [doctorLoad, setDoctorLoad] = useState<boolean>(false)
 
@@ -37,47 +37,12 @@ export function SelectDoctor({ stepClick }: Props) {
     const [addresses, setAddresses] = useState<any[]>([]);
     const [addressSelected, setAddresSelected] = useState<string>("all")
 
-    // local state
-    const [booking, setBooking] = useState<BookingInfo>({
-        currStep: 0,
-        symptoms: "",
-        doctorId: null,
-        date: null,
-        time: null,
-        name: "",
-        phone: "",
-        email: "",
-        dob: new Date(),
-        gender: "",
-        address: "",
-        allergies: "",
-        medicalHistory: "",
-    });
-
-    const bookingRef = useRef<BookingInfo>(booking);
     useEffect(() => {
-        bookingRef.current = booking;
-    }, [booking]);
-
-    // Cleanup khi component unmount
-    useEffect(() => {
-        return () => {
-            setBookingStore({doctorId:bookingRef.current.doctorId});
-        };
-    }, []);
-    useEffect(() => {
-        if (!hasHydrated) return;
-        const updatedBooking = { ...bookingInfo, currStep: 0 };
-        setBooking(updatedBooking);
-        bookingRef.current = updatedBooking;
-
         const fetchSpecialties = async () => {
             setLoading(true);
             try {
                 const queryParams = new URLSearchParams();
-                if (bookingInfo.symptoms.trim()) {
-                    queryParams.set("symptoms", bookingInfo.symptoms.trim());
-                }
+                if (symptoms?.trim()) { queryParams.set("symptoms", symptoms.trim()); }
                 const queryString = queryParams.toString();
                 const rss = await http.get<any[]>(`/booking/specialties${queryString ? `?${queryString}` : ""}`);
                 const rsa = await http.get<any[]>(`/booking/addresses`);
@@ -91,21 +56,21 @@ export function SelectDoctor({ stepClick }: Props) {
         };
 
         fetchSpecialties();
-    }, [hasHydrated]);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                setBooking(prev => ({ ...prev, doctorId: null }))
                 const queryParams = new URLSearchParams();
-                if (booking.symptoms.trim()) queryParams.set("symptoms", booking.symptoms.trim());
+                if (symptoms?.trim()) queryParams.set("symptoms", symptoms.trim());
                 if (specialtySelected !== "all") queryParams.set("specialty", specialtySelected);
                 if (addressSelected !== "all") queryParams.set("address", addressSelected);
                 const queryString = queryParams.toString();
                 const url = `/booking/doctors${queryString ? `?${queryString}` : ""}`;
                 const rs = await http.get<any[]>(url);
                 setDoctors(rs);
+                setDoctorSelected(rs.find(item => item.id == doctorIdSelected))
             } catch (err) {
                 console.error("Failed to fetch doctors:", err);
             } finally {
@@ -116,39 +81,34 @@ export function SelectDoctor({ stepClick }: Props) {
         fetchData();
     }, [specialtySelected, addressSelected]);
 
-
-    useEffect(() => {
-        if (!booking.doctorId) {
-            setDoctor(null);
-            return;
-        }
-
-        const fetchDoctor = async () => {
-            setDoctorLoad(true);
-            try {
-                const rs = await http.get<any>(`/booking/doctor/${booking.doctorId}`);
-                setDoctor(rs);
-            } catch (err) {
-                console.error("Failed to fetch doctor:", err);
-            } finally {
-                setDoctorLoad(false);
-            }
-        };
-
-        fetchDoctor();
-    }, [booking.doctorId]);
+    const handleBackStep = () => {
+        const currentParams = new URLSearchParams(searchParams.toString());
+        currentParams.set("curStep", "0");
+        const queryString = currentParams.toString();
+        router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+    };
 
 
+    const handleNextStep = () => {
+        const queryParams = new URLSearchParams(searchParams.toString());
+        queryParams.set("curStep", "2");
+        if (doctorSelected) { queryParams.set("doctorId", doctorSelected.id.toString()) }
+        const queryString = queryParams.toString();
+        router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+    }
 
     const doctorCard = (dt: any) => {
         return (
             <Card
                 key={dt.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${doctor?.id == dt.id
+                className={`cursor-pointer transition-all hover:shadow-md ${doctorIdSelected == dt.id
                     ? "border-2 border-teal-600"
                     : "border border-gray-200"
                     }`}
-                onClick={() => { setBooking(prev => ({ ...prev, doctorId: dt.id })) }}
+                onClick={() => {
+                    setDoctorIdSelected(dt.id)
+                    setDoctorSelected(dt)
+                }}
             >
                 <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row gap-4">
@@ -365,9 +325,9 @@ export function SelectDoctor({ stepClick }: Props) {
                 </CardHeader>
                 <CardContent className="px-6 pb-0 gap-3">
                     {
-                        doctor ? (
-                            doctor.hospital
-                                ? hospitalCard(doctor.hospital)
+                        doctorSelected ? (
+                            doctorSelected.hospital
+                                ? hospitalCard(doctorSelected.hospital)
                                 : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Không có thông tin bệnh viện của bác sĩ.</p>
                         ) : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Vui lòng chọn bác sĩ để xem thông tin.</p>
                     }
@@ -379,9 +339,9 @@ export function SelectDoctor({ stepClick }: Props) {
                 </CardHeader>
                 <CardContent className="px-6  gap-3">
                     {
-                        doctor ? (
-                            doctor.specialty
-                                ? specialtyCard(doctor.specialty)
+                        doctorSelected ? (
+                            doctorSelected.specialty
+                                ? specialtyCard(doctorSelected.specialty)
                                 : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Không có thông tin chuyên khoa của bác sĩ.</p>
                         ) : <p className="text-sm text-teal-600  p-3 rounded-md text-center ">Vui lòng chọn bác sĩ để xem thông tin.</p>
 
@@ -391,16 +351,14 @@ export function SelectDoctor({ stepClick }: Props) {
 
             <div className="flex justify-between col-span-3">
                 <button
-                    onClick={() => {
-                        stepClick(false)
-                    }}
+                    onClick={handleBackStep}
                     className="text-gray-600 px-4 py-2 disabled:opacity-50"
                 >
                     Quay lại
                 </button>
                 <button
-                    disabled={!doctor}
-                    onClick={() => { stepClick(true) }}
+                    disabled={!doctorSelected}
+                    onClick={handleNextStep}
                     className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Tiếp tục

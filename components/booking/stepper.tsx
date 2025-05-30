@@ -4,7 +4,7 @@ const steps = ["Triệu chứng", "Bác sĩ", "Thời gian", "Thông tin", "Xác
 
 interface StepperProps {
   currentStep: number;
-  stepClick: (step: number) => void;
+  stepClick?: (step: number) => void;
 }
 export default function Stepper({ currentStep, stepClick }: StepperProps) {
   return (
@@ -26,7 +26,7 @@ export default function Stepper({ currentStep, stepClick }: StepperProps) {
                   ? "border-4 border-teal-600 text-teal-600 bg-white"
                   : "bg-gray-200 text-gray-600"
             )}
-            onClick={() => stepClick(index)}
+            // onClick={() => stepClick(index)}
           >
             <span className="leading-none">{index + 1}</span>
           </div>

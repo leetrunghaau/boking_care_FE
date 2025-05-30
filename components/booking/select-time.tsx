@@ -11,29 +11,49 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatCurrencyVND } from "@/helper/customNumView"
 import { useBookingStore } from "@/store/booking"
+import { useRouter, useSearchParams } from "next/navigation"
 
 
 
-interface Pops {
-  stepClick: (nextStep: boolean) => void
-}
-export default function SelectTime({ stepClick }: Pops) {
-  const { hasHydrated, bookingInfo, setBooking: setBookingStore } = useBookingStore()
+export default function SelectTime() {
+  const router = useRouter()
+  const searchParams = useSearchParams();
+  const doctorIdParam = searchParams.get("doctorId")
+
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [availableTimes, setAvailableTimes] = useState<any[]>([])
   const [doctor, setDoctor] = useState<any | null>(null)
+
+
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [doctorLoad, setDoctorLoad] = useState<boolean>(false)
 
 
-
   useEffect(() => {
-    if (!hasHydrated) return
+    if (!doctorIdParam) return
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<any[]>(`/booking/doctor/${bookingInfo.doctorId}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
+        const res = await http.get<any[]>(`/booking/doctor/${doctorIdParam}`)
+        setDoctor(res);
+      } catch (err) {
+        console.error("Failed to fetch Hospital:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [])
+
+
+
+  useEffect(() => {
+    if (!doctorIdParam) return
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await http.get<any[]>(`/booking/doctor/${doctorIdParam}/schedule/${format(selectedDate, 'yyyy-MM-dd')}`)
         setAvailableTimes(res);
         console.log("fetch Hospital", res)
       } catch (err) {
@@ -43,26 +63,25 @@ export default function SelectTime({ stepClick }: Pops) {
       }
     };
     fetchData();
-  }, [hasHydrated])
+  }, [selectedDate])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setDoctorLoad(true);
-      setSelectedDate(bookingInfo.date ?? selectedDate)
-      setSelectedTime(bookingInfo.time)
-      try {
-        const rs = await http.get<any>(`/booking/doctor/${bookingInfo.doctorId}`);
-        // console.log(" doctors", rs)
-        setDoctor(rs);
-      } catch (err) {
-        console.error("Failed to fetch doctors:", err);
-      } finally {
-        setDoctorLoad(false);
-      }
-    };
-    fetchData();
-  }, [hasHydrated])
 
+  const handleBackStep = () => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    currentParams.set("curStep", "1");
+    const queryString = currentParams.toString();
+    router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+  };
+
+
+  const handleNextStep = () => {
+    const queryParams = new URLSearchParams(searchParams.toString());
+    queryParams.set("curStep", "3");
+    if (selectedDate) { queryParams.set("date", format(selectedDate, 'yyyy-MM-dd')) }
+    if (selectedTime) { queryParams.set("time", selectedTime.toString()) }
+    const queryString = queryParams.toString();
+    router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+  }
 
 
   const dateCard = () => {
@@ -239,16 +258,14 @@ export default function SelectTime({ stepClick }: Pops) {
       </div>
       <div className="flex justify-between col-span-3">
         <button
-          onClick={() => {
-            stepClick(false)
-          }}
+          onClick={handleBackStep}
           className="text-gray-600 px-4 py-2 disabled:opacity-50"
         >
           Quay lại
         </button>
         <button
           disabled={!selectedTime}
-          onClick={() => { stepClick(true) }}
+          onClick={handleNextStep}
           className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Tiếp tục
