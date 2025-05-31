@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button"
-import { Calendar, CalendarCheck, History, Clock } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Calendar, CalendarCheck, History, Clock } from "lucide-react";
 
 interface EmptyStateProps {
-  filterType: string
+  filterType: string;
 }
 
 export function EmptyState({ filterType }: EmptyStateProps) {
@@ -22,21 +22,25 @@ export function EmptyState({ filterType }: EmptyStateProps) {
       title: "Chưa có lịch sử khám",
       description: "Bạn chưa có lịch sử khám bệnh nào.",
     },
-    "Tương lai": {
+    "Tất cả": {
       icon: <Clock className="h-12 w-12 text-teal-200" />,
-      title: "Không có lịch hẹn trong tương lai",
-      description: "Bạn không có lịch hẹn nào trong tương lai.",
+      title: "Không có lịch hẹn",
+      description: "Bạn không có lịch hẹn nào.",
     },
-  }
+  };
 
-  const content = config[filterType] || config["Hôm nay"]
+  const content = config[filterType] || config["Hôm nay"];
 
   return (
     <div className="text-center py-16 px-4 rounded-lg border-2 border-dashed border-slate-200 bg-slate-50">
       <div className="flex justify-center mb-4">{content.icon}</div>
-      <h3 className="text-lg font-medium text-slate-800 mb-2">{content.title}</h3>
-      <p className="text-slate-500 mb-6 max-w-md mx-auto">{content.description}</p>
+      <h3 className="text-lg font-medium text-slate-800 mb-2">
+        {content.title}
+      </h3>
+      <p className="text-slate-500 mb-6 max-w-md mx-auto">
+        {content.description}
+      </p>
       <Button variant="outline">Xem lịch làm việc</Button>
     </div>
-  )
+  );
 }

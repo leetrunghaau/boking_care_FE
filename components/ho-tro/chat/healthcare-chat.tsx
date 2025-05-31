@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChatBubble } from "../chat-bubble";
 import { Send, Phone, FileText, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { handleApiError } from "@/helper/handle-error";
 
 export function HealthcareChat() {
   const [messages, setMessages] = useState<
@@ -59,6 +60,11 @@ export function HealthcareChat() {
         ...prev,
         { role: "ai", text: "Lỗi kết nối tới máy chủ AI." },
       ]);
+      handleApiError(
+        error,
+        "Có lỗi xảy ra, vui lòng thử lại sau",
+        "Lỗi kết nối tới máy chủ AI."
+      );
     }
 
     setIsLoading(false);

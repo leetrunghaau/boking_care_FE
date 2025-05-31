@@ -1,23 +1,19 @@
-"use client"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle2, Calendar, Clock, User, Phone, FileText } from 'lucide-react'
-import { getIconByName } from "@/helper/icon-map"
-import { formatCurrencyVND } from "@/helper/customNumView"
-import { useEffect, useState } from "react"
-import http from "@/helper/axios"
-import { useRouter, useSearchParams } from "next/navigation"
-
-
-
-
+"use client";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle2, Calendar, Clock, User } from "lucide-react";
+import { formatCurrencyVND } from "@/helper/customNumView";
+import { useEffect, useState } from "react";
+import http from "@/helper/axios";
+import { useRouter, useSearchParams } from "next/navigation";
+import { handleApiError } from "@/helper/handle-error";
 export default function Summary() {
-  const router = useRouter()
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [doctor, setDoctor] = useState<any | null>(null)
-  const [patient, setPatient] = useState<any | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [doctor, setDoctor] = useState<any | null>(null);
+  const [patient, setPatient] = useState<any | null>(null);
   const [formData, setFormData] = useState({
     patientId: Number(searchParams.get("patientId")) || null,
     doctorId: Number(searchParams.get("doctorId")) || null,
@@ -39,7 +35,7 @@ export default function Summary() {
         if (formData.patientId) {
           const rs = await http.get<any | null>(`/booking/info`);
           if (rs) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               name: rs.name,
               phone: rs.phone || "",
@@ -54,11 +50,17 @@ export default function Summary() {
 
         // Nếu có doctorId
         if (formData.doctorId) {
-          const rs = await http.get<any | null>(`/booking/doctor/${formData.doctorId}`);
+          const rs = await http.get<any | null>(
+            `/booking/doctor/${formData.doctorId}`
+          );
           setDoctor(rs);
         }
       } catch (err) {
-        console.error(err);
+        handleApiError(
+          err,
+          "Có lỗi xảy ra, vui lòng thử lại sau",
+          "Lấy thông tin bệnh nhân thất bại."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -69,26 +71,28 @@ export default function Summary() {
 
   const handleBackStep = () => {
     const currentParams = new URLSearchParams(searchParams.toString());
-    currentParams.set("curStep", `${formData.patientId ? '2' : '3'}`);
+    currentParams.set("curStep", `${formData.patientId ? "2" : "3"}`);
     const queryString = currentParams.toString();
     router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
   };
 
-
   const handleNextStep = () => {
     const postData = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-
-        const rs = await http.post("/booking/up", formData)
+        const rs = await http.post("/booking/up", formData);
+        if (rs) {
+          router.push(`/thanh-cong?action=booking`);
+        }
       } catch (err) {
-        console.log(err)
+        console.log(err);
+        handleApiError(err, "Lỗi kết nối", "Đặt lịch khám thất bại");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    postData()
-  }
+    };
+    postData();
+  };
 
   // const Icon = getIconByName(bookingData?.specialty?.icon ?? "unKnown")
   return (
@@ -104,7 +108,7 @@ export default function Summary() {
         </div>
       </div>
 
-      <Card >
+      <Card>
         <CardContent className="p-6">
           <div className="space-y-6">
             <div>
@@ -116,7 +120,9 @@ export default function Summary() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Chuyên khoa</p>
-                    <p className="font-medium">{doctor?.specialty?.name || "Chưa chọn"}</p>
+                    <p className="font-medium">
+                      {doctor?.specialty?.name || "Chưa chọn"}
+                    </p>
                   </div>
                 </div>
 
@@ -125,7 +131,9 @@ export default function Summary() {
                   <div>
                     <p className="text-sm text-gray-500">Bác sĩ</p>
                     <p className="font-medium">{doctor?.name || "Chưa chọn"}</p>
-                    {doctor && <p className="text-sm text-gray-500">{doctor?.title}</p>}
+                    {doctor && (
+                      <p className="text-sm text-gray-500">{doctor?.title}</p>
+                    )}
                   </div>
                 </div>
 
@@ -134,7 +142,11 @@ export default function Summary() {
                   <div>
                     <p className="text-sm text-gray-500">Ngày khám</p>
                     <p className="font-medium">
-                      {formData.date ? format(formData.date, "EEEE, dd/MM/yyyy", { locale: vi }) : "Chưa chọn"}
+                      {formData.date
+                        ? format(formData.date, "EEEE, dd/MM/yyyy", {
+                            locale: vi,
+                          })
+                        : "Chưa chọn"}
                     </p>
                   </div>
                 </div>
@@ -143,7 +155,9 @@ export default function Summary() {
                   <Clock className="w-5 h-5 mt-0.5 text-teal-600" />
                   <div>
                     <p className="text-sm text-gray-500">Giờ khám</p>
-                    <p className="font-medium">{formData.time || "Chưa chọn"}</p>
+                    <p className="font-medium">
+                      {formData.time || "Chưa chọn"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -159,7 +173,9 @@ export default function Summary() {
 
                 <div>
                   <p className="text-sm text-gray-500">Số điện thoại</p>
-                  <p className="font-medium">{formData?.phone ?? "Chưa nhập"}</p>
+                  <p className="font-medium">
+                    {formData?.phone ?? "Chưa nhập"}
+                  </p>
                 </div>
 
                 <div>
@@ -169,7 +185,11 @@ export default function Summary() {
 
                 <div>
                   <p className="text-sm text-gray-500">Ngày sinh</p>
-                  <p className="font-medium">{formData?.dob ? format(formData.dob, "dd-MM-yyyy", { locale: vi }) : "Không có"}</p>
+                  <p className="font-medium">
+                    {formData?.dob
+                      ? format(formData.dob, "dd-MM-yyyy", { locale: vi })
+                      : "Không có"}
+                  </p>
                 </div>
 
                 <div>
@@ -178,16 +198,18 @@ export default function Summary() {
                     {formData?.gender == "male"
                       ? "Nam"
                       : patient?.gender == "female"
-                        ? "Nữ"
-                        : patient?.gender == "other"
-                          ? "Khác"
-                          : "Không có"}
+                      ? "Nữ"
+                      : patient?.gender == "other"
+                      ? "Khác"
+                      : "Không có"}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500">Địa chỉ</p>
-                  <p className="font-medium">{doctor?.hospital?.address ?? "Không có"}</p>
+                  <p className="font-medium">
+                    {formData.address ?? "Không có"}
+                  </p>
                 </div>
 
                 {/* <div className="md:col-span-2">
@@ -217,7 +239,9 @@ export default function Summary() {
                 </div>
                 <div className="flex justify-between font-medium text-lg pt-2 border-t">
                   <span>Tổng cộng</span>
-                  <span className="text-teal-600">{formatCurrencyVND(doctor?.price || 0)}</span>
+                  <span className="text-teal-600">
+                    {formatCurrencyVND(doctor?.price || 0)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -227,24 +251,23 @@ export default function Summary() {
 
       <div className="bg-yellow-50 p-4 rounded-md">
         <p className="text-yellow-800 text-sm">
-          <strong>Lưu ý:</strong> Vui lòng đến trước giờ hẹn 15 phút để hoàn tất thủ tục. Mang theo giấy tờ tùy thân và thẻ bảo hiểm y tế (nếu có).
+          <strong>Lưu ý:</strong> Vui lòng đến trước giờ hẹn 15 phút để hoàn tất
+          thủ tục. Mang theo giấy tờ tùy thân và thẻ bảo hiểm y tế (nếu có).
         </p>
       </div>
 
       <div className="flex justify-between pb-10">
         <button
           onClick={handleBackStep}
-          className="text-gray-600 px-4 py-2 disabled:opacity-50"
-        >
+          className="text-gray-600 px-4 py-2 disabled:opacity-50">
           Quay lại
         </button>
         <button
           onClick={handleNextStep}
-          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Xác nhận
         </button>
       </div>
     </div>
-  )
+  );
 }

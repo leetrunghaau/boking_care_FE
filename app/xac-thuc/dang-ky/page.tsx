@@ -21,7 +21,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
 import { registerSchema } from "@/schemas/registerSchema";
-
+import { handleApiError } from "@/helper/handle-error";
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -95,24 +95,15 @@ export default function RegisterPage() {
 
     try {
       const rs = await http.post<any>("/sig/signup", formData);
-      console.log("Form data:", formData);
       toast({
         title: "Đăng ký thành công",
         description: "Chào mừng bạn đến với BookingCare",
         variant: "success",
         duration: 2000,
       });
-
-      router.push("/xac-thuc/dang-nhap");
+      router.push("/thanh-cong?action=register");
     } catch (error) {
-      console.log("Form data:", formData);
-
-      console.log(error);
-      toast({
-        title: "Đăng ký thất bại",
-        description: "Có lỗi xảy ra, vui lòng thử lại sau",
-        variant: "destructive",
-      });
+      handleApiError(error, "Lỗi không xác định", "Đăng ký thất bại");
     } finally {
       setIsLoading(false);
     }

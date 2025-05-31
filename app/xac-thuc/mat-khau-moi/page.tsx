@@ -18,6 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { handleApiError } from "@/helper/handle-error";
+
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -99,13 +101,11 @@ export default function ResetPasswordPage() {
 
       router.push("/xac-thuc/dang-nhap");
     } catch (error) {
-      const e = error as Error;
-
-      toast({
-        title: "Đặt lại mật khẩu thất bại",
-        description: e.message || "Có lỗi xảy ra, vui lòng thử lại sau",
-        variant: "destructive",
-      });
+      handleApiError(
+        error,
+        "Có lỗi xảy ra, vui lòng thử lại sau",
+        "Đặt lại mật khẩu thất bại"
+      );
     } finally {
       setIsLoading(false);
     }

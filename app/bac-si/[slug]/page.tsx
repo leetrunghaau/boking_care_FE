@@ -1,37 +1,22 @@
-'use client'
-import Image from "next/image"
-import {
-  MapPin,
-  Briefcase,
-  Heart,
-  Share2,
-  Phone,
-  Star,
-  CheckCircle,
-  BookOpen,
-  Award,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import DoctorReviews from "@/components/doctor-page/detail/doctor-reviews"
-import DoctorSchedule from "@/components/doctor-page/detail/doctor-schedule"
-import DoctorAbout from "@/components/doctor-page/detail/doctor-about"
-import { useParams } from "next/navigation"
-import DoctorExperience from "@/components/doctor-page/detail/doctor-experience"
-import DoctorFAQ from "@/components/doctor-page/detail/doctor-FAQ"
-import HospitalInfo from "@/components/doctor-page/detail/hospital-info"
-import { useEffect, useState } from "react"
-import http from "@/helper/axios"
-
-
+"use client";
+import Image from "next/image";
+import { MapPin, Briefcase, Phone, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import DoctorReviews from "@/components/doctor-page/detail/doctor-reviews";
+import DoctorSchedule from "@/components/doctor-page/detail/doctor-schedule";
+import DoctorAbout from "@/components/doctor-page/detail/doctor-about";
+import { useParams } from "next/navigation";
+import DoctorExperience from "@/components/doctor-page/detail/doctor-experience";
+import HospitalInfo from "@/components/doctor-page/detail/hospital-info";
+import { useEffect, useState } from "react";
+import http from "@/helper/axios";
+import { handleApiError } from "@/helper/handle-error";
 
 export default function DoctorDetailPage() {
-  const params = useParams()
-  const slug = params?.slug as string
-
+  const params = useParams();
+  const slug = params?.slug as string;
 
   const [doctor, setDoctor] = useState<any | null>();
   const [loading, setLoading] = useState(true);
@@ -41,10 +26,14 @@ export default function DoctorDetailPage() {
       setLoading(true);
       try {
         const res = await http.get<any | null>(`/doctor-site/doctor/${slug}`);
-        console.log("chi tiết bác sĩ\n", res)
+        console.log("chi tiết bác sĩ\n", res);
         setDoctor(res);
       } catch (err) {
-        console.error("Failed to fetch doctors:", err);
+        handleApiError(
+          err,
+          "Có lỗi xảy ra, vui lòng thử lại sau",
+          "Lấy thông tin bác sĩ thất bại."
+        );
       } finally {
         setLoading(false);
       }
@@ -52,8 +41,6 @@ export default function DoctorDetailPage() {
 
     fetchDoctors();
   }, []);
-
-
 
   return (
     <>
@@ -69,23 +56,27 @@ export default function DoctorDetailPage() {
                     <div className="flex-shrink-0">
                       <div className="relative w-40 h-40 mx-auto md:mx-0 rounded-lg overflow-hidden border">
                         <Image
-                          src={doctor?.img ?? `/placeholder.svg?height=300&width=300`}
+                          src={
+                            doctor?.img ??
+                            `/placeholder.svg?height=300&width=300`
+                          }
                           alt={doctor?.name ?? "bac si"}
                           fill
                           className="object-cover"
                         />
                       </div>
-
                     </div>
 
                     <div className="flex-1 text-center md:text-left">
                       <h1 className="text-2xl font-bold">{doctor?.name}</h1>
-                      <p className="text-muted-foreground">{ }</p>
+                      <p className="text-muted-foreground">{}</p>
 
                       <div className="flex items-center gap-1 mt-2 justify-center md:justify-start">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="font-medium">{doctor?.rating}</span>
-                        <span className="text-muted-foreground">({doctor?.reviews} đánh giá)</span>
+                        <span className="text-muted-foreground">
+                          ({doctor?.reviews} đánh giá)
+                        </span>
                       </div>
 
                       <div className="mt-4 space-y-2">
@@ -97,7 +88,11 @@ export default function DoctorDetailPage() {
                         </div>
                         <div className="flex items-start gap-2 justify-center md:justify-start">
                           <MapPin className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                          <span>{doctor?.hospital?.address ?? (doctor?.address ?? "không có thông tin")}</span>
+                          <span>
+                            {doctor?.hospital?.address ??
+                              doctor?.address ??
+                              "không có thông tin"}
+                          </span>
                         </div>
                         <div className="flex items-start gap-2 justify-center md:justify-start">
                           <Phone className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
@@ -106,11 +101,16 @@ export default function DoctorDetailPage() {
                       </div>
 
                       <div className="mt-6 flex flex-wrap gap-2 justify-center md:justify-start">
-                        {doctor?.technique.slice(0, 3).map((spec: string, index: number) => (
-                          <Badge key={index} variant="outline" className="bg-teal-50 text-teal-700 hover:bg-teal-100">
-                            {spec}
-                          </Badge>
-                        ))}
+                        {doctor?.technique
+                          .slice(0, 3)
+                          .map((spec: string, index: number) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="bg-teal-50 text-teal-700 hover:bg-teal-100">
+                              {spec}
+                            </Badge>
+                          ))}
                         {doctor && doctor.technique.length > 3 && (
                           <Badge variant="outline" className="bg-slate-50">
                             +{doctor.technique.length - 3}
@@ -137,7 +137,6 @@ export default function DoctorDetailPage() {
 
                 <TabsContent value="experience" className="space-y-6">
                   <DoctorExperience doctor={doctor} />
-
                 </TabsContent>
 
                 <TabsContent value="reviews">
@@ -195,14 +194,12 @@ export default function DoctorDetailPage() {
 
             {/* Sidebar */}
             <div className="flex flex-col gap-6">
-             <DoctorSchedule slug={slug}/>
+              <DoctorSchedule slug={slug} />
               <HospitalInfo doctor={doctor} />
-
             </div>
           </div>
         </div>
       </section>
-
     </>
-  )
+  );
 }

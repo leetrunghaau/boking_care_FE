@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 // Doctor schedule components
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
 
 // Icons
 import {
@@ -41,17 +40,8 @@ type FAQ = {
   };
   question: string;
   answer?: string;
-};
-
-const doctorInfo = {
-  doctorId: "D-123456",
-  doctorName: "BS. Nguyễn Văn A",
-  specialty: "Nội khoa tổng quát",
-  stats: {
-    total: 120,
-    booked: 15,
-    completed: 105,
-  },
+  answeredAt: string;
+  createdAt: string;
 };
 
 export default function DoctorFAQ() {
@@ -90,6 +80,8 @@ export default function DoctorFAQ() {
           },
           question: item.symptoms,
           answer: "",
+          answeredAt: item.answeredAt || null,
+          createdAt: item.createdAt || null,
         }));
 
         setFAQs(mappedFAQs);
@@ -127,12 +119,6 @@ export default function DoctorFAQ() {
 
   return (
     <div className="w-11/12 mx-auto my-12 space-y-16">
-      <DoctorHeader
-        doctorId={doctorInfo.doctorId}
-        doctorName={doctorInfo.doctorName}
-        specialty={doctorInfo.specialty}
-        stats={doctorInfo.stats}
-      />
       <section>
         <h1 className="text-3xl font-bold text-slate-800 mb-3 text-center">
           Giải đáp bệnh nhân
@@ -224,11 +210,11 @@ export default function DoctorFAQ() {
                           <div className=" text-sm text-gray-600">
                             <div className="flex items-center gap-2">
                               <Clock className="w-4 h-4 text-gray-400" />
-                              <span>06:30</span>
+                              <span> {faq.answeredAt}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <CalendarDays className="w-4 h-4 text-gray-400" />
-                              <span>12-06-2025</span>
+                              <span>{faq.createdAt}</span>
                             </div>
                           </div>
                         </div>
@@ -246,7 +232,7 @@ export default function DoctorFAQ() {
                           <Button
                             variant="outline"
                             className="text-red-600 border-red-600 rounded-full h-6 hover:bg-red-50 hover:text-red-600">
-                            xóa
+                            Xóa
                           </Button>
                         </div>
                       </div>

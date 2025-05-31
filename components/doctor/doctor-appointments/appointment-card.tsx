@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { format } from "date-fns";
 import {
   CalendarClock,
   Clock,
@@ -12,33 +11,10 @@ import {
   User,
   Search,
 } from "lucide-react";
-import { vi } from "date-fns/locale";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export interface AppointmentData {
-  id: string;
-  patientName: string;
-  patientAvatar?: string;
-  patientPhone: string;
-  date: string;
-  time: string;
-  duration: number;
-  price: number;
-  status: "confirmed" | "completed" | "cancelled" | "pending";
-  symptoms?: string;
-  address?: string;
-  isOnline?: boolean;
-}
-
-interface AppointmentCardProps {
-  appointment: AppointmentData;
-  showActions?: boolean;
-}
-
-export function AppointmentCard({
-  appointment,
-  showActions = true,
-}: AppointmentCardProps) {
+export function AppointmentCard({ appointment, showActions = true }: any) {
   const statusConfig = {
     confirmed: { label: "Đã xác nhận", color: "bg-blue-100 text-blue-700" },
     completed: { label: "Đã hoàn thành", color: "bg-green-100 text-green-700" },
@@ -46,9 +22,10 @@ export function AppointmentCard({
     pending: { label: "Chờ xác nhận", color: "bg-yellow-100 text-yellow-700" },
   };
   const router = useRouter();
-
-  const status = statusConfig[appointment.status];
-  const appointmentDate = new Date(appointment.date);
+  const status = statusConfig[appointment.status as keyof typeof statusConfig];
+  useEffect(() => {
+    console.log("appointment:", appointment);
+  }, []);
 
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
@@ -60,29 +37,29 @@ export function AppointmentCard({
               <Avatar className="h-12 w-12 border">
                 <AvatarImage
                   src={
-                    appointment.patientAvatar ||
+                    appointment?.patient?.img ??
                     `/placeholder.svg?height=48&width=48`
                   }
                 />
                 <AvatarFallback className="bg-slate-100">
-                  {appointment.patientName.charAt(0)}
+                  {appointment.patient?.name ?? "Không có"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-slate-800">
-                    {appointment.patientName}
+                    {appointment.patient?.name ?? "Không có"}
                   </h3>
                   <Badge className={status.color}>{status.label}</Badge>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
                   <Phone className="h-3.5 w-3.5" />
-                  <span>{appointment.patientPhone}</span>
+                  <span>{appointment.patient?.phone ?? "Không có"}</span>
                 </div>
                 {appointment.symptoms && (
                   <p className="text-sm text-slate-600 mt-2 line-clamp-2">
                     <span className="font-medium">Triệu chứng:</span>{" "}
-                    {appointment.symptoms}
+                    {appointment?.notes ?? "Trống"}
                   </p>
                 )}
               </div>
@@ -96,9 +73,14 @@ export function AppointmentCard({
                 <CalendarClock className="h-4 w-4 text-teal-600" />
                 <div className="text-sm">
                   <span className="font-medium text-slate-700">
-                    {format(appointmentDate, "EEEE, dd/MM/yyyy", {
-                      locale: vi,
-                    })}
+                    {new Date(appointment.bookingDate).toLocaleDateString(
+                      "vi-VN",
+                      {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "2-digit",
+                      }
+                    )}
                   </span>
                 </div>
               </div>
@@ -106,7 +88,7 @@ export function AppointmentCard({
                 <Clock className="h-4 w-4 text-teal-600" />
                 <div className="text-sm">
                   <span className="font-medium text-slate-700">
-                    {appointment.time} ({appointment.duration} phút)
+                    {appointment.bookingTime?.slice(0, 5)} phút
                   </span>
                 </div>
               </div>
@@ -114,18 +96,18 @@ export function AppointmentCard({
                 <DollarSign className="h-4 w-4 text-green-600" />
                 <div className="text-sm">
                   <span className="font-medium text-slate-700">
-                    {new Intl.NumberFormat("vi-VN").format(appointment.price)}{" "}
-                    VNĐ
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(500000)}
                   </span>
                 </div>
               </div>
-              {appointment.address && (
+              {appointment?.doctor?.hospital?.address && (
                 <div className="flex items-start gap-2">
                   <MapPin className="h-4 w-4 text-slate-600 mt-0.5" />
                   <div className="text-sm text-slate-600 flex-1">
-                    {appointment.isOnline
-                      ? "Khám trực tuyến"
-                      : appointment.address}
+                    {appointment?.doctor?.hospital?.address ?? "Không có"}
                   </div>
                 </div>
               )}

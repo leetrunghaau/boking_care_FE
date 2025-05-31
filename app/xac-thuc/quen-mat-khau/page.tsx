@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
-
+import { handleApiError } from "@/helper/handle-error";
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -55,12 +55,11 @@ export default function ForgotPasswordPage() {
         description: "Vui lòng kiểm tra email của bạn để đặt lại mật khẩu",
       });
     } catch (error) {
-      const e = error as Error;
-      toast({
-        title: "Yêu cầu thất bại",
-        description: e.message || "Đã có lỗi xảy ra",
-        variant: "destructive",
-      });
+      handleApiError(
+        error,
+        "Có lỗi xảy ra, vui lòng thử lại sau",
+        "Yêu cầu đặt lại mật khẩu thất bại"
+      );
     } finally {
       setIsLoading(false);
     }

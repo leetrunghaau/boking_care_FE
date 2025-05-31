@@ -1,7 +1,6 @@
 "use client";
 
 // React core and hooks
-import type React from "react";
 import { useEffect, useState } from "react";
 
 // Next hooks
@@ -17,11 +16,11 @@ import {
   DollarSign,
   FileText,
   MapPin,
-  MessageSquare,
   Phone,
   Stethoscope,
   Trash,
   User,
+  Mail,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -42,12 +41,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { PrescriptionForm } from "@/components/doctor/doctor-prescriptions/prescription-form";
 import { PrescriptionPreview } from "@/components/doctor/doctor-prescriptions/prescription-preview";
-
+import { ImageUploader } from "@/components/share/image-uploader";
+import { InputWithUnit } from "@/components/share/input-with-unit";
 // Utilities
 import http from "@/helper/axios";
 
@@ -93,15 +92,24 @@ export default function AppointmentDetail() {
   const [appointmentDetail, setAppointmentDetail] =
     useState<AppointmentDetail | null>(null);
   const [activeTab, setActiveTab] = useState("details");
-
   const [hasPrescription, setHasPrescription] = useState(false);
   const [showPrescriptionPreview, setShowPrescriptionPreview] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
   // Form inputs
   const [diagnosis, setDiagnosis] = useState("");
   const [clinicalNotes, setClinicalNotes] = useState("");
   const [followUpDate, setFollowUpDate] = useState("");
   const [followUpNotes, setFollowUpNotes] = useState("");
+  const [uploadedImages, setUploadedImages] = useState<any[]>([]);
+  const [vitalSigns, setVitalSigns] = useState({
+    bloodPressure: "",
+    heartRate: "",
+    temperature: "",
+    respiratoryRate: "",
+    weight: "",
+    height: "",
+  });
 
   //Effects
   useEffect(() => {
@@ -111,6 +119,7 @@ export default function AppointmentDetail() {
           `/doctor-appointment/appointments/${params.id}`
         );
         setAppointmentDetail(res);
+        setVitalSigns(res.vitalSigns);
         console.log("Appointment Detail:", res);
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
@@ -127,6 +136,69 @@ export default function AppointmentDetail() {
   // Xử lý hoàn thành lịch hẹn
   const handleCompleteAppointment = () => {
     alert("Lịch hẹn đã được đánh dấu là hoàn thành!");
+  };
+  const handleTestSubmit = async () => {
+    const formData = new FormData();
+
+    // Add uploaded images only
+    uploadedImages.forEach((file, index) => {
+      formData.append(`images[${index}]`, file);
+    });
+
+    try {
+      const response = await http.post(
+        `/doctor-appointment/appointments/${params.id}/test-upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      alert("Images uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      alert("Failed to upload images.");
+    }
+  };
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+
+    // Add form fields
+    formData.append("diagnosis", diagnosis);
+    formData.append("clinicalNotes", clinicalNotes);
+    formData.append("followUpDate", followUpDate);
+    formData.append("followUpNotes", followUpNotes);
+
+    // Add uploaded images
+    uploadedImages.forEach((file, index) => {
+      formData.append(`images[${index}]`, file);
+    });
+
+    try {
+      const response = await http.post(
+        `/doctor-appointment/appointments/${params.id}/submit`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      alert("Data submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      alert("Failed to submit data.");
+    }
+  };
+  //Xử lý thông tin sức khoẻ
+  const handleVitalChange = (key: keyof typeof vitalSigns, value: string) => {
+    setVitalSigns((prev) => ({ ...prev, [key]: value }));
+    console.log("Vital signs updated:", {
+      ...vitalSigns,
+      [key]: value,
+    });
   };
 
   // Xử lý lưu đơn thuốc
@@ -148,12 +220,25 @@ export default function AppointmentDetail() {
     return <div>Loading...</div>;
   }
 
+  const handleImageChange = (files: File[]) => {
+    setUploadedImages(files);
+  };
+
   // Status config
   const statusConfig = {
-    confirmed: { label: "Đã xác nhận", color: "bg-blue-100 text-blue-700" },
-    completed: { label: "Đã hoàn thành", color: "bg-green-100 text-green-700" },
-    cancelled: { label: "Đã hủy", color: "bg-red-100 text-red-700" },
-    pending: { label: "Chờ xác nhận", color: "bg-yellow-100 text-yellow-700" },
+    confirmed: {
+      label: "Đã xác nhận",
+      color: "bg-blue-100 text-blue-700  text-sm",
+    },
+    completed: {
+      label: "Đã hoàn thành",
+      color: "bg-green-100 text-green-700  text-sm",
+    },
+    cancelled: { label: "Đã hủy", color: "bg-red-100 text-red-700  text-sm" },
+    pending: {
+      label: "Chờ xác nhận",
+      color: "bg-yellow-100 text-yellow-700 text-sm",
+    },
   };
 
   const status = statusConfig[
@@ -233,16 +318,16 @@ export default function AppointmentDetail() {
               </div>
 
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="sm" className="flex-1">
+                {/* <Button variant="outline" size="sm" className="flex-1">
                   <MessageSquare className="h-4 w-4 mr-1" />
                   Nhắn tin
-                </Button>
+                </Button> */}
                 <Button
                   variant="default"
                   size="sm"
                   className="flex-1 bg-teal-600 hover:bg-teal-700">
                   <FileText className="h-4 w-4 mr-1" />
-                  Hồ sơ
+                  Xem hồ sơ bệnh nhân
                 </Button>
               </div>
             </CardContent>
@@ -263,7 +348,16 @@ export default function AppointmentDetail() {
                     <Calendar className="h-4 w-4 text-slate-500" />
                     <span className="text-sm font-medium">Ngày khám:</span>
                   </div>
-                  <span className="text-sm">{appointmentDetail.date}</span>
+                  <span className="text-sm">
+                    {new Date(appointmentDetail.date).toLocaleDateString(
+                      "vi-VN",
+                      {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "2-digit",
+                      }
+                    )}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -272,7 +366,7 @@ export default function AppointmentDetail() {
                     <span className="text-sm font-medium">Giờ khám:</span>
                   </div>
                   <span className="text-sm">
-                    {appointmentDetail.time} ({appointmentDetail.duration} phút)
+                    {appointmentDetail.time?.slice(0, 5)} phút
                   </span>
                 </div>
 
@@ -296,74 +390,15 @@ export default function AppointmentDetail() {
                   </div>
                   <span className="text-sm">{appointmentDetail.address}</span>
                 </div>
-              </div>
 
-              <Separator />
-
-              <div>
-                <h4 className="text-sm font-medium mb-2 flex items-center gap-1">
-                  <Stethoscope className="h-4 w-4 text-slate-500" />
-                  Triệu chứng:
-                </h4>
-                <p className="text-sm text-slate-600">
-                  {appointmentDetail.symptoms}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Activity className="h-5 w-5 text-teal-600" />
-                Sức khoẻ tổng quát
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {appointmentDetail.vitalSigns ? (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Huyết áp</p>
-                    <p className="text-sm font-medium">
-                      {appointmentDetail.vitalSigns.bloodPressure}
-                    </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Stethoscope className="h-4 w-4 text-slate-500" />
+                    <span className="text-sm font-medium"> Triệu chứng:</span>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Nhịp tim</p>
-                    <p className="text-sm font-medium">
-                      {appointmentDetail.vitalSigns.heartRate}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Nhiệt độ</p>
-                    <p className="text-sm font-medium">
-                      {appointmentDetail.vitalSigns.temperature}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Nhịp thở</p>
-                    <p className="text-sm font-medium">
-                      {appointmentDetail.vitalSigns.respiratoryRate}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Cân nặng</p>
-                    <p className="text-sm font-medium">
-                      {appointmentDetail.vitalSigns.weight}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Chiều cao</p>
-                    <p className="text-sm font-medium">
-                      {appointmentDetail.vitalSigns.height}
-                    </p>
-                  </div>
+                  <span className="text-sm"> {appointmentDetail.symptoms}</span>
                 </div>
-              ) : (
-                <p className="text-sm text-slate-500">
-                  Không có dữ liệu sức khoẻ.
-                </p>
-              )}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -387,6 +422,89 @@ export default function AppointmentDetail() {
                 <TabsContent value="details" className="space-y-6 mt-0">
                   <div className="space-y-4">
                     <div className="space-y-2">
+                      <Label htmlFor="diagnosis">Sức khoẻ tổng quát</Label>
+                      {appointmentDetail.vitalSigns ? (
+                        <div className="grid grid-cols-2 gap-6">
+                          <InputWithUnit
+                            id="bloodPressure"
+                            placeholder="Nhập huyết áp"
+                            value={vitalSigns.bloodPressure}
+                            readOnly={isEditable}
+                            className={isEditable ? "" : ""}
+                            label="Huyết áp"
+                            unit="mmHg"
+                            onChange={(e) =>
+                              handleVitalChange("bloodPressure", e.target.value)
+                            }
+                          />
+                          <InputWithUnit
+                            id="temperature"
+                            placeholder="Nhập nhiệt độ"
+                            value={vitalSigns.temperature}
+                            readOnly={isEditable}
+                            className={isEditable ? "" : ""}
+                            label="Nhiệt độ"
+                            unit="°C"
+                            onChange={(e) =>
+                              handleVitalChange("bloodPressure", e.target.value)
+                            }
+                          />
+                          <InputWithUnit
+                            id="height"
+                            placeholder="Nhập chiều cao"
+                            value={vitalSigns.height}
+                            readOnly={isEditable}
+                            className={isEditable ? "" : ""}
+                            label="Chiều cao"
+                            unit="cm"
+                            onChange={(e) =>
+                              handleVitalChange("bloodPressure", e.target.value)
+                            }
+                          />
+                          <InputWithUnit
+                            id="heartRate"
+                            placeholder="Nhập nhịp tim"
+                            value={vitalSigns.heartRate}
+                            readOnly={isEditable}
+                            className={isEditable ? "" : ""}
+                            label="Nhịp tim"
+                            unit="bpm"
+                            onChange={(e) =>
+                              handleVitalChange("bloodPressure", e.target.value)
+                            }
+                          />
+                          <InputWithUnit
+                            id="weight"
+                            placeholder="Nhập cân nặng"
+                            value={vitalSigns.weight}
+                            readOnly={isEditable}
+                            className={isEditable ? "" : ""}
+                            label="Cân nặng"
+                            unit="kg"
+                            onChange={(e) =>
+                              handleVitalChange("bloodPressure", e.target.value)
+                            }
+                          />
+                          <InputWithUnit
+                            id="respiratoryRate"
+                            placeholder="Nhập nhịp thở"
+                            value={vitalSigns.respiratoryRate}
+                            readOnly={isEditable}
+                            className={isEditable ? "" : ""}
+                            label="Nhịp thở"
+                            unit="bpm"
+                            onChange={(e) =>
+                              handleVitalChange("bloodPressure", e.target.value)
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500">
+                          Không có dữ liệu sức khoẻ.
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="diagnosis">Chẩn đoán</Label>
                       <Input
                         id="diagnosis"
@@ -406,8 +524,6 @@ export default function AppointmentDetail() {
                         onChange={(e) => setClinicalNotes(e.target.value)}
                       />
                     </div>
-
-                    <Separator />
 
                     <div className="space-y-2">
                       <Label>Hẹn tái khám</Label>
@@ -445,6 +561,15 @@ export default function AppointmentDetail() {
                         value={followUpNotes}
                         onChange={(e) => setFollowUpNotes(e.target.value)}
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <ImageUploader onFilesChange={handleImageChange} />
+                      <Button
+                        onClick={handleTestSubmit}
+                        className="bg-teal-600 hover:bg-teal-700">
+                        <Check className="h-4 w-4 mr-1" />
+                        Up ảnh Test
+                      </Button>
                     </div>
                   </div>
                 </TabsContent>
@@ -524,42 +649,5 @@ export default function AppointmentDetail() {
         </div>
       </div>
     </div>
-  );
-}
-
-function Mail(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round">
-      <rect width="20" height="16" x="2" y="4" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </svg>
-  );
-}
-
-function Activity(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round">
-      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-    </svg>
   );
 }

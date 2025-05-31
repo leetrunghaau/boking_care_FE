@@ -7,17 +7,20 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import { handleApiError } from "@/helper/handle-error";
 
 export default function SymptomInput() {
   const searchParams = useSearchParams();
-  const symptomsQuery = searchParams.get("symptoms")
+  const symptomsQuery = searchParams.get("symptoms");
   const [symptoms, setSymptoms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
   // local state
-  const [userInput, setUserInput] = useState<string>(symptomsQuery?.toString() ?? "" );
+  const [userInput, setUserInput] = useState<string>(
+    symptomsQuery?.toString() ?? ""
+  );
 
   // fetch data khi mount
   useEffect(() => {
@@ -29,13 +32,11 @@ export default function SymptomInput() {
           setSymptoms(rs);
         }
       } catch (err) {
-        const e = err as Error;
-        toast({
-          title: "Lỗi API",
-          description: e.message || "Đã có lỗi xảy ra",
-          variant: "error",
-          duration: 2000,
-        });
+        handleApiError(
+          err,
+          "Có lỗi xảy ra, vui lòng thử lại sau",
+          "Lấy thông tin triệu chứng thất bại"
+        );
       } finally {
         setLoading(false);
       }
@@ -66,10 +67,8 @@ export default function SymptomInput() {
     queryParams.set("curStep", "1");
 
     const queryString = queryParams.toString();
-    router.push(
-      `/dat-lich-kham${queryString ? `?${queryString}` : ""}`
-    );
-  }
+    router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
+  };
 
   return (
     <div className="space-y-6">

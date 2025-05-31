@@ -5,6 +5,7 @@ import http from "@/helper/axios";
 import SubHeader from "@/components/sub-header";
 import DoctorCard from "@/components/doctor-page/docter-card";
 import DoctorSearchFilter from "@/components/doctor-page/search-filter";
+import { handleApiError } from "@/helper/handle-error";
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -16,10 +17,14 @@ export default function DoctorsPage() {
       try {
         const res = await http.get<any[]>(`/doctor-site/doctors`);
 
-        console.log("tổng hợp bác sĩ\n", res)
+        console.log("tổng hợp bác sĩ\n", res);
         setDoctors(res);
       } catch (err) {
-        console.error("Failed to fetch doctors:", err);
+        handleApiError(
+          err,
+          "Có lỗi xảy ra, vui lòng thử lại sau",
+          "Lấy thông tin bác sĩ thất bại."
+        );
       } finally {
         setLoading(false);
       }
@@ -36,9 +41,7 @@ export default function DoctorsPage() {
     <>
       <section className="m-10">
         <div className="container justify-center mx-auto">
-          <SubHeader
-            title="Bác sĩ"
-          />
+          <SubHeader title="Bác sĩ" />
         </div>
       </section>
 

@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
 import useAuthStore from "@/store/auth";
 import { loginSchema } from "@/schemas/logInSchema";
-
+import { handleApiError } from "@/helper/handle-error";
 export default function LoginPage() {
   const { toast } = useToast();
   const { logIn } = useAuthStore();
@@ -89,13 +89,7 @@ export default function LoginPage() {
         role: rs.role,
       });
     } catch (err) {
-      const e = err as Error;
-      toast({
-        title: "Đăng nhập thất bại",
-        description: e.message || "Đã có lỗi xảy ra",
-        variant: "warning",
-        duration: 2000,
-      });
+      handleApiError(err, "Lỗi không xác định", "Đăng nhập thất bại");
     } finally {
       setIsLoading(false);
     }

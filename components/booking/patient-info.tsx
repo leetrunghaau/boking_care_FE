@@ -1,25 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
 import { InfoIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import http from "@/helper/axios";
 import { useRouter, useSearchParams } from "next/navigation";
-
-
+import { handleApiError } from "@/helper/handle-error";
 
 export default function PatientInformation() {
-  const router = useRouter()
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const symptomsQuery = searchParams.get("symptoms")
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const symptomsQuery = searchParams.get("symptoms");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -35,7 +32,6 @@ export default function PatientInformation() {
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
 
   const handleNextStep = () => {
     if (!formData.name || !formData.phone) {
@@ -57,7 +53,6 @@ export default function PatientInformation() {
     queryParams.set("address", formData.address);
     const queryString = queryParams.toString();
     router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
-
   };
   const handleBackStep = () => {
     const currentParams = new URLSearchParams(searchParams.toString());
@@ -66,34 +61,31 @@ export default function PatientInformation() {
     router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
   };
 
-
-
-
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const rs = await http.get<any | null>("/booking/info")
+        const rs = await http.get<any | null>("/booking/info");
         if (rs) {
           const queryParams = new URLSearchParams(searchParams.toString());
           queryParams.set("curStep", "4");
-          queryParams.set("patientId", rs.id.toString())
+          queryParams.set("patientId", rs.id.toString());
           const queryString = queryParams.toString();
           router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
         }
-
       } catch (err) {
-        console.error("Failed to fetch doctors:", err);
+        handleApiError(
+          err,
+          "Có lỗi xảy ra, vui lòng thử lại sau",
+          "Lấy thông tin bệnh nhân thất bại"
+        );
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [])
-
-
+  }, []);
 
   return (
     <div className="space-y-6 mx-auto w-10/12 mb-6">
@@ -168,8 +160,7 @@ export default function PatientInformation() {
             <RadioGroup
               value={formData.gender}
               onValueChange={(value) => handleChange("gender", value)}
-              className="flex space-x-4"
-            >
+              className="flex space-x-4">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="male" id="male" />
                 <Label htmlFor="male" className="cursor-pointer">
@@ -203,7 +194,6 @@ export default function PatientInformation() {
         </CardContent>
       </Card>
 
-      
       {/* ĐIỀU KHOẢN */}
       <div className="flex items-start space-x-2 pt-4">
         <Checkbox
@@ -214,8 +204,7 @@ export default function PatientInformation() {
         <div className="grid gap-1.5 leading-none">
           <Label
             htmlFor="terms"
-            className="text-sm font-normal leading-snug text-gray-700"
-          >
+            className="text-sm font-normal leading-snug text-gray-700">
             Tôi đồng ý với các điều khoản dịch vụ và chính sách bảo mật
           </Label>
         </div>
@@ -227,14 +216,12 @@ export default function PatientInformation() {
       <div className="flex justify-between col-span-3 pb-10">
         <button
           onClick={handleBackStep}
-          className="text-gray-600 px-4 py-2 disabled:opacity-50"
-        >
+          className="text-gray-600 px-4 py-2 disabled:opacity-50">
           Quay lại
         </button>
         <button
           onClick={handleNextStep}
-          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Tiếp tục
         </button>
       </div>

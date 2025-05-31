@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import SpecialtyCard from "@/components/specialties/SpecialtyCard"
-import SubHeader from "@/components/sub-header"
-import { Brain, Heart, Eye, Bone, Baby, Stethoscope } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
-import http from "@/helper/axios"
-import { CardLoading, Loading } from "@/components/ui/loading"
-import { useToast } from "@/hooks/use-toast"
+import SpecialtyCard from "@/components/specialties/SpecialtyCard";
+import SubHeader from "@/components/sub-header";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import http from "@/helper/axios";
+import { CardLoading } from "@/components/ui/loading";
+import { useToast } from "@/hooks/use-toast";
+import { handleApiError } from "@/helper/handle-error";
 
 interface Specialty {
   id: number;
@@ -18,31 +18,29 @@ interface Specialty {
 }
 
 export default function SpecialtyListPage() {
-  const [specialties, setSpecialties] = useState<Specialty[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const { toast } = useToast()
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await http.get<Specialty[]>("/specialties")
+        const res = await http.get<Specialty[]>("/specialties");
         setSpecialties(res);
       } catch (err) {
-        const e = err as Error
-        toast({
-          title: "Đăng nhập thất bại",
-          description: e.message || "Đã có lỗi xảy ra",
-          variant: "error",
-          duration: 2000
-        })
+        handleApiError(
+          err,
+          "Có lỗi xảy ra, vui lòng thử lại sau",
+          "Lấy thông tin chuyên khoa thất bại"
+        );
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [])
+  }, []);
   return (
     <>
       <section className="my-10">
@@ -57,41 +55,44 @@ export default function SpecialtyListPage() {
         </div>
       </section>
 
-
       <section className="my-6">
         <div className="container mx-auto px-6 max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-4 text-slate-800">Khám theo chuyên khoa</h2>
+          <h2 className="text-3xl font-bold mb-4 text-slate-800">
+            Khám theo chuyên khoa
+          </h2>
           <p className="text-muted-foreground text-lg">
-            Lựa chọn chuyên khoa phù hợp để được thăm khám và tư vấn với bác sĩ chuyên môn cao, tiết kiệm thời gian và chi phí.
+            Lựa chọn chuyên khoa phù hợp để được thăm khám và tư vấn với bác sĩ
+            chuyên môn cao, tiết kiệm thời gian và chi phí.
           </p>
         </div>
       </section>
 
-
       <section className="my-10">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
-            {isLoading ?
+            {isLoading ? (
               <>
                 <CardLoading />
                 <CardLoading />
                 <CardLoading />
               </>
-              : specialties.map((item) => (
+            ) : (
+              specialties.map((item) => (
                 <SpecialtyCard key={item.slug} {...item} />
               ))
-            }
-
+            )}
           </div>
         </div>
       </section>
 
-
       <section className="my-16 bg-teal-50 py-12">
         <div className="container mx-auto px-6 max-w-3xl text-center space-y-4">
-          <h3 className="text-2xl font-semibold text-teal-700">Chưa biết nên khám chuyên khoa nào?</h3>
+          <h3 className="text-2xl font-semibold text-teal-700">
+            Chưa biết nên khám chuyên khoa nào?
+          </h3>
           <p className="text-muted-foreground text-lg">
-            Đừng lo, hãy để chúng tôi tư vấn miễn phí cho bạn để lựa chọn đúng chuyên khoa và bác sĩ.
+            Đừng lo, hãy để chúng tôi tư vấn miễn phí cho bạn để lựa chọn đúng
+            chuyên khoa và bác sĩ.
           </p>
           <Button className="bg-teal-600 hover:bg-teal-700 text-white px-8 h-12 text-base">
             Nhận tư vấn miễn phí
@@ -99,5 +100,5 @@ export default function SpecialtyListPage() {
         </div>
       </section>
     </>
-  )
+  );
 }

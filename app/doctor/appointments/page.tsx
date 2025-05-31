@@ -1,12 +1,9 @@
 "use client";
+
 // React core and hooks
 import { useEffect, useState } from "react";
 
-// Date utils
-import { isToday, isThisWeek, isBefore, isAfter, parseISO } from "date-fns";
-
 // Components
-import { AppointmentData } from "@/components/doctor/doctor-appointments/appointment-card";
 import { FilterTabs } from "@/components/doctor/doctor-appointments/filter-tabs";
 import { SearchFilters } from "@/components/doctor/doctor-appointments/search-filters";
 import { AppointmentList } from "@/components/doctor/doctor-appointments/appointment-list";
@@ -15,26 +12,31 @@ import { AppointmentList } from "@/components/doctor/doctor-appointments/appoint
 import http from "@/helper/axios";
 
 export default function Appointments() {
-  //State
-  const appointmentTypes = ["Hôm nay", "Tuần này", "Lịch sử", "Tương lai"];
+  // Appointment types and states
+  const appointmentTypes = ["Hôm nay", "Tuần này", "Lịch sử", "Tất cả"];
   const [currType, setCurrType] = useState(appointmentTypes[0]);
-  const [filteredAppointments, setFilteredAppointments] = useState<
-    AppointmentData[]
-  >([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [appointments, setAppointments] = useState<AppointmentData[]>([]);
   const [loading, setLoading] = useState(false);
 
-  //Effect
+  // Mapping type to endpoint
+  const endpointMap: Record<string, string> = {
+    "Hôm nay": "/doctor-appointment/by-day",
+    "Tuần này": "/doctor-appointment/by-week",
+    "Lịch sử": "/doctor-appointment/history",
+    "Tất cả": "/doctor-appointment/all",
+  };
+
+  // Fetch data based on selected type
   useEffect(() => {
     const fetchAppointments = async () => {
+      setLoading(true);
       try {
-        const res = await http.get<AppointmentData[]>(
-          `/doctor-appointment/appointments`
-        );
+        const endpoint = endpointMap[currType];
+        const res = await http.get<any[]>(endpoint);
         setAppointments(res);
-        console.log("Fetched Appointments:", res);
+        console.log("Fetched appointments:", res);
       } catch (err) {
         console.error("Failed to fetch appointments:", err);
       } finally {
@@ -43,92 +45,53 @@ export default function Appointments() {
     };
 
     fetchAppointments();
-  }, []);
+  }, [currType]);
 
-  useEffect(() => {
-    if (!appointments.length) return;
-
-    let filtered = [...appointments];
-
-    // Lọc theo loại lịch hẹn
-    filtered = filtered.filter((appointment) => {
-      const appointmentDate = parseISO(appointment.date);
-      console.log("Appointment Date:", appointment);
-      switch (currType) {
-        case "Hôm nay":
-          return isToday(appointmentDate);
-        case "Tuần này":
-          return isThisWeek(appointmentDate);
-        case "Lịch sử":
-          return (
-            isBefore(appointmentDate, new Date()) && !isToday(appointmentDate)
-          );
-        case "Tương lai":
-          return (
-            isAfter(appointmentDate, new Date()) && !isToday(appointmentDate)
-          );
-        default:
-          return true;
-      }
-    });
-
-    // Lọc theo tìm kiếm
-    if (searchQuery) {
-      filtered = filtered.filter((appointment) =>
-        appointment.patientName
+  // Filter appointments by search and status
+  const finalAppointments = appointments.filter((appointment) => {
+    const matchSearch = searchQuery
+      ? appointment.patientName
           .toLowerCase()
           .includes(searchQuery.toLowerCase())
-      );
-    }
+      : true;
 
-    // Lọc theo trạng thái
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(
-        (appointment) => appointment.status === statusFilter
-      );
-    }
+    const matchStatus =
+      statusFilter === "all" || appointment.status === statusFilter;
 
-    setFilteredAppointments(filtered);
-  }, [appointments, currType, searchQuery, statusFilter]);
-
-  //Handlers
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleStatusFilter = (status: string) => {
-    setStatusFilter(status);
-  };
+    return matchSearch && matchStatus;
+  });
 
   return (
     <div className="container mx-auto my-8 px-4 space-y-8">
-      {/* Tabs lọc */}
+      {/* Filter Tabs */}
       <section>
         <FilterTabs currentType={currType} onTypeChange={setCurrType} />
       </section>
 
-      {/* Tiêu đề */}
+      {/* Title and Stats */}
       <section className="flex flex-col md:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
           Lịch hẹn {currType.toLowerCase()}
         </h1>
         <div className="text-sm text-slate-500">
-          Hiển thị {filteredAppointments.length} lịch hẹn
+          {loading
+            ? "Đang tải dữ liệu..."
+            : `Hiển thị ${finalAppointments.length} lịch hẹn}`}
         </div>
       </section>
 
-      {/* Tìm kiếm và lọc */}
+      {/* Search and Filter */}
       <section>
         <SearchFilters
-          onSearch={handleSearch}
-          onStatusFilter={handleStatusFilter}
+          onSearch={setSearchQuery}
+          onStatusFilter={setStatusFilter}
         />
       </section>
 
-      {/* Danh sách lịch hẹn */}
+      {/* Appointment List */}
       <section>
         <AppointmentList
-          appointments={filteredAppointments}
+          appointments={finalAppointments}
           filterType={currType}
         />
       </section>
