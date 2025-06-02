@@ -113,7 +113,7 @@ export default function LoginPage() {
               id="email"
               name="email"
               type="text"
-              placeholder="example@email.com hoặc 0912345678"
+              placeholder="example@email.com"
               value={formData.email}
               onChange={handleChange}
               disabled={isLoading}
@@ -137,7 +137,7 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Mật khẩu của bạn"
                 value={formData.password}
                 onChange={handleChange}
                 disabled={isLoading}

@@ -84,7 +84,9 @@ export default function UserDropdown() {
 
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="text-sm">
-          Xin chào, {user?.name ?? ""}
+          <h2 className="text-sm font-bold bg-gradient-to-r from-teal-500 to-indigo-500 bg-clip-text text-transparent">
+            Xin chào, {user?.name ?? ""}
+          </h2>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 

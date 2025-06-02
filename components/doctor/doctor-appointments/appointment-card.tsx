@@ -8,12 +8,11 @@ import {
   DollarSign,
   MapPin,
   Phone,
-  User,
-  Search,
+  Slice,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-
+import PatientRecordModal from "./patient-record-modal";
 export function AppointmentCard({ appointment, showActions = true }: any) {
   const statusConfig = {
     confirmed: { label: "Đã xác nhận", color: "bg-blue-100 text-blue-700" },
@@ -50,6 +49,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
                   <h3 className="font-medium text-slate-800">
                     {appointment.patient?.name ?? "Không có"}
                   </h3>
+
                   <Badge className={status.color}>{status.label}</Badge>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
@@ -67,7 +67,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
           </div>
 
           {/* Thông tin lịch hẹn */}
-          <div className="p-4 md:p-5 md:w-[280px] bg-slate-50">
+          <div className="p-4 md:p-5  bg-slate-50">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <CalendarClock className="h-4 w-4 text-teal-600" />
@@ -115,22 +115,22 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
 
             {showActions && (
               <div className="flex gap-2 mt-4">
-                <div></div>
                 <Button
                   variant="outline"
                   size="sm"
                   className="flex-1"
                   onClick={() => router.push(`appointments/${appointment.id}`)}>
-                  <Search className="h-4 w-4 mr-1" />
-                  Xem chi tiết
+                  <Slice />
+                  Khám
                 </Button>
-                <Button
+                {/* <Button
                   variant="default"
                   size="sm"
                   className="flex-1 bg-teal-600 hover:bg-teal-700">
                   <User className="h-4 w-4 mr-1" />
                   Hồ sơ
-                </Button>
+                </Button> */}
+                <PatientRecordModal />
               </div>
             )}
           </div>

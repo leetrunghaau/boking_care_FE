@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   DropdownMenu,
@@ -7,21 +7,21 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu"
-import Image from "next/image"
-import { LogOut, User, Calendar, Settings, Bell, CalendarClock, History } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import useAuthStore from "@/store/auth"
-import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
-import http from "@/helper/axios"
+} from "@/components/ui/dropdown-menu";
+import Image from "next/image";
+import { LogOut, User, Settings, Bell, History } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/auth";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import http from "@/helper/axios";
 
 export default function DoctorDropdown() {
-  const router = useRouter()
-  const { logOut } = useAuthStore()
-  const { toast } = useToast()
-  const [doctor, setDoctor] = useState<any | null>()
+  const router = useRouter();
+  const { logOut } = useAuthStore();
+  const { toast } = useToast();
+  const [doctor, setDoctor] = useState<any | null>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchAllFacilities = async () => {
@@ -30,13 +30,12 @@ export default function DoctorDropdown() {
         setDoctor(res);
         console.log("Fetched specialties:", res);
       } catch (err) {
-        const e = err as Error
+        const e = err as Error;
         toast({
           title: "Lỗi",
           description: e.message,
-          variant: "error"
-
-        })
+          variant: "error",
+        });
       } finally {
         setLoading(false);
       }
@@ -47,25 +46,22 @@ export default function DoctorDropdown() {
   const handleLogout = () => {
     logOut();
     toast({
-
       title: "Thành công!",
       description: "Bạn đã đăng xuất thành công.",
       variant: "success",
       duration: 2000,
-
-    })
-  }
+    });
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full"
-        >
+          className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full">
           {doctor?.img ? (
             <Image
-              src={doctor?.img }
+              src={doctor?.img}
               alt="Avatar"
               width={32}
               height={32}
@@ -82,30 +78,35 @@ export default function DoctorDropdown() {
 
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="text-sm">
-          Xin chào, {doctor?.name ?? ""}
+          <h2 className="text-sm font-bold bg-gradient-to-r from-teal-500 to-indigo-500 bg-clip-text text-transparent">
+            Xin chào, Bs.{doctor?.name ?? ""}
+          </h2>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
           onClick={() => router.push("/doctor/profile")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <User className="w-4 h-4 mr-2" />
           Hồ sơ cá nhân
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/doctor/appointments")}
+          className="hover:cursor-pointer">
+          <History className="w-4 h-4 mr-2" />
+          Lịch khám
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/doctor/notifications")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <Bell className="w-4 h-4 mr-2" />
           Thông báo
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push("/doctor/settings")}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <Settings className="w-4 h-4 mr-2" />
           Cài đặt
         </DropdownMenuItem>
@@ -114,12 +115,11 @@ export default function DoctorDropdown() {
 
         <DropdownMenuItem
           onClick={handleLogout}
-          className="hover:cursor-pointer"
-        >
+          className="hover:cursor-pointer">
           <LogOut className="w-4 h-4 mr-2 text-red-500" />
           <span className="text-red-500">Đăng xuất</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

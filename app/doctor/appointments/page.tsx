@@ -22,10 +22,10 @@ export default function Appointments() {
 
   // Mapping type to endpoint
   const endpointMap: Record<string, string> = {
-    "Hôm nay": "/doctor-appointment/by-day",
-    "Tuần này": "/doctor-appointment/by-week",
-    "Lịch sử": "/doctor-appointment/history",
-    "Tất cả": "/doctor-appointment/all",
+    "Hôm nay": "/doctor-appointments/by-day",
+    "Tuần này": "/doctor-appointments/by-week",
+    "Lịch sử": "/doctor-appointments/by-history",
+    "Tất cả": "/doctor-appointments/by-all",
   };
 
   // Fetch data based on selected type
@@ -76,7 +76,7 @@ export default function Appointments() {
         <div className="text-sm text-slate-500">
           {loading
             ? "Đang tải dữ liệu..."
-            : `Hiển thị ${finalAppointments.length} lịch hẹn}`}
+            : `Hiển thị ${finalAppointments.length} lịch hẹn`}
         </div>
       </section>
 

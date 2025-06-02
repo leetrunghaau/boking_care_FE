@@ -1,7 +1,7 @@
 "use client";
 
 // React core and hooks
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // Next hooks
 import { useRouter, useParams } from "next/navigation";
@@ -14,13 +14,14 @@ import {
   Check,
   Clock,
   DollarSign,
-  FileText,
   MapPin,
   Phone,
   Stethoscope,
   Trash,
   User,
   Mail,
+  MessageSquare,
+  CircleDashed,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -47,55 +48,23 @@ import { PrescriptionForm } from "@/components/doctor/doctor-prescriptions/presc
 import { PrescriptionPreview } from "@/components/doctor/doctor-prescriptions/prescription-preview";
 import { ImageUploader } from "@/components/share/image-uploader";
 import { InputWithUnit } from "@/components/share/input-with-unit";
+import PatientRecordModal from "@/components/doctor/doctor-appointments/patient-record-modal";
 // Utilities
 import http from "@/helper/axios";
 
-//Types
-interface AppointmentDetail {
-  id: string;
-  patientName: string;
-  patientAvatar?: string;
-  patientAge: number;
-  patientGender: string;
-  patientPhone: string;
-  patientEmail: string;
-  patientAddress: string;
-  date: string;
-  time: string;
-  duration: number;
-  price: number;
-  status: "confirmed" | "completed" | "cancelled" | "pending";
-  symptoms: string;
-  medicalHistory: {
-    date: string;
-    diagnosis: string;
-    doctor: string;
-  }[];
-  vitalSigns: {
-    bloodPressure: string;
-    heartRate: string;
-    temperature: string;
-    respiratoryRate: string;
-    weight: string;
-    height: string;
-  };
-  address: string;
-}
-
-// Main component
 export default function AppointmentDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
   // State
   const [loading, setLoading] = useState(false);
-  const [appointmentDetail, setAppointmentDetail] =
-    useState<AppointmentDetail | null>(null);
+  const [appointmentDetail, setAppointmentDetail] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState("details");
   const [hasPrescription, setHasPrescription] = useState(false);
   const [showPrescriptionPreview, setShowPrescriptionPreview] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
-
+  const buttonElement = useRef<HTMLButtonElement>(null);
+  const [updatedStatus, setUpdatedStatus] = useState<string | null>(null);
   // Form inputs
   const [diagnosis, setDiagnosis] = useState("");
   const [clinicalNotes, setClinicalNotes] = useState("");
@@ -113,10 +82,12 @@ export default function AppointmentDetail() {
 
   //Effects
   useEffect(() => {
+    setLoading(true);
+
     const fetchAppointmentDetail = async () => {
       try {
-        const res = await http.get<AppointmentDetail>(
-          `/doctor-appointment/appointments/${params.id}`
+        const res = await http.get<any>(
+          `/doctor-appointment/appointment/${params.id}`
         );
         setAppointmentDetail(res);
         setVitalSigns(res.vitalSigns);
@@ -132,6 +103,29 @@ export default function AppointmentDetail() {
   }, [params.id]);
 
   // Handlers
+
+  //Xử lý cập nhật status
+
+  const handleUpdateStatus = async (newStatus: string) => {
+    setUpdatedStatus(newStatus);
+    setLoading(true);
+    try {
+      const res = await http.post<any>(
+        `/doctor-appointment/${params.id}/status`,
+        { status: newStatus }
+      );
+      if (res)
+        setAppointmentDetail((prev: any) => ({
+          ...prev,
+          status: newStatus,
+        }));
+      console.log("New status:", res);
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Xử lý hoàn thành lịch hẹn
   const handleCompleteAppointment = () => {
@@ -192,6 +186,10 @@ export default function AppointmentDetail() {
       alert("Failed to submit data.");
     }
   };
+
+  const handleButtonFocus = () => {
+    buttonElement.current?.focus();
+  };
   //Xử lý thông tin sức khoẻ
   const handleVitalChange = (key: keyof typeof vitalSigns, value: string) => {
     setVitalSigns((prev) => ({ ...prev, [key]: value }));
@@ -237,7 +235,8 @@ export default function AppointmentDetail() {
     cancelled: { label: "Đã hủy", color: "bg-red-100 text-red-700  text-sm" },
     pending: {
       label: "Chờ xác nhận",
-      color: "bg-yellow-100 text-yellow-700 text-sm",
+      color:
+        "bg-amber-100 text-amber-800 border-amber-200 px-4 py-2 text-sm font-medium",
     },
   };
 
@@ -260,7 +259,36 @@ export default function AppointmentDetail() {
             Chi tiết lịch hẹn
           </h1>
         </div>
-        <Badge className={status.color}>{status.label}</Badge>
+        {appointmentDetail.status !== "pending" && (
+          <Badge className={`cursor-pointer ${status.color}`}>
+            {status.label}
+          </Badge>
+        )}
+        {appointmentDetail.status === "pending" && (
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-teal-100 rounded-full">
+                <CircleDashed className="w-6 h-6 text-teal-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Xác nhận khám cho bệnh nhân
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className={`${status.color}`}>
+                <Clock className="w-4 h-4 mr-2" />
+                {status.label}
+              </Badge>
+              <Button
+                ref={buttonElement}
+                variant="confirm"
+                size="sm"
+                onClick={() => handleUpdateStatus("confirmed")}>
+                Xác nhận
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Thông tin chính */}
@@ -318,17 +346,11 @@ export default function AppointmentDetail() {
               </div>
 
               <div className="flex gap-2 mt-4">
-                {/* <Button variant="outline" size="sm" className="flex-1">
+                <Button variant="outline" size="sm" className="flex-1">
                   <MessageSquare className="h-4 w-4 mr-1" />
                   Nhắn tin
-                </Button> */}
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="flex-1 bg-teal-600 hover:bg-teal-700">
-                  <FileText className="h-4 w-4 mr-1" />
-                  Xem hồ sơ bệnh nhân
                 </Button>
+                <PatientRecordModal />
               </div>
             </CardContent>
           </Card>
@@ -605,7 +627,7 @@ export default function AppointmentDetail() {
                     appointmentDetail.medicalHistory.length > 0 ? (
                       <div className="space-y-3">
                         {appointmentDetail.medicalHistory.map(
-                          (record, index) => (
+                          (record: any, index: any) => (
                             <div
                               key={index}
                               className="p-3 border rounded-md hover:bg-slate-50">
@@ -633,17 +655,33 @@ export default function AppointmentDetail() {
                 </TabsContent>
               </CardContent>
             </Tabs>
-            <CardFooter className="flex justify-between border-t pt-4">
-              <Button variant="outline">
-                <Trash className="h-4 w-4 mr-1" />
-                Hủy lịch hẹn
-              </Button>
-              <Button
-                onClick={handleCompleteAppointment}
-                className="bg-teal-600 hover:bg-teal-700">
-                <Check className="h-4 w-4 mr-1" />
-                Hoàn thành khám
-              </Button>
+            <CardFooter>
+              {appointmentDetail.status === "pending" ? (
+                <div className="flex justify-center border-t pt-4">
+                  <h2
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      handleButtonFocus();
+                    }}
+                    className=" cursor-pointer text-lg font-bold text-center bg-gradient-to-r from-teal-500 to-indigo-500 bg-clip-text text-transparent">
+                    Vui lòng xác nhận lịch hẹn trước khi hoàn thành khám. Bấm để
+                    xác nhận lịch hẹn
+                  </h2>
+                </div>
+              ) : (
+                <div className="w-full flex justify-between  border-t pt-4">
+                  <Button variant="destructiveOutline">
+                    <Trash className="h-4 w-4 mr-1" />
+                    Hủy lịch hẹn
+                  </Button>
+                  <Button
+                    onClick={handleCompleteAppointment}
+                    className="bg-teal-600 hover:bg-teal-700">
+                    <Check className="h-4 w-4 mr-1" />
+                    Hoàn thành khám
+                  </Button>
+                </div>
+              )}
             </CardFooter>
           </Card>
         </div>
