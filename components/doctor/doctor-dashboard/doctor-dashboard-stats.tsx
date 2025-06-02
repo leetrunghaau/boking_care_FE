@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Calendar, CheckCircle, Clock, DollarSign, XCircle } from "lucide-react"
 
-interface DoctorDashboardStatsProps {
+interface Props {
   stats: {
     appointments: number
     completed: number
@@ -11,9 +11,9 @@ interface DoctorDashboardStatsProps {
   }
 }
 
-export function DoctorDashboardStats({ stats }: DoctorDashboardStatsProps) {
+export function DoctorDashboardStats({ stats }: Props) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <Card className="bg-slate-50">
         <CardContent className="p-4 flex items-center gap-3">
           <div className="bg-slate-200 p-2 rounded-full">
@@ -62,23 +62,7 @@ export function DoctorDashboardStats({ stats }: DoctorDashboardStatsProps) {
         </CardContent>
       </Card>
 
-      <Card className="bg-teal-50">
-        <CardContent className="p-4 flex items-center gap-3">
-          <div className="bg-teal-200 p-2 rounded-full">
-            <DollarSign className="h-5 w-5 text-teal-700" />
-          </div>
-          <div>
-            <p className="text-sm text-teal-500">Doanh thu</p>
-            <p className="text-2xl font-bold text-teal-700">
-              {new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-                maximumFractionDigits: 0,
-              }).format(stats.revenue)}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+     
     </div>
   )
 }

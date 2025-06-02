@@ -10,6 +10,11 @@ import {
   Users,
   Activity,
   UserCheck,
+  Droplet,
+  Sun,
+  BrainCircuit,
+  HeartPulse,
+  CloudSnow,
 } from "lucide-react";
 
 export const iconMap: { [key: string]: React.ElementType } = {
@@ -22,7 +27,12 @@ export const iconMap: { [key: string]: React.ElementType } = {
   Users,
   Stethoscope,
   Activity,
+  HeartPulse,
   UserCheck,
+  Droplet,
+  Sun,
+  CloudSnow,
+  BrainCircuit,
 };
 
 // Hàm trả về icon component dựa trên tên (string)

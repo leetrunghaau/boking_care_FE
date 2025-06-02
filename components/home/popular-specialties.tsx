@@ -59,10 +59,10 @@ export default function PopularSpecialties() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        {specialties.map((specialty, index) => {
+        {specialties.map((specialty) => {
           const Icon = getIconByName(specialty.icon)
           return (
-            <Link href={`/chuyen-khoa/${specialty.slug}`} key={index}>
+            <Link href={`/chuyen-khoa/${specialty.slug}`} key={specialty.id}>
               <Card className="hover:shadow-md transition-shadow text-center h-full">
                 <CardContent className="p-6 flex flex-col items-center gap-3">
                   {Icon ? (

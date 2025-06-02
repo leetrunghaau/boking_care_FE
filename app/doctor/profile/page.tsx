@@ -21,7 +21,7 @@ import { DoctorProfileCertificates } from "@/components/doctor/doctor-profile/do
 import { Camera, Edit, Save, Upload } from "lucide-react";
 
 // Doctor schedule components
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+import { DoctorHeader } from "@/components/doctor/doctor-header";
 
 export default function DoctorProfilePage() {
   //State

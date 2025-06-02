@@ -22,16 +22,14 @@ import { DoctorNotifications } from "@/components/doctor/doctor-dashboard/doctor
 import { DoctorTasks } from "@/components/doctor/doctor-dashboard/doctor-tasks";
 
 // Doctor schedule components
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+import { DoctorHeader } from "@/components/doctor/doctor-header";
 
 // Icons
 import { Calendar, ChevronLeft, ChevronRight, Download } from "lucide-react";
 
 export default function DoctorDashboardPage() {
   //State
-  const [dateRange, setDateRange] = useState<"today" | "week" | "month">(
-    "today"
-  );
+
 
   // Thông tin bác sĩ
   const doctorInfo = {
@@ -45,33 +43,8 @@ export default function DoctorDashboardPage() {
     },
   };
 
-  // Thống kê theo ngày/tuần/tháng
-  const statsData = {
-    today: {
-      appointments: 8,
-      completed: 5,
-      upcoming: 3,
-      cancelled: 0,
-      revenue: 2500000,
-    },
-    week: {
-      appointments: 42,
-      completed: 35,
-      upcoming: 7,
-      cancelled: 2,
-      revenue: 15000000,
-    },
-    month: {
-      appointments: 120,
-      completed: 105,
-      upcoming: 15,
-      cancelled: 8,
-      revenue: 45000000,
-    },
-  };
-
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6 w-11/12">
       {/* Header với thông tin bác sĩ và thống kê */}
       <DoctorHeader
         doctorId={doctorInfo.doctorId}
@@ -86,17 +59,6 @@ export default function DoctorDashboardPage() {
           Bảng điều khiển
         </h1>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            <span>Trước</span>
-          </Button>
-          <Button variant="outline" size="icon" className="px-3">
-            <Calendar className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm">
-            <span>Sau</span>
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-1" />
             <span>Xuất báo cáo</span>
@@ -117,15 +79,13 @@ export default function DoctorDashboardPage() {
         </TabsList> */}
 
         <TabsContent value="today" className="mt-6">
-          <DoctorDashboardStats stats={statsData.today} />
-        </TabsContent>
-
-        <TabsContent value="week" className="mt-6">
-          <DoctorDashboardStats stats={statsData.week} />
-        </TabsContent>
-
-        <TabsContent value="month" className="mt-6">
-          <DoctorDashboardStats stats={statsData.month} />
+          <DoctorDashboardStats stats={{
+            appointments: 8,
+            completed: 5,
+            upcoming: 3,
+            cancelled: 0,
+            revenue: 2500000,
+          }} />
         </TabsContent>
       </Tabs>
 
@@ -142,7 +102,7 @@ export default function DoctorDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <DoctorActivityChart dateRange={dateRange} />
+              <DoctorActivityChart />
             </CardContent>
           </Card>
 
@@ -185,7 +145,7 @@ export default function DoctorDashboardPage() {
           </Card>
 
           {/* Nhiệm vụ */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Nhiệm vụ</CardTitle>
               <CardDescription>
@@ -195,7 +155,7 @@ export default function DoctorDashboardPage() {
             <CardContent>
               <DoctorTasks />
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
     </div>

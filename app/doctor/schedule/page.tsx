@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Doctor schedule components
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+import { DoctorHeader } from "@/components/doctor/doctor-header";
 import { DailySchedule } from "@/components/doctor/doctor-schedule/daily-schedule";
 import { WeeklySchedule } from "@/components/doctor/doctor-schedule/weekly-schedule";
 import { ScheduleSettings } from "@/components/doctor/doctor-schedule/schedule-settings";

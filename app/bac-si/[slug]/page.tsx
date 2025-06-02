@@ -96,19 +96,19 @@ export default function DoctorDetailPage() {
                         </div>
                         <div className="flex items-start gap-2 justify-center md:justify-start">
                           <Phone className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                          <span>Hotline: 1900 1234</span>
+                          <span>Hotline: {doctor?.phone}</span>
                         </div>
                       </div>
 
                       <div className="mt-6 flex flex-wrap gap-2 justify-center md:justify-start">
                         {doctor?.technique
                           .slice(0, 3)
-                          .map((spec: string, index: number) => (
+                          .map((i: any) => (
                             <Badge
-                              key={index}
+                              key={i.id}
                               variant="outline"
                               className="bg-teal-50 text-teal-700 hover:bg-teal-100">
-                              {spec}
+                              {i.name}
                             </Badge>
                           ))}
                         {doctor && doctor.technique.length > 3 && (
@@ -143,9 +143,6 @@ export default function DoctorDetailPage() {
                   <DoctorReviews slug={slug} />
                 </TabsContent>
 
-                {/* <TabsContent value="faq">
-                  <DoctorFAQ doctor={doctor}/>
-                </TabsContent> */}
               </Tabs>
 
               {/* Similar Doctors */}
@@ -194,8 +191,8 @@ export default function DoctorDetailPage() {
 
             {/* Sidebar */}
             <div className="flex flex-col gap-6">
-              <DoctorSchedule slug={slug} />
-              <HospitalInfo doctor={doctor} />
+              {/* <DoctorSchedule slug={slug} /> */}
+              {/* <HospitalInfo doctor={doctor} /> */}
             </div>
           </div>
         </div>

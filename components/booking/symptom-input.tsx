@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import http from "@/helper/axios";
 import { cn } from "@/lib/utils";
@@ -21,28 +21,65 @@ export default function SymptomInput() {
   const [userInput, setUserInput] = useState<string>(
     symptomsQuery?.toString() ?? ""
   );
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // fetch data khi mount
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const rs = await http.get<any | null>(`/booking/symptoms`);
-        if (rs) {
-          setSymptoms(rs);
-        }
-      } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin triệu chứng thất bại"
-        );
-      } finally {
-        setLoading(false);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setUserInput(val);
+
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      fetchData(val);
+    }, 1000); 
+  };
+  const fetchData = async (newSymptoms: string | string[] | null = null) => {
+    setLoading(true);
+
+    try {
+      const queryParams = new URLSearchParams();
+
+      // Chuẩn hóa đầu vào
+      let symptomList: string[] = [];
+
+      if (typeof newSymptoms === "string" && newSymptoms.trim()) {
+        symptomList = newSymptoms.split(",").map(s => s.trim()).filter(Boolean);
+      } else if (Array.isArray(newSymptoms)) {
+        symptomList = newSymptoms.map(s => s.trim()).filter(Boolean);
       }
-    };
+
+      if (symptomList.length > 0) {
+        queryParams.set("symptoms", symptomList.join(","));
+      }
+
+      const queryString = queryParams.toString();
+      console.log( `/booking/symptoms${queryString ? `?${queryString}` : ""}`)
+      const rs = await http.get<any | null>(
+        `/booking/symptoms${queryString ? `?${queryString}` : ""}`
+      );
+
+      if (rs) {
+        setSymptoms(rs);
+      }
+    } catch (err) {
+      handleApiError(
+        err,
+        "Có lỗi xảy ra, vui lòng thử lại sau",
+        "Lấy thông tin triệu chứng thất bại"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+
 
     fetchData();
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
   }, []);
 
   const handleAddDisease = (disease: string) => {
@@ -55,7 +92,8 @@ export default function SymptomInput() {
 
     const newSymptom = [...normalized, disease].join(", ");
 
-    setSymptoms((prev) => prev.filter((item) => item !== disease));
+    // setSymptoms((prev) => prev.filter((item) => item !== disease)); 
+    fetchData(newSymptom);
     setUserInput(newSymptom);
   };
 
@@ -91,7 +129,7 @@ export default function SymptomInput() {
           "md:max-w-[600px] lg:max-w-[900px] mx-auto"
         )}
         value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
+        onChange={handleChange}
       />
 
       {/* Triệu chứng phổ biến */}

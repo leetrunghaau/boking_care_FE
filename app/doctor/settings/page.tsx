@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 
 // Doctor components
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+import { DoctorHeader } from "@/components/doctor/doctor-header";
 
 export default function DoctorSettingsPage() {
   //State

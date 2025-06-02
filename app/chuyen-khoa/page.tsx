@@ -46,26 +46,13 @@ export default function SpecialtyListPage() {
       <section className="my-10">
         <div className="container mx-auto px-6 ">
           <SubHeader
-            title="Chuyên khoa"
-            breadcrumbs={[
-              { label: "Trang chủ", href: "/" },
-              { label: "Chuyên khoa", href: "/chuyen-khoa" },
-            ]}
+            title="Khám theo chuyên khoa"
+            detail="Lựa chọn chuyên khoa phù hợp để được thăm khám và tư vấn với bác sĩ chuyên môn cao, tiết kiệm thời gian và chi phí."
           />
         </div>
       </section>
 
-      <section className="my-6">
-        <div className="container mx-auto px-6 max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-4 text-slate-800">
-            Khám theo chuyên khoa
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Lựa chọn chuyên khoa phù hợp để được thăm khám và tư vấn với bác sĩ
-            chuyên môn cao, tiết kiệm thời gian và chi phí.
-          </p>
-        </div>
-      </section>
+     
 
       <section className="my-10">
         <div className="container mx-auto px-6 max-w-6xl">

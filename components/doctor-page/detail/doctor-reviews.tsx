@@ -4,9 +4,11 @@ import { useEffect, useState } from "react"
 import { Star, ThumbsUp, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import http from "@/helper/axios"
+import useAuthStore from './../../../store/auth';
+import { useToast } from "@/hooks/use-toast"
 
 
 interface Pops {
@@ -20,17 +22,23 @@ export default function DoctorRating({ slug }: Pops) {
 
   const [review, setReview] = useState<any | null>(null)
   const [reviews, setReviews] = useState<any>({ max: 0, rvs: [] })
-  const [reviewsIndex, setReviewIndex] = useState<number>(1)
+  const [reviewsIndex, setReviewIndex] = useState<number>(2)
+  const { isLoggedIn } = useAuthStore()
+  const [canRating, setCanRating] = useState(false)
+    const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
+
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const res = await http.get<any | null>(`/doctor-site/doctor/${slug}/rating`)
+        const res1 = await http.get<any | null>(`/doctor-site/doctor/${slug}/can-rating`)
         console.log("rating info", res)
         setReview(res);
+        setCanRating(res1)
       } catch (err) {
         console.error("Failed to fetch doctors:", err);
       } finally {
@@ -59,15 +67,35 @@ export default function DoctorRating({ slug }: Pops) {
 
 
   const handleSubmitReview = async () => {
-    // Xử lý gửi đánh giá
-    // console.log({ rating: userRating, comment: reviewText })
-    //call api
-    const rs = await http.post(`/doctor-site/doctor/${slug}/rating`, { rating: userRating, comment: reviewText })
-    console.log("update rating", rs)
-    setShowReviewForm(false)
-    setReviewText("")
-    setUserRating(0)
-  }
+    try {
+      // Gửi đánh giá lên server
+      const rs = await http.post<any>(`/doctor-site/doctor/${slug}/rating`, {
+        rating: userRating,
+        comment: reviewText,
+        index: reviewsIndex,
+      });
+
+      setReview(rs.ratingDistribution);
+      setReviews(rs.ratings);
+      setShowReviewForm(false);
+      setReviewText("");
+      setUserRating(0);
+      toast({
+        title: "Đánh giá thành công",
+        description: "Cảm ơn bạn đã góp ý kiến cho chúng tôi.",
+        variant: "success",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast({
+        title: "Đánh giá thất bại",
+        description: "Gửi đánh giá thất bại. Vui lòng thử lại sau.",
+        variant: "error",
+        duration: 2000,
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -108,7 +136,7 @@ export default function DoctorRating({ slug }: Pops) {
 
 
       {/* Form đánh giá */}
-      {true && (
+      {isLoggedIn && canRating && (
         !showReviewForm ? (
           <div className="text-center">
             <Button onClick={() => setShowReviewForm(true)} className="bg-teal-600 hover:bg-teal-700">
@@ -171,7 +199,10 @@ export default function DoctorRating({ slug }: Pops) {
           <div key={item.id} className="border-b pb-4 last:border-b-0">
             <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarFallback>{item.patient.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={item.patient.img} alt={item.patient.name} />
+                <AvatarFallback>
+                  {item.patient.name?.charAt(0) ?? "?"}
+                </AvatarFallback>
               </Avatar>
 
               <div className="flex-1">
@@ -191,7 +222,7 @@ export default function DoctorRating({ slug }: Pops) {
 
                 <p className="text-muted-foreground mt-2">{item.value}</p>
 
-                
+
               </div>
             </div>
           </div>
@@ -205,7 +236,7 @@ export default function DoctorRating({ slug }: Pops) {
       {
         review && reviewsIndex <= reviews.max && (
           <div className="text-center">
-            <Button variant="outline" onClick={()=>setReviewIndex(reviewsIndex + 2)}>Xem thêm đánh giá</Button>
+            <Button variant="outline" onClick={() => setReviewIndex(reviewsIndex + 2)}>Xem thêm đánh giá</Button>
           </div>
         )
       }

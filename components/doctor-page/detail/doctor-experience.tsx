@@ -20,9 +20,9 @@ export default function DoctorExperience({ doctor }: Pops) {
           <div>
             <h2 className="text-xl font-bold mb-4">Kinh nghiệm làm việc</h2>
             <ul className="space-y-6">
-              {doctor.experience.map((exp: any, index: number) => (
+              {doctor.experience.map((exp: any) => (
                 <li
-                  key={index}
+                  key={exp.id}
                   className="relative pl-8 pb-6 border-l-2 border-teal-200 last:border-l-0 last:pb-0"
                 >
                   <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-teal-600"></div>

@@ -34,7 +34,7 @@ import { DoctorRatingChart } from "@/components/doctor/doctor-ratings/doctor-rat
 import { Search, Filter, Download } from "lucide-react";
 
 // Doctor schedule components
-import { DoctorHeader } from "@/components/doctor/doctor-schedule/doctor-header";
+import { DoctorHeader } from "@/components/doctor/doctor-header";
 
 export default function DoctorRatingsPage() {
   //State
