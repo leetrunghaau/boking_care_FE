@@ -249,7 +249,7 @@ export default function PatientRecordModal() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="w-5 h-5" />
-                  Chỉ số sinh hiệu hiện tại
+                  Chỉ số sinh hiệu gần nhất
                 </CardTitle>
               </CardHeader>
               <CardContent>

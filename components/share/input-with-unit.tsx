@@ -8,6 +8,7 @@ interface InputWithUnitProps {
   id?: string;
   placeholder?: string;
   value?: string;
+  type?:string;
   readOnly?: boolean;
   className?: string;
   unit: string;
@@ -19,6 +20,7 @@ export function InputWithUnit({
   id,
   placeholder,
   value,
+  type = "text",
   readOnly,
   className,
   unit,
@@ -32,6 +34,7 @@ export function InputWithUnit({
           id={id}
           placeholder={placeholder}
           value={value}
+          type={type}
           readOnly={readOnly}
           className={cn("pt-4", className)}
           onChange={onChange}
