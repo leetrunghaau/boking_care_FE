@@ -82,7 +82,22 @@ export default function ExaminationTab({ bookingId }: Pops) {
         );
         console.warn("get chi tiết thông tin khám bệnh", res);
 
-        setExamination(res.examination);
+        setExamination({
+          diagnosis: res.examination?.diagnosis || "",
+          finalDiagnosis: res.examination?.finalDiagnosis || "",
+          notes: res.examination?.notes || "",
+          temperature: res.examination?.temperature || "",
+          pulse: res.examination?.pulse || "",
+          bloodPressure: res.examination?.bloodPressure || "",
+          respiratoryRate: res.examination?.respiratoryRate || "",
+          weight: res.examination?.weight || "",
+          height: res.examination?.height || "",
+          folowUp: res.examination?.folowUp || false,
+          folowUpDate: res.examination?.folowUpDate || "",
+          folowUpTime: res.examination?.folowUpTime || "",
+          folowUpNote: res.examination?.folowUpNote || "",
+        });
+
         setFileStore(res.files);
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
@@ -95,7 +110,6 @@ export default function ExaminationTab({ bookingId }: Pops) {
 
   // cập nhật thời gian khi chọn ngày
   const handleDatePicker = async (date: string) => {
-    console.log("follow date", date);
     if (!bookingId) return;
     try {
       setLoading(true);
@@ -110,25 +124,25 @@ export default function ExaminationTab({ bookingId }: Pops) {
     }
   };
 
-  //   useEffect(() => {
-  //     console.log("follow date", examination.folowUpDate);
+  useEffect(() => {
+    console.log("follow date", examination.folowUpDate);
 
-  //     if (!bookingId) return;
-  //     const fetchPatient = async () => {
-  //       try {
-  //         setLoading(true);
-  //         const res = await http.get<any>(
-  //           `/doctor-appointment/my-schedule/${examination.folowUpDate}`
-  //         );
-  //         setSchedule(res);
-  //       } catch (err) {
-  //         console.error("Failed to fetch appointment detail:", err);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-  //     fetchPatient();
-  //   }, [examination.folowUpDate]);
+    if (!bookingId || examination.folowUpDate != "") return;
+    const fetchSchedule = async () => {
+      try {
+        setLoading(true);
+        const res = await http.get<any>(
+          `/doctor-appointment/my-schedule/${examination.folowUpDate}`
+        );
+        setSchedule(res);
+      } catch (err) {
+        console.error("Failed to fetch appointment schedule:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSchedule();
+  }, [examination.folowUpDate]);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
