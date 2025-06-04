@@ -28,7 +28,6 @@ export default function DoctorDropdown() {
       try {
         const res = await http.get<any>(`/sig/info`);
         setDoctor(res);
-        console.log("Fetched specialties:", res);
       } catch (err) {
         const e = err as Error;
         toast({

@@ -34,10 +34,10 @@ export default function ExaminationTab({ bookingId }: Pops) {
     respiratoryRate: "", //nhịp thở
     weight: "",
     height: "",
-    folowUp: false,
-    folowUpDate: "",
-    folowUpTime: "",
-    folowUpNote: "",
+    followUp: false,
+    followUpDate: moment().format('YYYY-MM-DD'),
+    followUpTime: "",
+    followUpNote: "",
   });
 
   const [fileStore, setFileStore] = useState<any[]>([]);
@@ -62,7 +62,10 @@ export default function ExaminationTab({ bookingId }: Pops) {
         examination
       );
       console.warn("Lưu thông tin khám bệnh", res);
-
+      if (res) {
+        setExamination(res.examination);
+        setFileStore(res.files);
+      }
       // setExamination(res);
     } catch (err) {
       console.error("Failed to fetch appointment detail:", err);
@@ -80,25 +83,12 @@ export default function ExaminationTab({ bookingId }: Pops) {
         const res = await http.get<any>(
           `/doctor-appointment/examination/${bookingId}`
         );
-        console.warn("get chi tiết thông tin khám bệnh", res);
+        console.log("get chi tiết thông tin khám bệnh", res);
+        if (res){
 
-        setExamination({
-          diagnosis: res.examination?.diagnosis || "",
-          finalDiagnosis: res.examination?.finalDiagnosis || "",
-          notes: res.examination?.notes || "",
-          temperature: res.examination?.temperature || "",
-          pulse: res.examination?.pulse || "",
-          bloodPressure: res.examination?.bloodPressure || "",
-          respiratoryRate: res.examination?.respiratoryRate || "",
-          weight: res.examination?.weight || "",
-          height: res.examination?.height || "",
-          folowUp: res.examination?.folowUp || false,
-          folowUpDate: res.examination?.folowUpDate || "",
-          folowUpTime: res.examination?.folowUpTime || "",
-          folowUpNote: res.examination?.folowUpNote || "",
-        });
-
-        setFileStore(res.files);
+          setExamination(res.examination);
+          setFileStore(res.files);
+        }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
       } finally {
@@ -109,30 +99,30 @@ export default function ExaminationTab({ bookingId }: Pops) {
   }, [bookingId]);
 
   // cập nhật thời gian khi chọn ngày
-  const handleDatePicker = async (date: string) => {
-    if (!bookingId) return;
-    try {
-      setLoading(true);
-      const res = await http.get<any>(
-        `/doctor-appointment/my-schedule/${date}`
-      );
-      setSchedule(res);
-    } catch (err) {
-      console.error("Failed to fetch appointment detail:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   const handleDatePicker = async (date: string) => {
+  //     if (!bookingId) return;
+  //     try {
+  //       setLoading(true);
+  //       const res = await http.get<any>(
+  //         `/doctor-appointment/my-schedule/${date}`
+  //       );
+  //       setSchedule(res);
+  //     } catch (err) {
+  //       console.error("Failed to fetch appointment detail:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
   useEffect(() => {
-    console.log("follow date", examination.folowUpDate);
+    console.log("follow date", examination.followUpDate);
 
-    if (!bookingId || examination.folowUpDate != "") return;
+    if (!bookingId) return;
     const fetchSchedule = async () => {
       try {
         setLoading(true);
         const res = await http.get<any>(
-          `/doctor-appointment/my-schedule/${examination.folowUpDate}`
+          `/doctor-appointment/my-schedule/${examination.followUpDate}`
         );
         setSchedule(res);
       } catch (err) {
@@ -142,7 +132,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
       }
     };
     fetchSchedule();
-  }, [examination.folowUpDate]);
+  }, [examination.followUpDate]);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -258,27 +248,27 @@ export default function ExaminationTab({ bookingId }: Pops) {
         <div className="flex gap-4 items-center mt-6">
           <h3 className="text-lg font-medium ">Hẹn tái khám</h3>
           <Switch
-            checked={examination.folowUp}
-            onCheckedChange={(e) => handleChange("folowUp", e)}
+            checked={examination.followUp}
+            onCheckedChange={(e) => handleChange("followUp", e)}
           />
         </div>
-        {examination.folowUp && (
+        {examination.followUp && (
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Input
                 type="date"
                 min={moment().format("YYYY-MM-DD")}
-                value={examination.folowUpDate}
+                value={examination.followUpDate}
                 onChange={(e) => {
-                  handleChange("folowUpDate", e.target.value);
-                  handleDatePicker(e.target.value);
+                  handleChange("followUpDate", e.target.value);
+                  //   handleDatePicker(e.target.value);
                 }}
               />
             </div>
             <div>
               <Select
-                value={examination.folowUpTime}
-                onValueChange={(e) => handleChange("folowUpTime", e)}>
+                value={examination.followUpTime}
+                onValueChange={(e) => handleChange("followUpTime", e)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn giờ" />
                 </SelectTrigger>
@@ -294,15 +284,15 @@ export default function ExaminationTab({ bookingId }: Pops) {
           </div>
         )}
       </div>
-      {examination.folowUp && (
+      {examination.followUp && (
         <div className="space-y-2">
           <Label htmlFor="followup-notes">Ghi chú tái khám</Label>
           <Textarea
             id="followup-notes"
             placeholder="Nhập hướng dẫn cho bệnh nhân khi tái khám"
             rows={2}
-            value={examination.folowUpNote}
-            onChange={(e) => handleChange("folowUpNote", e.target.value)}
+            value={examination.followUpNote}
+            onChange={(e) => handleChange("followUpNote", e.target.value)}
           />
         </div>
       )}

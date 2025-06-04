@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 import http from "@/helper/axios"
 
 interface Pops {
-    bookingId: number |string| null
+    bookingId: number | string | null
 }
 export default function PatientCard({ bookingId }: Pops) {
     const [patient, setPatient] = useState<any | null>()
@@ -22,7 +22,6 @@ export default function PatientCard({ bookingId }: Pops) {
                 setLoading(true)
                 const res = await http.get<any>(`/doctor-appointment/patient/booking/${bookingId}`);
                 setPatient(res);
-                console.log("thông tin bệnh nhân card ở booking ", res)
             } catch (err) {
                 console.error("Failed to fetch appointment detail:", err);
             } finally {

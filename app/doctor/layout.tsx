@@ -11,8 +11,6 @@ function DoctorLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   useEffect(() => {
     if (!hasHydrated) return;
-    console.log("checkkkkkkkkkkkk => ", isLoggedIn);
-
     if (isLoggedIn === false) {
       router.push("/");
     }
