@@ -51,14 +51,17 @@ import { InputWithUnit } from "@/components/share/input-with-unit";
 import PatientRecordModal from "@/components/doctor/doctor-appointments/patient-record-modal";
 // Utilities
 import http from "@/helper/axios";
-import  PatientCrad  from '@/components/doctor/doctor-appointments/detail/patient-card';
+import PatientCrad from '@/components/doctor/doctor-appointments/detail/patient-card';
 import BookingInfoCard from "@/components/doctor/doctor-appointments/detail/booking-info-card";
 import ExaminationTab from "@/components/doctor/doctor-appointments/detail/examination-tab";
+import ReviewFile from "@/components/share/review-file";
 
 export default function AppointmentDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
+
+   const [selectedFile, setSelectedFile] = useState<File>();
   // State
   const [loading, setLoading] = useState(false);
   const [appointmentDetail, setAppointmentDetail] = useState<any | null>(null);
@@ -299,10 +302,10 @@ export default function AppointmentDetail() {
         {/* Cột thông tin bệnh nhân */}
         <div className="space-y-6">
           {/* Thẻ thông tin bệnh nhân */}
-          <PatientCrad patientId={2}/>
-
+          <PatientCrad bookingId={params.id}  />
+          
           {/* Thẻ thông tin lịch hẹn */}
-         <BookingInfoCard bookingId={params.id}/>
+          <BookingInfoCard bookingId={params.id} />
         </div>
 
         {/* Cột chính - Tabs */}
@@ -322,15 +325,15 @@ export default function AppointmentDetail() {
               <CardContent className="pt-6">
                 {/* Tab khám bệnh */}
                 <TabsContent value="details" className="space-y-6 mt-0">
-                 <ExaminationTab bookingId={params.id}/>
+                  <ExaminationTab bookingId={params.id} />
                 </TabsContent>
 
                 {/* Tab kê đơn thuốc */}
                 <TabsContent value="prescription" className="mt-0">
                   {!showPrescriptionPreview ? (
                     <PrescriptionForm
-                      onSave={handleSavePrescription}
-                      onPreview={() => setShowPrescriptionPreview(true)}
+                      bookingId={params.id}
+
                     />
                   ) : (
                     <PrescriptionPreview
@@ -353,7 +356,7 @@ export default function AppointmentDetail() {
                       Lịch sử khám bệnh gần đây
                     </h3>
                     {appointmentDetail.medicalHistory &&
-                    appointmentDetail.medicalHistory.length > 0 ? (
+                      appointmentDetail.medicalHistory.length > 0 ? (
                       <div className="space-y-3">
                         {appointmentDetail.medicalHistory.map(
                           (record: any, index: any) => (

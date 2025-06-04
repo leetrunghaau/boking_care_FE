@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { LogOut, User, Settings, Bell, History } from "lucide-react";
+import { LogOut, User, Settings, Bell, History, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/auth";
@@ -83,7 +83,12 @@ export default function DoctorDropdown() {
           </h2>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-
+        <DropdownMenuItem
+          onClick={() => router.push("/doctor")}
+          className="hover:cursor-pointer">
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          Trang làm việc
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => router.push("/doctor/profile")}
           className="hover:cursor-pointer">

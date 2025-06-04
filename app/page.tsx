@@ -7,6 +7,7 @@ import Footer from "../components/layout/footer";
 import PopularSpecialties from "@/components/home/popular-specialties";
 import PopularDoctors from "@/components/home/popular-doctors";
 import HeroSection1 from "@/components/home/hero-section1";
+import HeroSection from "@/components/home/hero-section";
 
 export default function HomePage() {
   return (
@@ -15,7 +16,7 @@ export default function HomePage() {
       <MainHeader />
 
       <main className="flex-1">
-        <HeroSection1 />
+        <HeroSection />
 
         <section className="py-16 bg-slate-50 px-16">
           <PopularSpecialties />

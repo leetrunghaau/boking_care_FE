@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Eye, Plus, Save, Trash } from "lucide-react"
+import http from "@/helper/axios"
+import { useToast } from "@/hooks/use-toast"
 
 interface Medication {
-  id: string
+  id: number
   name: string
   dosage: string
   frequency: string
@@ -17,21 +19,17 @@ interface Medication {
   instructions: string
 }
 
-interface PrescriptionFormProps {
-  onSave: () => void
-  onPreview: () => void
+interface Props {
+  onPreview: () => void;
+  bookingId: number | string | null
 }
 
-export function PrescriptionForm({ onSave, onPreview }: PrescriptionFormProps) {
+export function PrescriptionForm({ bookingId, onPreview }: Props) {
+  const [loading, setLoading] = useState(false)
+  const [saveLoading, setSaveLoading] = useState(false)
+  const { toast } = useToast()
   const [medications, setMedications] = useState<Medication[]>([
-    {
-      id: "1",
-      name: "",
-      dosage: "",
-      frequency: "",
-      duration: "",
-      instructions: "",
-    },
+
   ])
 
   const [generalInstructions, setGeneralInstructions] = useState("")
@@ -41,7 +39,7 @@ export function PrescriptionForm({ onSave, onPreview }: PrescriptionFormProps) {
     setMedications([
       ...medications,
       {
-        id: Date.now().toString(),
+        id: -Number(Date.now().toString()),
         name: "",
         dosage: "",
         frequency: "",
@@ -52,14 +50,14 @@ export function PrescriptionForm({ onSave, onPreview }: PrescriptionFormProps) {
   }
 
   // Xóa thuốc
-  const handleRemoveMedication = (id: string) => {
+  const handleRemoveMedication = (id: number) => {
     if (medications.length > 1) {
       setMedications(medications.filter((med) => med.id !== id))
     }
   }
 
   // Cập nhật thông tin thuốc
-  const handleMedicationChange = (id: string, field: keyof Medication, value: string) => {
+  const handleMedicationChange = (id: number, field: keyof Medication, value: string) => {
     setMedications(
       medications.map((med) => {
         if (med.id === id) {
@@ -99,6 +97,64 @@ export function PrescriptionForm({ onSave, onPreview }: PrescriptionFormProps) {
   // Danh sách thời gian dùng
   const durationOptions = ["3 ngày", "5 ngày", "7 ngày", "10 ngày", "14 ngày", "1 tháng", "2 tháng", "3 tháng"]
 
+  // lấy thuốc mẫu
+  useEffect(() => {
+
+  }, [])
+
+  // lấy thông tin thuốc cũ
+  useEffect(() => {
+    if (!bookingId) return
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const res = await http.get<any>(`/doctor-appointment/prescription/${bookingId}`);
+        console.log("đơn thuốc khi tải mới", res)
+        if (res) {
+          setMedications(res.prescriptions);
+          setGeneralInstructions(res.generalInstructions);
+        }
+      } catch (err) {
+        console.error("Failed to fetch appointment detail:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData()
+  }, [bookingId])
+
+
+  const handleSavePrescription = () => {
+    const fetchData = async () => {
+      try {
+        setSaveLoading(true)
+        console.log(medications)
+        const res = await http.post<any>(`/doctor-appointment/prescription/${bookingId}`, {
+          prescriptions: medications.map(prev => ({
+            ...prev,
+            id: prev.id > 0 ? prev.id : null
+          })),
+          generalInstructions: generalInstructions
+        });
+        console.log("thuốc trả về", res)
+        if (res) {
+          setMedications(res.prescriptions);
+          setGeneralInstructions(res.generalInstructions);
+          toast({
+            title: "Thành công!",
+            description: "Bạn đã lưu đơn thuốc thành công.",
+            variant: "success",
+            duration: 2000,
+          })
+        }
+      } catch (err) {
+        console.error("Failed to fetch appointment detail:", err);
+      } finally {
+        setSaveLoading(false);
+      }
+    };
+    fetchData()
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -108,7 +164,7 @@ export function PrescriptionForm({ onSave, onPreview }: PrescriptionFormProps) {
             <Eye className="h-4 w-4 mr-1" />
             Xem trước
           </Button>
-          <Button onClick={onSave} className="bg-teal-600 hover:bg-teal-700">
+          <Button onClick={handleSavePrescription} className="bg-teal-600 hover:bg-teal-700" disabled={saveLoading}>
             <Save className="h-4 w-4 mr-1" />
             Lưu đơn thuốc
           </Button>

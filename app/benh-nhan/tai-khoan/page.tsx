@@ -24,7 +24,6 @@ export default function AccountSettingsPage() {
         if (newPassword !== confirmPassword) {
             // alert("Mật khẩu không khớp")
             toast({
-
                 title: "Thành công!",
                 description: "Bạn đã lưu thông tin thành công.",
                 action: (

@@ -73,7 +73,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
                 <CalendarClock className="h-4 w-4 text-teal-600" />
                 <div className="text-sm">
                   <span className="font-medium text-slate-700">
-                    {new Date(appointment.bookingDate).toLocaleDateString(
+                    {new Date(appointment.day).toLocaleDateString(
                       "vi-VN",
                       {
                         day: "2-digit",
@@ -88,7 +88,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
                 <Clock className="h-4 w-4 text-teal-600" />
                 <div className="text-sm">
                   <span className="font-medium text-slate-700">
-                    {appointment.bookingTime?.slice(0, 5)} phút
+                    {appointment.time?.slice(0, 5)} phút
                   </span>
                 </div>
               </div>

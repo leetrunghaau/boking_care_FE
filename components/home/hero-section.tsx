@@ -1,7 +1,11 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Calendar, Search, Users, Shield, Clock } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function HeroSection() {
+  const router = useRouter()
   return (
     <section className="relative h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-teal-50 to-teal-100">
       {/* SVG Background Pattern */}
@@ -94,6 +98,7 @@ export default function HeroSection() {
             <Button
               size="lg"
               className="h-16 px-12 text-xl font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xl transform hover:scale-105 transition-all duration-200"
+              onClick={()=>{router.push("/dat-lich-kham")}}
             >
               <Calendar className="mr-3 h-6 w-6" />
               Đặt lịch khám ngay

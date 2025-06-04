@@ -161,6 +161,7 @@ export function ImageUploader({
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      console.log("test file", e)
       processFiles(e.target.files);
     }
   };
@@ -337,6 +338,7 @@ export function ImageUploader({
         <div className="mt-4 pt-4 border-t">
           <Button
             onClick={() => {
+              console.log("file state", uploadedFiles)
               const filesToUpload = uploadedFiles
                 .filter((f) => f.uploaded)
                 .map((f) => f.file);
