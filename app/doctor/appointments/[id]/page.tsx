@@ -7,23 +7,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 // UI and icons
-import {
-  ArrowLeft,
-  Calendar,
-  CalendarClock,
-  Check,
-  Clock,
-  DollarSign,
-  MapPin,
-  Phone,
-  Stethoscope,
-  Trash,
-  User,
-  Mail,
-  MessageSquare,
-  CircleDashed,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft, Check, Clock, Trash, CircleDashed } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,37 +15,21 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { PrescriptionForm } from "@/components/doctor/doctor-prescriptions/prescription-form";
 import { PrescriptionPreview } from "@/components/doctor/doctor-prescriptions/prescription-preview";
-import { ImageUploader } from "@/components/share/image-uploader";
-import { InputWithUnit } from "@/components/share/input-with-unit";
-import PatientRecordModal from "@/components/doctor/doctor-appointments/patient-record-modal";
 // Utilities
 import http from "@/helper/axios";
-import PatientCrad from '@/components/doctor/doctor-appointments/detail/patient-card';
+import PatientCrad from "@/components/doctor/doctor-appointments/detail/patient-card";
 import BookingInfoCard from "@/components/doctor/doctor-appointments/detail/booking-info-card";
 import ExaminationTab from "@/components/doctor/doctor-appointments/detail/examination-tab";
-import ReviewFile from "@/components/share/review-file";
 
 export default function AppointmentDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
-
-   const [selectedFile, setSelectedFile] = useState<File>();
+  const [selectedFile, setSelectedFile] = useState<File>();
   // State
   const [loading, setLoading] = useState(false);
   const [appointmentDetail, setAppointmentDetail] = useState<any | null>(null);
@@ -302,8 +270,8 @@ export default function AppointmentDetail() {
         {/* Cột thông tin bệnh nhân */}
         <div className="space-y-6">
           {/* Thẻ thông tin bệnh nhân */}
-          <PatientCrad bookingId={params.id}  />
-          
+          <PatientCrad bookingId={params.id} />
+
           {/* Thẻ thông tin lịch hẹn */}
           <BookingInfoCard bookingId={params.id} />
         </div>
@@ -333,7 +301,7 @@ export default function AppointmentDetail() {
                   {!showPrescriptionPreview ? (
                     <PrescriptionForm
                       bookingId={params.id}
-
+                      onPreview={() => setShowPrescriptionPreview(true)}
                     />
                   ) : (
                     <PrescriptionPreview
@@ -356,7 +324,7 @@ export default function AppointmentDetail() {
                       Lịch sử khám bệnh gần đây
                     </h3>
                     {appointmentDetail.medicalHistory &&
-                      appointmentDetail.medicalHistory.length > 0 ? (
+                    appointmentDetail.medicalHistory.length > 0 ? (
                       <div className="space-y-3">
                         {appointmentDetail.medicalHistory.map(
                           (record: any, index: any) => (

@@ -1,38 +1,42 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Eye, Plus, Save, Trash } from "lucide-react"
-import http from "@/helper/axios"
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Eye, Plus, Save, Trash } from "lucide-react";
+import http from "@/helper/axios";
+import { useToast } from "@/hooks/use-toast";
 
 interface Medication {
-  id: number
-  name: string
-  dosage: string
-  frequency: string
-  duration: string
-  instructions: string
+  id: number;
+  name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions: string;
 }
 
 interface Props {
   onPreview: () => void;
-  bookingId: number | string | null
+  bookingId: number | string | null;
 }
 
 export function PrescriptionForm({ bookingId, onPreview }: Props) {
-  const [loading, setLoading] = useState(false)
-  const [saveLoading, setSaveLoading] = useState(false)
-  const { toast } = useToast()
-  const [medications, setMedications] = useState<Medication[]>([
+  const [loading, setLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const { toast } = useToast();
+  const [medications, setMedications] = useState<any[]>([]);
 
-  ])
-
-  const [generalInstructions, setGeneralInstructions] = useState("")
+  const [generalInstructions, setGeneralInstructions] = useState("");
 
   // Thêm thuốc mới
   const handleAddMedication = () => {
@@ -46,27 +50,31 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
         duration: "",
         instructions: "",
       },
-    ])
-  }
+    ]);
+  };
 
   // Xóa thuốc
   const handleRemoveMedication = (id: number) => {
     if (medications.length > 1) {
-      setMedications(medications.filter((med) => med.id !== id))
+      setMedications(medications.filter((med) => med.id !== id));
     }
-  }
+  };
 
   // Cập nhật thông tin thuốc
-  const handleMedicationChange = (id: number, field: keyof Medication, value: string) => {
+  const handleMedicationChange = (
+    id: number,
+    field: keyof Medication,
+    value: string
+  ) => {
     setMedications(
       medications.map((med) => {
         if (med.id === id) {
-          return { ...med, [field]: value }
+          return { ...med, [field]: value };
         }
-        return med
-      }),
-    )
-  }
+        return med;
+      })
+    );
+  };
 
   // Danh sách thuốc mẫu
   const medicationOptions = [
@@ -80,7 +88,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
     "Atorvastatin 10mg",
     "Losartan 50mg",
     "Metoprolol 25mg",
-  ]
+  ];
 
   // Danh sách tần suất
   const frequencyOptions = [
@@ -92,24 +100,53 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
     "Mỗi 8 giờ",
     "Mỗi 12 giờ",
     "Khi cần",
-  ]
+  ];
 
   // Danh sách thời gian dùng
-  const durationOptions = ["3 ngày", "5 ngày", "7 ngày", "10 ngày", "14 ngày", "1 tháng", "2 tháng", "3 tháng"]
+  const durationOptions = [
+    "3 ngày",
+    "5 ngày",
+    "7 ngày",
+    "10 ngày",
+    "14 ngày",
+    "1 tháng",
+    "2 tháng",
+    "3 tháng",
+  ];
 
   // lấy thuốc mẫu
   useEffect(() => {
-
-  }, [])
+    const fetchData = async () => {
+      try {
+        //  setLoading(true);
+        //  const res = await http.get<any>(
+        //    `/doctor-appointment/prescription/${bookingId}`
+        //  );
+        //  console.log("đơn thuốc khi tải mới", res);
+        //  if (res) {
+        //    setMedications(res.prescriptions);
+        //    setGeneralInstructions(res.generalInstructions);
+        //  }
+        setMedications(medicationOptions);
+      } catch (err) {
+        console.error("Failed to fetch appointment detail:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [bookingId]);
 
   // lấy thông tin thuốc cũ
   useEffect(() => {
-    if (!bookingId) return
+    if (!bookingId) return;
     const fetchData = async () => {
       try {
-        setLoading(true)
-        const res = await http.get<any>(`/doctor-appointment/prescription/${bookingId}`);
-        console.log("đơn thuốc khi tải mới", res)
+        setLoading(true);
+        const res = await http.get<any>(
+          `/doctor-appointment/prescription/${bookingId}`
+        );
+        console.log("đơn thuốc khi tải mới", res);
         if (res) {
           setMedications(res.prescriptions);
           setGeneralInstructions(res.generalInstructions);
@@ -120,23 +157,25 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
         setLoading(false);
       }
     };
-    fetchData()
-  }, [bookingId])
-
+    fetchData();
+  }, [bookingId]);
 
   const handleSavePrescription = () => {
     const fetchData = async () => {
       try {
-        setSaveLoading(true)
-        console.log(medications)
-        const res = await http.post<any>(`/doctor-appointment/prescription/${bookingId}`, {
-          prescriptions: medications.map(prev => ({
-            ...prev,
-            id: prev.id > 0 ? prev.id : null
-          })),
-          generalInstructions: generalInstructions
-        });
-        console.log("thuốc trả về", res)
+        setSaveLoading(true);
+        console.log(medications);
+        const res = await http.post<any>(
+          `/doctor-appointment/prescription/${bookingId}`,
+          {
+            prescriptions: medications.map((prev) => ({
+              ...prev,
+              id: prev.id > 0 ? prev.id : null,
+            })),
+            generalInstructions: generalInstructions,
+          }
+        );
+        console.log("thuốc trả về", res);
         if (res) {
           setMedications(res.prescriptions);
           setGeneralInstructions(res.generalInstructions);
@@ -145,7 +184,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
             description: "Bạn đã lưu đơn thuốc thành công.",
             variant: "success",
             duration: 2000,
-          })
+          });
         }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
@@ -153,8 +192,8 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
         setSaveLoading(false);
       }
     };
-    fetchData()
-  }
+    fetchData();
+  };
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -164,7 +203,10 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
             <Eye className="h-4 w-4 mr-1" />
             Xem trước
           </Button>
-          <Button onClick={handleSavePrescription} className="bg-teal-600 hover:bg-teal-700" disabled={saveLoading}>
+          <Button
+            onClick={handleSavePrescription}
+            className="bg-teal-600 hover:bg-teal-700"
+            disabled={saveLoading}>
             <Save className="h-4 w-4 mr-1" />
             Lưu đơn thuốc
           </Button>
@@ -174,7 +216,9 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
       {/* Danh sách thuốc */}
       <div className="space-y-6">
         {medications.map((medication, index) => (
-          <div key={medication.id} className="p-4 border rounded-md bg-slate-50">
+          <div
+            key={medication.id}
+            className="p-4 border rounded-md bg-slate-50">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium">Thuốc {index + 1}</h4>
               {medications.length > 1 && (
@@ -182,8 +226,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
                   variant="ghost"
                   size="sm"
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => handleRemoveMedication(medication.id)}
-                >
+                  onClick={() => handleRemoveMedication(medication.id)}>
                   <Trash className="h-4 w-4" />
                 </Button>
               )}
@@ -194,8 +237,9 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
                 <Label htmlFor={`med-name-${medication.id}`}>Tên thuốc</Label>
                 <Select
                   value={medication.name}
-                  onValueChange={(value) => handleMedicationChange(medication.id, "name", value)}
-                >
+                  onValueChange={(value) =>
+                    handleMedicationChange(medication.id, "name", value)
+                  }>
                   <SelectTrigger id={`med-name-${medication.id}`}>
                     <SelectValue placeholder="Chọn hoặc nhập tên thuốc" />
                   </SelectTrigger>
@@ -210,21 +254,32 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`med-dosage-${medication.id}`}>Liều lượng</Label>
+                <Label htmlFor={`med-dosage-${medication.id}`}>
+                  Liều lượng
+                </Label>
                 <Input
                   id={`med-dosage-${medication.id}`}
                   placeholder="VD: 1 viên"
                   value={medication.dosage}
-                  onChange={(e) => handleMedicationChange(medication.id, "dosage", e.target.value)}
+                  onChange={(e) =>
+                    handleMedicationChange(
+                      medication.id,
+                      "dosage",
+                      e.target.value
+                    )
+                  }
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`med-frequency-${medication.id}`}>Tần suất</Label>
+                <Label htmlFor={`med-frequency-${medication.id}`}>
+                  Tần suất
+                </Label>
                 <Select
                   value={medication.frequency}
-                  onValueChange={(value) => handleMedicationChange(medication.id, "frequency", value)}
-                >
+                  onValueChange={(value) =>
+                    handleMedicationChange(medication.id, "frequency", value)
+                  }>
                   <SelectTrigger id={`med-frequency-${medication.id}`}>
                     <SelectValue placeholder="Chọn tần suất" />
                   </SelectTrigger>
@@ -239,11 +294,14 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor={`med-duration-${medication.id}`}>Thời gian dùng</Label>
+                <Label htmlFor={`med-duration-${medication.id}`}>
+                  Thời gian dùng
+                </Label>
                 <Select
                   value={medication.duration}
-                  onValueChange={(value) => handleMedicationChange(medication.id, "duration", value)}
-                >
+                  onValueChange={(value) =>
+                    handleMedicationChange(medication.id, "duration", value)
+                  }>
                   <SelectTrigger id={`med-duration-${medication.id}`}>
                     <SelectValue placeholder="Chọn thời gian" />
                   </SelectTrigger>
@@ -258,19 +316,30 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor={`med-instructions-${medication.id}`}>Hướng dẫn sử dụng</Label>
+                <Label htmlFor={`med-instructions-${medication.id}`}>
+                  Hướng dẫn sử dụng
+                </Label>
                 <Textarea
                   id={`med-instructions-${medication.id}`}
                   placeholder="VD: Uống sau khi ăn"
                   value={medication.instructions}
-                  onChange={(e) => handleMedicationChange(medication.id, "instructions", e.target.value)}
+                  onChange={(e) =>
+                    handleMedicationChange(
+                      medication.id,
+                      "instructions",
+                      e.target.value
+                    )
+                  }
                 />
               </div>
             </div>
           </div>
         ))}
 
-        <Button variant="outline" className="w-full" onClick={handleAddMedication}>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleAddMedication}>
           <Plus className="h-4 w-4 mr-1" />
           Thêm thuốc
         </Button>
@@ -288,5 +357,5 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
         />
       </div>
     </div>
-  )
+  );
 }
