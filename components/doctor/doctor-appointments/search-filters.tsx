@@ -1,30 +1,39 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Filter } from "lucide-react"
-import { useState } from "react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Filter } from "lucide-react";
+import { useState } from "react";
 
 interface SearchFiltersProps {
-  onSearch: (query: string) => void
-  onStatusFilter: (status: string) => void
+  onSearch: (query: string) => void;
+  onStatusFilter: (status: string) => void;
 }
 
-export function SearchFilters({ onSearch, onStatusFilter }: SearchFiltersProps) {
-  const [searchQuery, setSearchQuery] = useState("")
+export function SearchFilters({
+  onSearch,
+  onStatusFilter,
+}: SearchFiltersProps) {
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = () => {
-    onSearch(searchQuery)
-  }
+    onSearch(searchQuery);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleSearch()
+      handleSearch();
     }
-  }
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-3">
@@ -54,11 +63,13 @@ export function SearchFilters({ onSearch, onStatusFilter }: SearchFiltersProps) 
             <SelectItem value="pending">Chờ xác nhận</SelectItem>
           </SelectContent>
         </Select>
-        <Button onClick={handleSearch} className="bg-teal-600 hover:bg-teal-700">
+        <Button
+          onClick={handleSearch}
+          className="bg-teal-600 hover:bg-teal-700">
           <Search className="mr-2 h-4 w-4" />
           Tìm kiếm
         </Button>
       </div>
     </div>
-  )
+  );
 }

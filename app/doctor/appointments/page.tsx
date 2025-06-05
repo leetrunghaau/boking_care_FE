@@ -49,12 +49,10 @@ export default function Appointments() {
 
   // Filter appointments by search and status
   const finalAppointments = appointments.filter((appointment) => {
-    const matchSearch = searchQuery
-      ? appointment.patientName
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase())
-      : true;
-
+    const patientName = appointment?.patientName ?? "";
+    const matchSearch = patientName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchStatus =
       statusFilter === "all" || appointment.status === statusFilter;
 

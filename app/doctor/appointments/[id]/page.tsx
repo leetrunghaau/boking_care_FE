@@ -25,7 +25,6 @@ export default function AppointmentDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [showReview, setShowReview] = useState(false);
-  const [updatedStatus, setUpdatedStatus] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const buttonElement = useRef<HTMLButtonElement>(null);
@@ -44,32 +43,32 @@ export default function AppointmentDetail() {
     }
   };
   type Status = "pending" | "confirmed" | "cancelled" | "completed";
-
+  const fetchAppointmentStatus = async () => {
+    setLoading(true);
+    try {
+      const res = await http.get<any>(
+        `/doctor-appointment/${params.id}/status`
+      );
+      setStatus(res);
+    } catch (err) {
+      console.error("Failed to fetch appointment status:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchAppointmentStatus = async () => {
-      setLoading(true);
-      try {
-        const res = await http.get<any>(
-          `/doctor-appointment/${params.id}/status`
-        );
-        setStatus(res);
-      } catch (err) {
-        console.error("Failed to fetch appointment status:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAppointmentStatus();
-  }, [status]);
+  }, [params.id]);
 
   const handleUpdateStatus = async (newStatus: string) => {
-    setUpdatedStatus(newStatus);
+    console.log("Updating status to:", newStatus);
+    setStatus(newStatus);
     setLoading(true);
     try {
       await http.post(`/doctor-appointment/${params.id}/status`, {
         status: newStatus,
       });
+      await fetchAppointmentStatus();
     } catch (err) {
       console.error("Failed to update status:", err);
     } finally {
@@ -132,14 +131,24 @@ export default function AppointmentDetail() {
         </div>
       ) : (
         <div className="flex items-center justify-end gap-4">
-          <Button variant="destructiveOutline">
-            <Trash className="h-4 w-4 mr-1" />
-            Hủy lịch hẹn
-          </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700">
-            <Check className="h-4 w-4 mr-1" />
-            Hoàn thành khám
-          </Button>
+          {status === "completed" || "cancelled" ? (
+            <></>
+          ) : (
+            <>
+              <Button
+                variant="destructiveOutline"
+                onClick={() => handleUpdateStatus("cancelled")}>
+                <Trash className="h-4 w-4 mr-1" />
+                Hủy lịch hẹn
+              </Button>
+              <Button
+                className="bg-teal-600 hover:bg-teal-700"
+                onClick={() => handleUpdateStatus("completed")}>
+                <Check className="h-4 w-4 mr-1" />
+                Hoàn thành khám
+              </Button>
+            </>
+          )}
         </div>
       )}
 

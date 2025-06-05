@@ -105,14 +105,14 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
 
   // Danh sách thời gian dùng
   const durationOptions = [
-    "3 ngày",
-    "5 ngày",
-    "7 ngày",
-    "10 ngày",
-    "14 ngày",
-    "1 tháng",
-    "2 tháng",
-    "3 tháng",
+    { label: "3 ngày", value: 3 },
+    { label: "5 ngày", value: 5 },
+    { label: "7 ngày", value: 7 },
+    { label: "10 ngày", value: 10 },
+    { label: "14 ngày", value: 14 },
+    { label: "1 tháng", value: 30 },
+    { label: "2 tháng", value: 60 },
+    { label: "3 tháng", value: 90 },
   ];
 
   // lấy thuốc mẫu
@@ -303,8 +303,10 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
                   </SelectTrigger>
                   <SelectContent>
                     {durationOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
+                      <SelectItem
+                        key={option.value}
+                        value={option.value.toString()}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
