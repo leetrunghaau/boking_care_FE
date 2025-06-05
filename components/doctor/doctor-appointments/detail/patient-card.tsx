@@ -88,7 +88,7 @@ export default function PatientCard({ bookingId }: Pops) {
                                     <MessageSquare className="h-4 w-4 mr-1" />
                                     Nhắn tin
                                 </Button>
-                                <PatientRecordModal />
+                                <PatientRecordModal patientId={patient.id}/>
                             </div>
                         </CardContent>
                     </ Card >
