@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface InputWithUnitProps {
+  disabled?: boolean;
   id?: string;
   placeholder?: string;
   value?: string;
-  type?:string;
+  type?: string;
   readOnly?: boolean;
   className?: string;
   unit: string;
@@ -17,6 +18,7 @@ interface InputWithUnitProps {
 }
 
 export function InputWithUnit({
+  disabled,
   id,
   placeholder,
   value,
@@ -31,6 +33,7 @@ export function InputWithUnit({
     <div className="space-y-1">
       <div className="relative">
         <Input
+          disabled={disabled}
           id={id}
           placeholder={placeholder}
           value={value}

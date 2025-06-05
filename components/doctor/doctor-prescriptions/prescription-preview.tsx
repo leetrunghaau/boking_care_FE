@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import http from "@/helper/axios"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
-import { ArrowLeft, Printer, Send } from "lucide-react"
-import { useEffect, useState } from "react"
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Button } from "@/components/ui/button";
+import http from "@/helper/axios";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { ArrowLeft, Printer, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 interface PrescriptionPreviewProps {
-  bookingId: string | number | null
-  onBack: () => void
+  bookingId: string | number | null;
+  onBack: () => void;
 }
 
 const styles = StyleSheet.create({
@@ -25,7 +25,10 @@ const MyDocument = () => (
     </Page>
   </Document>
 );
-export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewProps) {
+export function PrescriptionPreview({
+  bookingId,
+  onBack,
+}: PrescriptionPreviewProps) {
   const [medications, setMedications] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<any>({
@@ -37,7 +40,7 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
     doctorSpecialty: "",
     doctorHospital: "",
     prescriptions: "",
-    generalInstructions: ""
+    generalInstructions: "",
   });
 
   useEffect(() => {
@@ -51,8 +54,7 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
         console.log("đơn thuốc khi tải mới", res);
         if (res) {
           setMedications(res.prescriptions);
-          setInfo(res.info)
-
+          setInfo(res.info);
         }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
@@ -63,7 +65,6 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
     fetchData();
   }, [bookingId]);
 
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -72,7 +73,7 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
           Quay lại
         </Button>
         <div className="flex gap-2">
-          <Button variant="outline" >
+          <Button variant="outline">
             <Printer className="h-4 w-4 mr-1" />
             In đơn thuốc
           </Button>
@@ -80,27 +81,32 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
             <Send className="h-4 w-4 mr-1" />
             Gửi cho bệnh nhân
           </Button>
-          
         </div>
       </div>
 
       {/* Xem trước đơn thuốc */}
       <div className="border rounded-md p-6 bg-white">
         <div className="text-center mb-6">
-          <h2 className="text-xl font-bold uppercase text-teal-700">Đơn thuốc</h2>
-          <p className="text-sm text-slate-500">Ngày kê đơn: {format(new Date, "dd/MM/yyyy", { locale: vi })}</p>
+          <h2 className="text-xl font-bold uppercase text-teal-700">
+            Đơn thuốc
+          </h2>
+          <p className="text-sm text-slate-500">
+            Ngày kê đơn: {format(new Date(), "dd/MM/yyyy", { locale: vi })}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <p className="text-sm">
-              <span className="font-medium">Họ tên bệnh nhân:</span> {info.patientName}
+              <span className="font-medium">Họ tên bệnh nhân:</span>{" "}
+              {info.patientName}
             </p>
             <p className="text-sm">
               <span className="font-medium">Tuổi:</span> {info.patientAge}
             </p>
             <p className="text-sm">
-              <span className="font-medium">Giới tính:</span> {info.patientGender}
+              <span className="font-medium">Giới tính:</span>{" "}
+              {info.patientGender}
             </p>
           </div>
           <div>
@@ -116,22 +122,28 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
             {medications.map((med, index) => (
               <div key={index} className="border-b pb-3">
                 <div className="flex items-baseline">
-                  <span className="font-medium text-teal-700 mr-2">{index + 1}.</span>
+                  <span className="font-medium text-teal-700 mr-2">
+                    {index + 1}.
+                  </span>
                   <div className="flex-1">
                     <p className="font-medium">{med.name}</p>
                     <div className="grid grid-cols-3 gap-2 mt-1">
                       <p className="text-sm">
-                        <span className="text-slate-500">Liều dùng:</span> {med.dosage}
+                        <span className="text-slate-500">Liều dùng:</span>{" "}
+                        {med.dosage}
                       </p>
                       <p className="text-sm">
-                        <span className="text-slate-500">Tần suất:</span> {med.frequency}
+                        <span className="text-slate-500">Tần suất:</span>{" "}
+                        {med.frequency}
                       </p>
                       <p className="text-sm">
-                        <span className="text-slate-500">Thời gian:</span> {med.duration}
+                        <span className="text-slate-500">Thời gian:</span>{" "}
+                        {med.duration}
                       </p>
                     </div>
                     <p className="text-sm mt-1">
-                      <span className="text-slate-500">Hướng dẫn:</span> {med.instructions}
+                      <span className="text-slate-500">Hướng dẫn:</span>{" "}
+                      {med.instructions}
                     </p>
                   </div>
                 </div>
@@ -155,5 +167,5 @@ export function PrescriptionPreview({ bookingId, onBack }: PrescriptionPreviewPr
         </div>
       </div>
     </div>
-  )
+  );
 }

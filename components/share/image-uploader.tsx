@@ -23,6 +23,7 @@ interface MedicalImageUploaderProps {
   maxFiles?: number;
   maxSizeMB?: number;
   className?: string;
+  disabled?: boolean;
 }
 
 export function ImageUploader({
@@ -31,6 +32,7 @@ export function ImageUploader({
   maxFiles = 10,
   maxSizeMB = 10,
   className,
+  disabled = false,
 }: MedicalImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -161,7 +163,7 @@ export function ImageUploader({
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      console.log("test file", e)
+      console.log("test file", e);
       processFiles(e.target.files);
     }
   };
@@ -190,47 +192,59 @@ export function ImageUploader({
   return (
     <div className={cn("w-full", className)}>
       <div className="mb-4">
-        <h3 className="text-sm font-medium mb-2">Tải lên hình ảnh y tế</h3>
+        <h3 className="text-lg font-medium mb-2">Tải lên hình ảnh y tế</h3>
         <p className="text-xs text-gray-600">
           Tải lên kết quả xét nghiệm, X-quang, đơn thuốc hoặc tài liệu y tế khác
         </p>
       </div>
 
       {/* Upload Area */}
-      <div
-        className={cn(
-          "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors mb-4",
-          isDragging
-            ? "border-teal-500 bg-teal-50"
-            : "border-gray-300 hover:border-teal-400 hover:bg-gray-50"
-        )}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}>
-        <div className="flex flex-col items-center gap-2">
-          <div className="p-3 rounded-full bg-gray-100">
-            <Upload className="w-6 h-6 text-gray-600" />
-          </div>
-          <div>
-            <p className="font-medium text-gray-700">
-              Kéo thả file hoặc click để chọn
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Hỗ trợ: JPG, PNG, PDF, DOC (tối đa {maxSizeMB}MB mỗi file)
-            </p>
-          </div>
+      {disabled ? (
+        <div className="flex flex-col">
+          <h1 className="text-lg font-medium text-teal-500 mb-2">
+            Không thể thêm tài liệu.
+          </h1>
+          <p className="text-xs text-gray-600">
+            Lịch hẹn đang ở trạng thái chưa xác nhận, đã bị huỷ hoặc đã hoàn
+            thành
+          </p>
         </div>
+      ) : (
+        <div
+          className={cn(
+            "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors mb-4",
+            isDragging
+              ? "border-teal-500 bg-teal-50"
+              : "border-gray-300 hover:border-teal-400 hover:bg-gray-50"
+          )}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}>
+          <div className="flex flex-col items-center gap-2">
+            <div className="p-3 rounded-full bg-gray-100">
+              <Upload className="w-6 h-6 text-gray-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-700">
+                Kéo thả file hoặc click để chọn
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Hỗ trợ: JPG, PNG, PDF, DOC (tối đa {maxSizeMB}MB mỗi file)
+              </p>
+            </div>
+          </div>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept={acceptedTypes.join(",")}
-          className="hidden"
-          onChange={handleFileInputChange}
-        />
-      </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept={acceptedTypes.join(",")}
+            className="hidden"
+            onChange={handleFileInputChange}
+          />
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
@@ -338,7 +352,7 @@ export function ImageUploader({
         <div className="mt-4 pt-4 border-t">
           <Button
             onClick={() => {
-              console.log("file state", uploadedFiles)
+              console.log("file state", uploadedFiles);
               const filesToUpload = uploadedFiles
                 .filter((f) => f.uploaded)
                 .map((f) => f.file);

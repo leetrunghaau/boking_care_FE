@@ -127,7 +127,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
                   <User className="h-4 w-4 mr-1" />
                   Hồ sơ
                 </Button> */}
-                <PatientRecordModal userId={appointment.patient.id} />
+                <PatientRecordModal patientId={appointment.patient.id} />
               </div>
             )}
           </div>

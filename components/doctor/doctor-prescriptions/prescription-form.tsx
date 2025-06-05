@@ -28,9 +28,10 @@ interface Medication {
 interface Props {
   onPreview: () => void;
   bookingId: number | string | null;
+  disabled?: boolean;
 }
 
-export function PrescriptionForm({ bookingId, onPreview }: Props) {
+export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const { toast } = useToast();
@@ -213,9 +214,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
       {/* Danh sách thuốc */}
       <div className="space-y-6">
         {medications.map((medication, index) => (
-          <div
-            key={index}
-            className="p-4 border rounded-md bg-slate-50">
+          <div key={index} className="p-4 border rounded-md bg-slate-50">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium">Thuốc {index + 1}</h4>
               {medications.length > 1 && (
@@ -336,7 +335,8 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
         <Button
           variant="outline"
           className="w-full"
-          onClick={handleAddMedication}>
+          onClick={handleAddMedication}
+          disabled={disabled}>
           <Plus className="h-4 w-4 mr-1" />
           Thêm thuốc
         </Button>
@@ -346,6 +346,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
       <div className="space-y-2">
         <Label htmlFor="general-instructions">Hướng dẫn chung</Label>
         <Textarea
+          disabled={disabled}
           id="general-instructions"
           placeholder="Nhập hướng dẫn chung cho bệnh nhân"
           rows={3}
@@ -353,6 +354,20 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
           onChange={(e) => setGeneralInstructions(e.target.value)}
         />
       </div>
+
+      {disabled ? (
+        <div className="flex flex-col">
+          <h1 className="text-lg font-medium text-teal-500 mb-2">
+            Không thể thêm đơn thuốc.
+          </h1>
+          <p className="text-xs text-gray-600">
+            Lịch hẹn đang ở trạng thái chưa xác nhận, đã bị huỷ hoặc đã hoàn
+            thành
+          </p>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

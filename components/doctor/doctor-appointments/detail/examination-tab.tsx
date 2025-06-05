@@ -17,13 +17,14 @@ import { ImageUploader } from "@/components/share/image-uploader";
 import { Switch } from "@/components/ui/switch";
 import moment from "moment";
 import { Divider } from "@/components/ui/divider";
-import { Rss, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Pops {
   bookingId: number | string | null;
+  disabled?: boolean;
 }
-export default function ExaminationTab({ bookingId }: Pops) {
+export default function ExaminationTab({ bookingId, disabled }: Pops) {
   const [examination, setExamination] = useState<any>({
     diagnosis: "",
     finalDiagnosis: "",
@@ -35,7 +36,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
     weight: "",
     height: "",
     followUp: false,
-    followUpDate: moment().format('YYYY-MM-DD'),
+    followUpDate: moment().format("YYYY-MM-DD"),
     followUpTime: "",
     followUpNote: "",
   });
@@ -87,7 +88,6 @@ export default function ExaminationTab({ bookingId }: Pops) {
         if (res) {
           setExamination(res.examination);
           setFileStore(res.files);
-
         }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
@@ -125,7 +125,10 @@ export default function ExaminationTab({ bookingId }: Pops) {
           `/doctor-appointment/my-schedule/${examination.followUpDate}`
         );
         if (res ?? res.length > 0) {
-          console.log(`schedule mới được cập nhật theo ngày ${examination.followUpDate}`, res)
+          console.log(
+            `schedule mới được cập nhật theo ngày ${examination.followUpDate}`,
+            res
+          );
           setSchedule(res);
         }
       } catch (err) {
@@ -152,6 +155,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
       <div className="space-y-2">
         <div className="grid grid-cols-2 gap-6">
           <InputWithUnit
+            disabled={disabled}
             id="bloodPressure"
             placeholder="Nhập huyết áp"
             type="number"
@@ -163,6 +167,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
             }}
           />
           <InputWithUnit
+            disabled={disabled}
             id="temperature"
             placeholder="Nhập nhiệt độ"
             type="number"
@@ -174,6 +179,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
             }}
           />
           <InputWithUnit
+            disabled={disabled}
             id="height"
             placeholder="Nhập chiều cao"
             type="number"
@@ -185,6 +191,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
             }}
           />
           <InputWithUnit
+            disabled={disabled}
             id="pulse"
             placeholder="Nhập nhịp tim"
             value={examination.pulse}
@@ -196,6 +203,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
             }}
           />
           <InputWithUnit
+            disabled={disabled}
             id="weight"
             placeholder="Nhập cân nặng"
             value={examination.weight}
@@ -207,6 +215,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
             }}
           />
           <InputWithUnit
+            disabled={disabled}
             id="respiratoryRate"
             placeholder="Nhập nhịp thở"
             type="number"
@@ -220,6 +229,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
       <div className="space-y-2">
         <h3 className="text-lg font-medium mt-10">Chẩn đoán ban đầu</h3>
         <Input
+          disabled={disabled}
           id="diagnosis"
           placeholder="Nhập chẩn đoán ban đầu của bác sĩ"
           value={examination.diagnosis}
@@ -229,6 +239,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
       <div className="space-y-2">
         <Label htmlFor="finalDiagnosis">Kết luận</Label>
         <Input
+          disabled={disabled}
           id="finalDiagnosis"
           placeholder="Nhập kết luận bệnh án của bác sĩ"
           value={examination.finalDiagnosis}
@@ -239,6 +250,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
       <div className="space-y-2">
         <Label htmlFor="notes">Ghi chú lâm sàng</Label>
         <Textarea
+          disabled={disabled}
           id="notes"
           placeholder="Nhập ghi chú lâm sàng, kết quả khám và các chỉ định"
           rows={5}
@@ -251,6 +263,7 @@ export default function ExaminationTab({ bookingId }: Pops) {
         <div className="flex gap-4 items-center mt-6">
           <h3 className="text-lg font-medium ">Hẹn tái khám</h3>
           <Switch
+            disabled={disabled}
             checked={examination.followUp}
             onCheckedChange={(e) => handleChange("followUp", e)}
           />
@@ -276,13 +289,15 @@ export default function ExaminationTab({ bookingId }: Pops) {
                   <SelectValue placeholder="Chọn giờ" />
                 </SelectTrigger>
                 <SelectContent>
-                  {
-                    examination.followUpTime != "" ?
-                      <SelectItem key={examination.followUpTime} value={examination.followUpTime}>
-                        {examination.followUpTime}
-                      </SelectItem>
-                      : <></>
-                  }
+                  {examination.followUpTime != "" ? (
+                    <SelectItem
+                      key={examination.followUpTime}
+                      value={examination.followUpTime}>
+                      {examination.followUpTime}
+                    </SelectItem>
+                  ) : (
+                    <></>
+                  )}
                   {schedule.map((item: any) => (
                     <SelectItem key={item.start} value={item.start}>
                       {item.start}
@@ -309,7 +324,12 @@ export default function ExaminationTab({ bookingId }: Pops) {
 
       <Divider />
       <div className="space-y-2">
-        <ImageUploader onUpload={handleUpload} maxFiles={5} maxSizeMB={5} />
+        <ImageUploader
+          disabled={disabled}
+          onUpload={handleUpload}
+          maxFiles={5}
+          maxSizeMB={5}
+        />
         {/* <ImageUploader onFilesChange={handleImageChange} /> */}
       </div>
     </div>
