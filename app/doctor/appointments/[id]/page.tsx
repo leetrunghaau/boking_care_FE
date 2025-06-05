@@ -5,7 +5,14 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 // UI & Icons
-import { ArrowLeft, CircleDashed, Clock, Trash, Check } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleDashed,
+  Clock,
+  Trash,
+  Slice,
+  Check,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -49,6 +56,7 @@ export default function AppointmentDetail() {
       const res = await http.get<any>(
         `/doctor-appointment/${params.id}/status`
       );
+      console.log("Appointment status:", res);
       setStatus(res);
     } catch (err) {
       console.error("Failed to fetch appointment status:", err);
@@ -125,15 +133,14 @@ export default function AppointmentDetail() {
               variant="confirm"
               size="sm"
               onClick={() => handleUpdateStatus("confirmed")}>
+              <Slice className="h-5 w-5" />
               Xác nhận khám
             </Button>
           </div>
         </div>
       ) : (
         <div className="flex items-center justify-end gap-4">
-          {status === "completed" || "cancelled" ? (
-            <></>
-          ) : (
+          {status === "confirmed" ? (
             <>
               <Button
                 variant="destructiveOutline"
@@ -148,6 +155,8 @@ export default function AppointmentDetail() {
                 Hoàn thành khám
               </Button>
             </>
+          ) : (
+            <></>
           )}
         </div>
       )}

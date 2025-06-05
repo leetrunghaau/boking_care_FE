@@ -9,8 +9,11 @@ import http from "@/helper/axios";
 import { getIconByName } from "@/helper/icon-map";
 import Link from "next/link";
 import { handleApiError } from "@/helper/handle-error";
+import { useRouter } from "next/router";
 
 export default function SpecialtyDetailPage() {
+  const router = useRouter();
+
   const params = useParams();
   const slug = params?.slug as string;
   const [specialty, setSpecialty] = useState<any | null>(null);
@@ -46,7 +49,6 @@ export default function SpecialtyDetailPage() {
     if (!specialty?.disease || specialty.disease.length === 0) {
       return null;
     }
-
     return (
       <section className="px-6 max-w-6xl mx-auto">
         <h2 className="text-2xl font-semibold text-slate-800 mb-6">
@@ -72,7 +74,7 @@ export default function SpecialtyDetailPage() {
   };
   const renderAdvantages = () => {
     if (!specialty?.advantages || specialty.advantages.length === 0) {
-      return null; 
+      return null;
     }
 
     return (
@@ -81,7 +83,7 @@ export default function SpecialtyDetailPage() {
           Tại sao nên chọn chuyên khoa này?
         </h2>
         <ul className="list-disc pl-6 space-y-2 text-muted-foreground text-lg">
-          {specialty.advantages.map((adv:any) => (
+          {specialty.advantages.map((adv: any) => (
             <li key={adv.id}>{adv.name}</li>
           ))}
         </ul>
@@ -95,7 +97,9 @@ export default function SpecialtyDetailPage() {
           <h2 className="text-2xl font-semibold text-slate-800 mb-6">
             Cơ sở y tế hỗ trợ
           </h2>
-          <p className="text-center text-muted-foreground">Không có cơ sở y tế hỗ trợ nào.</p>
+          <p className="text-center text-muted-foreground">
+            Không có cơ sở y tế hỗ trợ nào.
+          </p>
         </section>
       );
     }
@@ -109,8 +113,7 @@ export default function SpecialtyDetailPage() {
           {specialty.hospitals.map((hop: any) => (
             <div
               key={hop.id || hop.slug}
-              className="bg-white p-4 rounded-md shadow-md flex gap-4"
-            >
+              className="bg-white p-4 rounded-md shadow-md flex gap-4">
               <div className="relative w-28 h-20 shrink-0 rounded-md overflow-hidden">
                 <Image
                   src={hop.thumbnail}
@@ -142,7 +145,9 @@ export default function SpecialtyDetailPage() {
           <h2 className="text-2xl font-semibold text-slate-800 mb-6">
             Bác sĩ chuyên khoa
           </h2>
-          <p className="text-center text-muted-foreground">Chưa có bác sĩ chuyên khoa nào.</p>
+          <p className="text-center text-muted-foreground">
+            Chưa có bác sĩ chuyên khoa nào.
+          </p>
         </section>
       );
     }
@@ -158,8 +163,7 @@ export default function SpecialtyDetailPage() {
             return (
               <div
                 key={doc.id || doc.slug}
-                className="bg-white rounded-md shadow-md overflow-hidden"
-              >
+                className="bg-white rounded-md shadow-md overflow-hidden">
                 <div className="relative w-full h-56">
                   <Image
                     src={doc.img ?? "/placeholder.svg"}
@@ -170,7 +174,9 @@ export default function SpecialtyDetailPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-lg">{doc.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{doc.title}</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {doc.title}
+                  </p>
                   <div className="flex items-center gap-1 mb-3">
                     {[...Array(ratingCount)].map((_, i) => (
                       <Star
@@ -180,7 +186,11 @@ export default function SpecialtyDetailPage() {
                     ))}
                     <span className="text-sm text-muted-foreground">{`${doc.rating} (${doc.sumRating})`}</span>
                   </div>
-                  <Button className="w-full bg-teal-600 text-white hover:bg-teal-700">
+                  <Button
+                    className="w-full bg-teal-600 text-white hover:bg-teal-700"
+                    onClick={() => {
+                      router.push("/dat-lich-kham");
+                    }}>
                     Đặt lịch khám
                   </Button>
                 </div>
@@ -198,7 +208,9 @@ export default function SpecialtyDetailPage() {
           <h2 className="text-2xl font-semibold text-slate-800 mb-4">
             Câu hỏi thường gặp
           </h2>
-          <p className="text-center text-muted-foreground">Chưa có câu hỏi thường gặp nào.</p>
+          <p className="text-center text-muted-foreground">
+            Chưa có câu hỏi thường gặp nào.
+          </p>
         </section>
       );
     }
@@ -211,7 +223,9 @@ export default function SpecialtyDetailPage() {
         <div className="space-y-4">
           {specialty.faqs.map((faq: any) => (
             <div key={faq.id} className="border p-4 rounded-md bg-slate-50">
-              <h4 className="font-medium text-slate-700 mb-2">{faq.question}</h4>
+              <h4 className="font-medium text-slate-700 mb-2">
+                {faq.question}
+              </h4>
               <p className="text-muted-foreground">{faq.answer}</p>
             </div>
           ))}
@@ -219,7 +233,6 @@ export default function SpecialtyDetailPage() {
       </section>
     );
   };
-
 
   return (
     <div className="space-y-16">
@@ -233,9 +246,7 @@ export default function SpecialtyDetailPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <h1 className="text-white text-4xl font-bold">
-              {specialty.name}
-            </h1>
+            <h1 className="text-white text-4xl font-bold">{specialty.name}</h1>
           </div>
         </div>
       )}
@@ -250,9 +261,7 @@ export default function SpecialtyDetailPage() {
             <h2 className="text-2xl font-bold mb-2 text-slate-800">
               {specialty.name}
             </h2>
-            <p className="text-muted-foreground text-lg">
-              {specialty.about}
-            </p>
+            <p className="text-muted-foreground text-lg">{specialty.about}</p>
           </div>
         </div>
       </section>

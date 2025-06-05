@@ -1,12 +1,19 @@
-import { Button } from "@/components/ui/button"
-import { Calendar, Search, Users, Shield, Clock } from "lucide-react"
+"use client";
+import { Button } from "@/components/ui/button";
+import { Calendar, Search, Users, Shield, Clock } from "lucide-react";
+import { useRouter } from "next/router";
 
 export default function HeroSection1() {
+  const router = useRouter();
   return (
     <section className="relative h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-teal-50 to-teal-100">
       {/* SVG Background Pattern */}
       <div className="absolute inset-0 z-0">
-        <svg className="w-full h-full opacity-10" viewBox="0 0 1600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          className="w-full h-full opacity-10"
+          viewBox="0 0 1600 600"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg">
           {/* Medical Cross Pattern */}
           <g fill="currentColor" className="text-teal-600">
             {/* Large medical crosses */}
@@ -17,12 +24,22 @@ export default function HeroSection1() {
 
             {/* Stethoscope shapes */}
             <circle cx="600" cy="120" r="15" />
-            <path d="M600 135v80" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path
+              d="M600 135v80"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
             <circle cx="580" cy="215" r="12" />
             <circle cx="620" cy="215" r="12" />
 
             <circle cx="1400" cy="300" r="12" />
-            <path d="M1400 312v60" stroke="currentColor" strokeWidth="3" fill="none" />
+            <path
+              d="M1400 312v60"
+              stroke="currentColor"
+              strokeWidth="3"
+              fill="none"
+            />
             <circle cx="1385" cy="372" r="10" />
             <circle cx="1415" cy="372" r="10" />
 
@@ -63,14 +80,42 @@ export default function HeroSection1() {
             <circle cx="150" cy="450" r="8" />
             <circle cx="170" cy="470" r="6" />
             <circle cx="130" cy="470" r="6" />
-            <line x1="150" y1="450" x2="170" y2="470" stroke="currentColor" strokeWidth="2" />
-            <line x1="150" y1="450" x2="130" y2="470" stroke="currentColor" strokeWidth="2" />
+            <line
+              x1="150"
+              y1="450"
+              x2="170"
+              y2="470"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <line
+              x1="150"
+              y1="450"
+              x2="130"
+              y2="470"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
 
             <circle cx="1450" cy="180" r="6" />
             <circle cx="1465" cy="195" r="5" />
             <circle cx="1435" cy="195" r="5" />
-            <line x1="1450" y1="180" x2="1465" y2="195" stroke="currentColor" strokeWidth="2" />
-            <line x1="1450" y1="180" x2="1435" y2="195" stroke="currentColor" strokeWidth="2" />
+            <line
+              x1="1450"
+              y1="180"
+              x2="1465"
+              y2="195"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <line
+              x1="1450"
+              y1="180"
+              x2="1435"
+              y2="195"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
           </g>
         </svg>
       </div>
@@ -92,16 +137,20 @@ export default function HeroSection1() {
           {/* Primary CTA */}
           <div className="space-y-4">
             <Button
+              onClick={() => {
+                router.push("/dat-lich-kham");
+              }}
               size="lg"
-              className="h-16 px-12 text-xl font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xl transform hover:scale-105 transition-all duration-200"
-            >
+              className="h-16 px-12 text-xl font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-xl transform hover:scale-105 transition-all duration-200">
               <Calendar className="mr-3 h-6 w-6" />
               Đặt lịch khám ngay
             </Button>
 
             {/* Secondary CTA */}
             <div className="pt-2">
-              <Button variant="ghost" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-medium">
+              <Button
+                variant="ghost"
+                className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-medium">
                 <Search className="mr-2 h-4 w-4" />
                 Tìm bác sĩ theo chuyên khoa
               </Button>
@@ -128,5 +177,5 @@ export default function HeroSection1() {
         </div>
       </div>
     </section>
-  )
+  );
 }

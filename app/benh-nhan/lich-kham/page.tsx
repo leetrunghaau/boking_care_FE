@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { CalendarCheck, MapPin, Stethoscope, Clock3, XCircle, CheckCircle, UserCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import Link from "next/link";
+import {
+  CalendarCheck,
+  MapPin,
+  Stethoscope,
+  Clock3,
+  XCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/router";
 
 const appointments = [
   {
@@ -16,7 +23,7 @@ const appointments = [
     facility: "BV Đại học Y Dược TP.HCM",
     facilityAddress: "215 Hồng Bàng, Quận 5, TP.HCM",
     doctorAvatar: "/doctors/bs-a.jpg",
-    status: "Đã xác nhận"
+    status: "Đã xác nhận",
   },
   {
     id: 2,
@@ -28,7 +35,7 @@ const appointments = [
     facility: "Phòng khám Vinmec Times City",
     facilityAddress: "458 Minh Khai, Hai Bà Trưng, Hà Nội",
     doctorAvatar: "/doctors/bs-b.jpg",
-    status: "Chờ xác nhận"
+    status: "Chờ xác nhận",
   },
   {
     id: 3,
@@ -40,9 +47,8 @@ const appointments = [
     facility: "BV Da Liễu Trung Ương",
     facilityAddress: "15A Phương Mai, Đống Đa, Hà Nội",
     doctorAvatar: "/doctors/bs-c.jpg",
-    status: "Đã khám"
-  }
-  ,
+    status: "Đã khám",
+  },
   {
     id: 4,
     code: "APPT-20250515-003",
@@ -53,11 +59,12 @@ const appointments = [
     facility: "BV Da Liễu Trung Ương",
     facilityAddress: "15A Phương Mai, Đống Đa, Hà Nội",
     doctorAvatar: "/doctors/bs-c.jpg",
-    status: "Đã khám"
-  }
-]
+    status: "Đã khám",
+  },
+];
 
 export default function UpcomingAppointmentsPage() {
+  const router = useRouter();
   return (
     <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
       <header className="flex items-center justify-between border-b pb-4 mb-6">
@@ -66,7 +73,13 @@ export default function UpcomingAppointmentsPage() {
           Lịch khám sắp tới
         </h1>
         <Link href="/dat-lich-kham">
-          <Button className="bg-teal-600 text-white hover:bg-teal-700">+ Đặt lịch mới</Button>
+          <Button
+            className="bg-teal-600 text-white hover:bg-teal-700"
+            onClick={() => {
+              router.push("/dat-lich-kham");
+            }}>
+            + Đặt lịch mới
+          </Button>
         </Link>
       </header>
 
@@ -79,8 +92,7 @@ export default function UpcomingAppointmentsPage() {
           {appointments.map((appt) => (
             <div
               key={appt.id}
-              className="bg-white p-6 rounded-lg shadow-xl transition-transform transform hover:scale-105 hover:shadow-2xl hover:border-teal-500 border-l-4 border-teal-600"
-            >
+              className="bg-white p-6 rounded-lg shadow-xl transition-transform transform hover:scale-105 hover:shadow-2xl hover:border-teal-500 border-l-4 border-teal-600">
               {/* Doctor Avatar */}
               <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-teal-500 mb-4">
                 <Image
@@ -93,12 +105,15 @@ export default function UpcomingAppointmentsPage() {
 
               {/* Appointment Information */}
               <div className="space-y-2 text-center">
-                <h2 className="text-xl font-semibold text-slate-800">{appt.doctor}</h2>
+                <h2 className="text-xl font-semibold text-slate-800">
+                  {appt.doctor}
+                </h2>
                 <p className="text-sm text-teal-500 flex items-center justify-center gap-2">
                   <Stethoscope className="w-4 h-4" /> {appt.specialty}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4 inline" /> {appt.facility} - {appt.facilityAddress}
+                  <MapPin className="w-4 h-4 inline" /> {appt.facility} -{" "}
+                  {appt.facilityAddress}
                 </p>
                 <p className="text-sm text-muted-foreground flex items-center gap-2 justify-center">
                   <Clock3 className="w-4 h-4" /> {appt.date} lúc {appt.time}
@@ -106,7 +121,10 @@ export default function UpcomingAppointmentsPage() {
 
                 {/* Status */}
                 <div className="mt-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusBadge(appt.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${statusBadge(
+                      appt.status
+                    )}`}>
                     {appt.status}
                   </span>
                 </div>
@@ -114,7 +132,9 @@ export default function UpcomingAppointmentsPage() {
                 {/* Appointment Actions */}
                 <div className="mt-4 flex justify-center gap-4">
                   <Link href={`/benh-nhan/lich-kham/${appt.id}`}>
-                    <Button variant="outline" size="sm">Xem chi tiết</Button>
+                    <Button variant="outline" size="sm">
+                      Xem chi tiết
+                    </Button>
                   </Link>
                   {appt.status === "Chờ xác nhận" && (
                     <Button variant="destructive" size="sm">
@@ -122,7 +142,9 @@ export default function UpcomingAppointmentsPage() {
                     </Button>
                   )}
                   {appt.status === "Đã xác nhận" && (
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white">
                       Đến khám
                     </Button>
                   )}
@@ -133,21 +155,21 @@ export default function UpcomingAppointmentsPage() {
         </div>
       )}
     </main>
-  )
+  );
 }
 
 // Trạng thái badge màu
 function statusBadge(status: string) {
   switch (status) {
     case "Đã xác nhận":
-      return "bg-green-100 text-green-700"
+      return "bg-green-100 text-green-700";
     case "Chờ xác nhận":
-      return "bg-yellow-100 text-yellow-700"
+      return "bg-yellow-100 text-yellow-700";
     case "Đã khám":
-      return "bg-gray-100 text-gray-700"
+      return "bg-gray-100 text-gray-700";
     case "Bị hủy":
-      return "bg-red-100 text-red-700"
+      return "bg-red-100 text-red-700";
     default:
-      return "bg-slate-100 text-slate-700"
+      return "bg-slate-100 text-slate-700";
   }
 }
