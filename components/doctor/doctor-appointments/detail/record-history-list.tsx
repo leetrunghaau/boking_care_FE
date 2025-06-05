@@ -25,7 +25,7 @@ interface RecordHistoryListProps {
 
 export function RecordHistoryList({ bookingId }: RecordHistoryListProps) {
   const [loading, setLoading] = useState(false);
-  const [records, setRecords] = useState<RecordHistory[]>([]);
+  const [records, setRecords] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchRecordHistory = async () => {

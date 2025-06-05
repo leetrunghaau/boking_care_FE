@@ -21,7 +21,7 @@ interface RecordHistory {
 }
 
 interface RecordHistoryCardProps {
-  record: RecordHistory;
+  record: any;
 }
 
 export function RecordHistoryCard({ record }: RecordHistoryCardProps) {
@@ -35,7 +35,7 @@ export function RecordHistoryCard({ record }: RecordHistoryCardProps) {
               Bác sĩ: {record.doctorName}
             </p>
           </div>
-          <Badge variant="secondary">{record.diagnosis}</Badge>
+          <Badge variant="secondary">{record.finalDiagnosis}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

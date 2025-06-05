@@ -9,7 +9,7 @@ import http from "@/helper/axios";
 import { getIconByName } from "@/helper/icon-map";
 import Link from "next/link";
 import { handleApiError } from "@/helper/handle-error";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function SpecialtyDetailPage() {
   const router = useRouter();

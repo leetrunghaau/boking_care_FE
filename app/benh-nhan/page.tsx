@@ -17,7 +17,7 @@ import http from "@/helper/axios";
 import { bookingStatusVN, statusColor } from "./../../helper/status";
 import { cn } from "@/lib/utils";
 import { getNotificationIcon } from "@/helper/noti-patient";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const router = useRouter();

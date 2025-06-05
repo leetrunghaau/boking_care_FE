@@ -189,7 +189,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Activity className="w-5 h-5" />
-                    Chỉ số sinh hiệu gần nhất
+                    Chỉ số sức khỏe gần nhất
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -256,7 +256,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                               Bác sĩ: {visit.doctorName}
                             </p>
                           </div>
-                          <Badge variant="outline">{visit.diagnosis}</Badge>
+                          <Badge variant="outline">{visit.finalDiagnosis}</Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
