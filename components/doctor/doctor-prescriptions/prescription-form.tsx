@@ -168,10 +168,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
         const res = await http.post<any>(
           `/doctor-appointment/prescription/${bookingId}`,
           {
-            prescriptions: medications.map((prev) => ({
-              ...prev,
-              id: prev.id > 0 ? prev.id : null,
-            })),
+            prescriptions: medications,
             generalInstructions: generalInstructions,
           }
         );
@@ -217,7 +214,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
       <div className="space-y-6">
         {medications.map((medication, index) => (
           <div
-            key={medication.id}
+            key={index}
             className="p-4 border rounded-md bg-slate-50">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium">Thuốc {index + 1}</h4>
@@ -260,7 +257,7 @@ export function PrescriptionForm({ bookingId, onPreview }: Props) {
                 <Input
                   id={`med-dosage-${medication.id}`}
                   placeholder="VD: 1 viên"
-                  value={medication.dosage}
+                  value={medication.dosage ?? ""}
                   onChange={(e) =>
                     handleMedicationChange(
                       medication.id,

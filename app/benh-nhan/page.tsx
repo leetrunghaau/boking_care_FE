@@ -12,6 +12,8 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import http from "@/helper/axios"
 
 const upcomingAppointments = [
   {
@@ -42,6 +44,27 @@ const notifications = [
 ]
 
 export default function DashboardPage() {
+
+  const [info, setInfo] =useState<any | null>(null)
+const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      setLoading(true);
+      try {
+        const res = await http.get<any[]>("/patient/info");
+        setInfo(res);
+        console.log("Fetched appointments:", res);
+      } catch (err) {
+        console.error("Failed to fetch appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
   return (
     <>
       {/* Header / Patient Info */}
@@ -52,7 +75,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-slate-800">Chào, Nguyễn Văn A</h1>
-            <p className="text-muted-foreground text-sm">Mã bệnh nhân: <strong>BN102945</strong></p>
+            {/* <p className="text-muted-foreground text-sm">Mã bệnh nhân: <strong>BN102945</strong></p> */}
             <p className="text-sm text-slate-500">Lượt khám đã thực hiện: <strong>5</strong></p>
           </div>
         </div>

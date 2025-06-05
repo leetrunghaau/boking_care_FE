@@ -28,6 +28,7 @@ import ExaminationTab from "@/components/doctor/doctor-appointments/detail/exami
 export default function AppointmentDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const [showReview, setShowReview] = useState(false)
 
   return (
     <div className="container mx-auto my-8 px-4 space-y-6 w-11/12">
@@ -70,25 +71,21 @@ export default function AppointmentDetail() {
                 </TabsContent>
 
                 {/* Tab kê đơn thuốc */}
-                {/* <TabsContent value="prescription" className="mt-0">
-                  {!showPrescriptionPreview ? (
+                <TabsContent value="prescription" className="mt-0">
+                  {!showReview ? (
                     <PrescriptionForm
                       bookingId={params.id}
-                      onPreview={() => setShowPrescriptionPreview(true)}
+                      onPreview={() => setShowReview(true)}
                     />
                   ) : (
                     <PrescriptionPreview
-                      patientName={appointmentDetail.patientName}
-                      patientAge={appointmentDetail.patientAge}
-                      patientGender={appointmentDetail.patientGender}
-                      diagnosis={diagnosis}
-                      date={new Date()}
-                      onBack={() => setShowPrescriptionPreview(false)}
-                      onPrint={handlePrintPrescription}
-                      onSend={handleSendPrescription}
+                     bookingId={params.id}
+                      onBack={() => setShowReview(false)}
+                      // onPrint={handlePrintPrescription}
+                      // onSend={handleSendPrescription}
                     />
                   )}
-                </TabsContent> */}
+                </TabsContent>
 
                 {/* Tab lịch sử khám */}
                 {/* <TabsContent value="history" className="mt-0">

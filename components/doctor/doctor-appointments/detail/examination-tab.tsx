@@ -17,7 +17,7 @@ import { ImageUploader } from "@/components/share/image-uploader";
 import { Switch } from "@/components/ui/switch";
 import moment from "moment";
 import { Divider } from "@/components/ui/divider";
-import { Save } from "lucide-react";
+import { Rss, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Pops {
@@ -25,13 +25,13 @@ interface Pops {
 }
 export default function ExaminationTab({ bookingId }: Pops) {
   const [examination, setExamination] = useState<any>({
-    diagnosis: "", //	Chẩn đoán ban đầu hoặc chẩn đoán sơ bộ.
-    finalDiagnosis: "", //	Chẩn đoán cuối cùng sau khi có kết quả xét nghiệm, đánh giá chuyên sâu.
+    diagnosis: "",
+    finalDiagnosis: "",
     notes: "",
-    temperature: "", //nhiệt độ
-    pulse: "", //nhip tim
-    bloodPressure: "", //huyết áp
-    respiratoryRate: "", //nhịp thở
+    temperature: "",
+    pulse: "",
+    bloodPressure: "",
+    respiratoryRate: "",
     weight: "",
     height: "",
     followUp: false,
@@ -84,10 +84,10 @@ export default function ExaminationTab({ bookingId }: Pops) {
           `/doctor-appointment/examination/${bookingId}`
         );
         console.log("get chi tiết thông tin khám bệnh", res);
-        if (res){
-
+        if (res) {
           setExamination(res.examination);
           setFileStore(res.files);
+
         }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
@@ -124,7 +124,10 @@ export default function ExaminationTab({ bookingId }: Pops) {
         const res = await http.get<any>(
           `/doctor-appointment/my-schedule/${examination.followUpDate}`
         );
-        setSchedule(res);
+        if (res ?? res.length > 0) {
+          console.log(`schedule mới được cập nhật theo ngày ${examination.followUpDate}`, res)
+          setSchedule(res);
+        }
       } catch (err) {
         console.error("Failed to fetch appointment schedule:", err);
       } finally {
@@ -273,6 +276,13 @@ export default function ExaminationTab({ bookingId }: Pops) {
                   <SelectValue placeholder="Chọn giờ" />
                 </SelectTrigger>
                 <SelectContent>
+                  {
+                    examination.followUpTime != "" ?
+                      <SelectItem key={examination.followUpTime} value={examination.followUpTime}>
+                        {examination.followUpTime}
+                      </SelectItem>
+                      : <></>
+                  }
                   {schedule.map((item: any) => (
                     <SelectItem key={item.start} value={item.start}>
                       {item.start}
