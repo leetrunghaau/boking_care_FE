@@ -35,6 +35,7 @@ export default function AppointmentDetail() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const buttonElement = useRef<HTMLButtonElement>(null);
+
   const formatStatus = (status: string) => {
     switch (status) {
       case "pending":
