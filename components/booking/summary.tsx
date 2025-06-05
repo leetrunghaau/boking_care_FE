@@ -2,12 +2,13 @@
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Calendar, Clock, User } from "lucide-react";
+import { CheckCircle2, Calendar, Clock, User, MapPin } from "lucide-react";
 import { formatCurrencyVND } from "@/helper/customNumView";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { handleApiError } from "@/helper/handle-error";
+import { getIconByName } from "@/helper/icon-map";
 export default function Summary() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -94,7 +95,7 @@ export default function Summary() {
     postData();
   };
 
-  // const Icon = getIconByName(bookingData?.specialty?.icon ?? "unKnown")
+  const Icon = getIconByName(doctor?.specialtyIcon ?? "")
   return (
     <div className="space-y-6 md:max-w-[600px] lg:max-w-[900px] mx-auto">
       <h2 className="text-xl font-semibold">Xác nhận thông tin đặt lịch</h2>
@@ -116,12 +117,12 @@ export default function Summary() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-start space-x-3">
                   <div className="w-5 h-5 mt-0.5 text-teal-600">
-                    {/* <Icon /> */}
+                    <Icon className="w-5 h-5 mt-0.5 text-teal-600"/>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Chuyên khoa</p>
                     <p className="font-medium">
-                      {doctor?.specialty?.name || "Chưa chọn"}
+                      {doctor?.specialtyName || "Chưa chọn"}
                     </p>
                   </div>
                 </div>
@@ -157,6 +158,15 @@ export default function Summary() {
                     <p className="text-sm text-gray-500">Giờ khám</p>
                     <p className="font-medium">
                       {formData.time || "Chưa chọn"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3 col-span-2">
+                  <MapPin className="w-5 h-5 mt-0.5 text-teal-600" />
+                  <div>
+                    <p className="text-sm text-gray-500">Địa chỉ</p>
+                    <p className="font-medium">
+                      {doctor?.address || "không có thông tin"}
                     </p>
                   </div>
                 </div>
