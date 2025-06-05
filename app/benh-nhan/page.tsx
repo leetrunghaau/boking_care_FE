@@ -10,43 +10,21 @@ import {
   Lock,
   Stethoscope,
   ChevronRight,
+  Clock,
+  MapPin,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import http from "@/helper/axios"
+import { bookingStatusVN, statusColor } from './../../helper/status';
+import { cn } from "@/lib/utils"
+import { getNotificationIcon } from "@/helper/noti-patient"
 
-const upcomingAppointments = [
-  {
-    id: "A123456",
-    date: "2025-05-22",
-    time: "14:00",
-    status: "Đã xác nhận",
-    doctor: "TS.BS. Nguyễn Văn A",
-    doctorAvatar: "/placeholder.svg",
-    specialty: "Tim mạch",
-    facility: "BV Đại học Y Dược TP.HCM",
-  },
-  {
-    id: "A123457",
-    date: "2025-05-28",
-    time: "09:30",
-    status: "Chờ xác nhận",
-    doctor: "ThS.BS. Trần Thị B",
-    doctorAvatar: "/placeholder.svg",
-    specialty: "Thần kinh",
-    facility: "PK Quốc tế Vinmec",
-  },
-]
-
-const notifications = [
-  "⏰ Hệ thống bảo trì từ 0h00 - 2h00 ngày 20/05.",
-  "🎁 Ưu đãi khám miễn phí định kỳ tháng 5 đang diễn ra!",
-]
 
 export default function DashboardPage() {
 
-  const [info, setInfo] =useState<any | null>(null)
-const [loading, setLoading] = useState(false)
+  const [info, setInfo] = useState<any | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -54,7 +32,7 @@ const [loading, setLoading] = useState(false)
       try {
         const res = await http.get<any[]>("/patient/info");
         setInfo(res);
-        console.log("Fetched appointments:", res);
+        console.log("Fetched data thôn tin bệnh nhân :", res);
       } catch (err) {
         console.error("Failed to fetch appointments:", err);
       } finally {
@@ -71,12 +49,12 @@ const [loading, setLoading] = useState(false)
       <section className="flex items-center justify-between mx-auto w-11/12 my-12 ">
         <div className="flex items-center gap-5">
           <div className="relative w-20 h-20 rounded-full ring-2 ring-teal-500 overflow-hidden">
-            <Image src="/placeholder.svg" alt="Avatar" fill className="object-cover" />
+            <Image src={info?.img ?? "/placeholder.svg"} alt="Avatar" fill className="object-cover" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">Chào, Nguyễn Văn A</h1>
-            {/* <p className="text-muted-foreground text-sm">Mã bệnh nhân: <strong>BN102945</strong></p> */}
-            <p className="text-sm text-slate-500">Lượt khám đã thực hiện: <strong>5</strong></p>
+            <h1 className="text-3xl font-bold text-slate-800">Chào,{info?.name ?? ""}</h1>
+            <p className="text-muted-foreground text-sm">Mã bệnh nhân: <strong>{info?.code}</strong></p>
+            <p className="text-sm text-slate-500">Lượt khám đã thực hiện: <strong>{info?.history}</strong></p>
           </div>
         </div>
         <Link href="/dat-lich-kham">
@@ -90,11 +68,11 @@ const [loading, setLoading] = useState(false)
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6 mx-auto w-11/12 my-12">
         <div className="p-4 bg-teal-50 rounded-lg text-center shadow">
           <p className="text-sm text-muted-foreground">Lịch hẹn sắp tới</p>
-          <p className="text-2xl font-bold text-teal-600">2</p>
+          <p className="text-2xl font-bold text-teal-600">{info?.upcomingAppointment ?? 0}</p>
         </div>
         <div className="p-4 bg-yellow-50 rounded-lg text-center shadow">
           <p className="text-sm text-muted-foreground">Thông báo chưa đọc</p>
-          <p className="text-2xl font-bold text-yellow-600">2</p>
+          <p className="text-2xl font-bold text-yellow-600">{info?.notification ?? 0}</p>
         </div>
         <div className="p-4 bg-slate-50 rounded-lg text-center shadow">
           <p className="text-sm text-muted-foreground">Hồ sơ y tế</p>
@@ -102,7 +80,7 @@ const [loading, setLoading] = useState(false)
         </div>
         <div className="p-4 bg-indigo-50 rounded-lg text-center shadow">
           <p className="text-sm text-muted-foreground">Lịch sử khám</p>
-          <p className="text-2xl font-bold">5 lần</p>
+          <p className="text-2xl font-bold">{info?.history ?? 0} lần</p>
         </div>
       </section>
 
@@ -113,27 +91,43 @@ const [loading, setLoading] = useState(false)
           Lịch khám sắp tới
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {upcomingAppointments.map((appt, idx) => (
-            <div key={idx} className="p-5 bg-white rounded-lg shadow border-l-4 border-teal-600 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden">
-                  <Image src={appt.doctorAvatar} alt={appt.doctor} width={48} height={48} />
+          {info?.upcomingAppointments?.length > 0 ? (
+            info.upcomingAppointments.map((appt: any, idx: number) => (
+              <div key={appt.id || idx} className={cn(
+                "p-5 bg-white rounded-lg shadow border-l-4  space-y-3",
+                `border-${statusColor(appt.status)}-600`
+              )}>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full overflow-hidden">
+                    <Image src={appt.doctorImg} alt={appt.doctor} width={48} height={48} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{appt.doctor}</h3>
+                    <p className="text-sm text-muted-foreground">{appt.specialty}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold">{appt.doctor}</h3>
-                  <p className="text-sm text-muted-foreground">{appt.specialty}</p>
-                </div>
+                <p className="text-sm flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-teal-600" />
+                  {appt.date} lúc {appt.time}
+                </p>
+                <p className="text-sm flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-teal-600" />
+                  {appt.address}
+                </p>
+                <p className="text-sm text-teal-600 font-medium">Trạng thái: {bookingStatusVN(appt.status)}</p>
+                <Link href={`/benh-nhan/lich-kham/${appt.id}`}>
+                  <Button variant="outline" size="sm" className="w-full mt-2">
+                    Xem chi tiết
+                  </Button>
+                </Link>
               </div>
-              <p className="text-sm">🕒 {appt.date} lúc {appt.time}</p>
-              <p className="text-sm">🏥 {appt.facility}</p>
-              <p className="text-sm text-teal-600 font-medium">Trạng thái: {appt.status}</p>
-              <Link href={`/lich-kham/${appt.id}`}>
-                <Button variant="outline" size="sm" className="w-full mt-2">
-                  Xem chi tiết
-                </Button>
-              </Link>
+            ))
+          ) : (
+            <div className="p-5 bg-gray-50 text-gray-500 rounded-lg text-center col-span-2">
+              Không có lịch hẹn sắp tới
             </div>
-          ))}
+          )}
+
         </div>
       </section>
 
@@ -144,11 +138,37 @@ const [loading, setLoading] = useState(false)
           Thông báo mới
         </h2>
         <div className="space-y-2">
-          {notifications.map((note, idx) => (
-            <div key={idx} className="bg-yellow-50 px-4 py-3 rounded-md text-sm text-slate-800 border border-yellow-100">
-              {note}
+
+          {info?.notifications?.length > 0 ? (
+            <div className="space-y-3">
+              {info.notifications.map((note: any) => {
+                const Icon = getNotificationIcon(note.type);
+                const formattedDate = new Intl.DateTimeFormat("vi-VN", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                }).format(new Date(note.createdAt));
+
+                return (
+                  <div
+                    key={note.id}
+                    className="bg-yellow-50 px-4 py-3 rounded-md border border-yellow-100 flex items-start gap-3"
+                  >
+                    <Icon className="w-5 h-5 text-teal-600 mt-0.5" />
+
+                    <div className="text-sm text-slate-800 space-y-1">
+                      <div className="font-medium">{note.title}</div>
+                      <div>{note.message}</div>
+                      <div className="text-xs text-gray-500">{formattedDate}</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          ) : (
+            <div className="p-5 bg-gray-50 text-gray-500 rounded-lg text-center col-span-2">
+              Không có thông báo mới
+            </div>
+          )}
         </div>
       </section>
 
@@ -182,6 +202,6 @@ const [loading, setLoading] = useState(false)
           </Link>
         </div>
       </section>
-   </>
+    </>
   )
 }
