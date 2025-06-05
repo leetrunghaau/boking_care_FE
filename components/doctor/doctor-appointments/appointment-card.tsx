@@ -73,14 +73,11 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
                 <CalendarClock className="h-4 w-4 text-teal-600" />
                 <div className="text-sm">
                   <span className="font-medium text-slate-700">
-                    {new Date(appointment.day).toLocaleDateString(
-                      "vi-VN",
-                      {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "2-digit",
-                      }
-                    )}
+                    {new Date(appointment.day).toLocaleDateString("vi-VN", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "2-digit",
+                    })}
                   </span>
                 </div>
               </div>
@@ -130,7 +127,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
                   <User className="h-4 w-4 mr-1" />
                   Hồ sơ
                 </Button> */}
-                <PatientRecordModal />
+                <PatientRecordModal userId={appointment.patient.id} />
               </div>
             )}
           </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import http from "@/helper/axios";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Calendar,
   FileText,
@@ -170,9 +171,29 @@ const samplePatient: PatientRecord = {
   ],
 };
 
-export default function PatientRecordModal() {
+export default function PatientRecordModal(userId: any) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  console.log(userId);
+  const [patientRecord, setPatientRecord] = useState<any>({});
+  useEffect(() => {
+    setLoading(true);
+    const fetchPatientRecord = async () => {
+      try {
+        const res = await http.get<any>(
+          `/doctor-appointment/patient/record/${userId}`
+        );
+        setPatientRecord(res);
+        console.log("Fetched patient record:", res);
+      } catch (err) {
+        console.error("Failed to fetch patient record:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchPatientRecord();
+  }, []);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -201,13 +222,15 @@ export default function PatientRecordModal() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-start gap-4">
-                  <Image
-                    src={samplePatient.avatar || "/placeholder.svg"}
-                    alt={samplePatient.name}
-                    width={80}
-                    height={80}
-                    className="rounded-full border-2 border-gray-200"
-                  />
+                  <Avatar className="h-24 w-24">
+                    <AvatarImage
+                      src={samplePatient.avatar || "/placeholder.svg"}
+                    />
+                    <AvatarFallback>
+                      {samplePatient.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">

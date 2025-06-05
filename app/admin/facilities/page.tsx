@@ -30,6 +30,7 @@ export default function FacilitiesPage() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
+    setLoading(true);
     const fetchAllFacilities = async () => {
       try {
         const res = await http.get<Facility[]>(`/admin-facility/facilities`);
