@@ -22,7 +22,7 @@ export default function UpcomingAppointmentsPage() {
       case "cancelled":
         return "Đã hủy";
       case "completed":
-        return "Hoàn thành";
+        return "Đã khám";
       default:
         return status;
     }

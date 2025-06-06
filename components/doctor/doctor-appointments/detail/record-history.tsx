@@ -5,21 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-interface RecordHistory {
-  id: string;
-  recordDate: string;
-  doctorName: string;
-  diagnosis: string;
-  symptoms: string;
-  // treatment?: string; // nếu dùng thì mở comment
-  notes: string;
-  bloodPressure: string;
-  temperature: string;
-  pulse: string;
-  weight: string;
-  bmi: string;
-}
-
 interface RecordHistoryCardProps {
   record: any;
 }

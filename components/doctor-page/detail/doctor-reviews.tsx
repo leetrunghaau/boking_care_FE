@@ -18,7 +18,6 @@ export default function DoctorRating({ slug }: Pops) {
   const [reviewText, setReviewText] = useState("");
   const [userRating, setUserRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
-
   const [review, setReview] = useState<any | null>(null);
   const [reviews, setReviews] = useState<any>({ max: 0, rvs: [] });
   const [reviewsIndex, setReviewIndex] = useState<number>(2);

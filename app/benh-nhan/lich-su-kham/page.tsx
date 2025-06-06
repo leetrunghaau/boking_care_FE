@@ -1,84 +1,53 @@
-import {
-  Calendar,
-  MapPin,
-  Star,
-  FileText,
-  Pill,
-  Clock,
-  ChevronRight,
-} from "lucide-react";
+"use client";
+import { useEffect, useState } from "react";
+import http from "@/helper/axios";
+import { Calendar, MapPin, Star, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const appointments = [
-  {
-    id: 1,
-    doctorName: "TS.BS. Nguyễn Văn A",
-    specialty: "Tim mạch",
-    hospital: "BV Đại học Y Dược TP.HCM",
-    address: "215 Hồng Bàng, Quận 5, TP.HCM",
-    date: "10 tháng 4, 2025",
-    time: "10:00",
-    status: "Đã khám",
-    statusColor: "green",
-    avatar: "NVA",
-  },
-  {
-    id: 2,
-    doctorName: "BS. Trần Thị B",
-    specialty: "Da liễu",
-    hospital: "BV Chợ Rẫy",
-    address: "201B Nguyễn Chí Thanh, Quận 5, TP.HCM",
-    date: "12 tháng 4, 2025",
-    time: "14:30",
-    status: "Sắp tới",
-    statusColor: "blue",
-    avatar: "TTB",
-  },
-  {
-    id: 3,
-    doctorName: "PGS.TS. Lê Văn C",
-    specialty: "Nội khoa",
-    hospital: "BV Bình Dân",
-    address: "371 Điện Biên Phủ, Quận 3, TP.HCM",
-    date: "15 tháng 4, 2025",
-    time: "09:15",
-    status: "Đã đặt",
-    statusColor: "orange",
-    avatar: "LVC",
-  },
-  {
-    id: 4,
-    doctorName: "BS. Phạm Thị D",
-    specialty: "Sản phụ khoa",
-    hospital: "BV Từ Dũ",
-    address: "284 Cống Quỳnh, Quận 1, TP.HCM",
-    date: "18 tháng 4, 2025",
-    time: "16:00",
-    status: "Đã hủy",
-    statusColor: "gray",
-    avatar: "PTD",
-  },
-];
-
-const getStatusColor = (color: string) => {
-  switch (color) {
-    case "green":
-      return "bg-green-100 text-green-800 hover:bg-green-100";
-    case "blue":
-      return "bg-blue-100 text-blue-800 hover:bg-blue-100";
-    case "orange":
-      return "bg-orange-100 text-orange-800 hover:bg-orange-100";
-    case "gray":
-      return "bg-gray-100 text-gray-600 hover:bg-gray-100";
-    default:
-      return "bg-gray-100 text-gray-600 hover:bg-gray-100";
-  }
-};
+import { handleApiError } from "@/helper/toast-utils";
+import { PrescriptionPreviewStatic } from "@/components/share/prescription-preview-static";
+import { RecordHistoryDialog } from "@/components/share/record-history-dialog";
+import { useRouter } from "next/navigation";
 
 export default function LichSuKhamPage() {
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
+  const formatStatus = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Chờ xác nhận";
+      case "confirmed":
+        return "Đã xác nhận";
+      case "cancelled":
+        return "Đã hủy";
+      case "completed":
+        return "Đã khám";
+      default:
+        return status;
+    }
+  };
+  type Status = "pending" | "confirmed" | "cancelled" | "completed";
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await http.get<any[]>("/patient/records");
+        setAppointments(res);
+
+        console.log("Fetched appointments:", res);
+      } catch (err) {
+        console.error(err);
+        handleApiError(err, "Không thể tải lịch sử khám.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="mb-6">
@@ -112,9 +81,9 @@ export default function LichSuKhamPage() {
                         {appointment.specialty}
                       </p>
                     </div>
-                    <Badge className={getStatusColor(appointment.statusColor)}>
+                    <Badge variant={appointment.status as Status}>
                       <Clock className="w-3 h-3 mr-1" />
-                      {appointment.status}
+                      {formatStatus(appointment.status)}
                     </Badge>
                   </div>
 
@@ -132,42 +101,36 @@ export default function LichSuKhamPage() {
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
                       <span className="text-sm font-medium text-gray-900">
-                        {appointment.date} lúc {appointment.time}
+                        {appointment.date}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="flex gap-2">
+                      {appointment.prescriptionsInfo &&
+                        appointment.prescriptions && (
+                          <PrescriptionPreviewStatic
+                            info={appointment.prescriptionsInfo}
+                            medications={appointment.prescriptions}
+                          />
+                        )}
+                      {appointment.result && (
+                        <RecordHistoryDialog record={appointment.result} />
+                      )}
+
                       <Button
-                        variant="outline"
+                        variant="confirmSecondary"
                         size="sm"
-                        className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5" />
-                        <span className="text-xs">Kết quả</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1.5">
-                        <Pill className="w-3.5 h-3.5" />
-                        <span className="text-xs">Đơn thuốc</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-1.5 text-teal-600 hover:text-teal-700 hover:bg-teal-50">
+                        onClick={() => {
+                          router.push(
+                            `/bac-si/${appointment.doctorSlug}?rating=1`
+                          );
+                        }}>
                         <Star className="w-3.5 h-3.5" />
                         <span className="text-xs">Đánh giá</span>
                       </Button>
                     </div>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 hover:text-gray-600">
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
               </div>
