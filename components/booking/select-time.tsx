@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrencyVND } from "@/helper/customNumView";
 import { useRouter, useSearchParams } from "next/navigation";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError } from "@/helper/toast-utils";
 
 export default function SelectTime() {
   const router = useRouter();
@@ -42,11 +42,7 @@ export default function SelectTime() {
         const res = await http.get<any[]>(`/booking/doctor/${doctorIdParam}`);
         setDoctor(res);
       } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thời gian làm việc thất bại."
-        );
+        handleApiError(err, "Lấy thời gian làm việc bác sĩ thất bại.");
       } finally {
         setIsLoading(false);
       }

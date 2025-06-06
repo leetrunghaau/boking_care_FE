@@ -9,19 +9,6 @@ import http from "@/helper/axios";
 import { Badge } from "@/components/ui/badge";
 import { getIconByName } from "@/helper/icon-map";
 
-type Appointment = {
-  id: number;
-  code: string;
-  date: string;
-  time: string;
-  doctor: string;
-  specialty: string;
-  facility: string;
-  facilityAddress: string;
-  doctorAvatar: string;
-  status: string;
-};
-
 export default function UpcomingAppointmentsPage() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

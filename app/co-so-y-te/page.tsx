@@ -3,8 +3,8 @@
 import HospitalCard, { Hospital } from "@/components/hospital/hospital-card";
 import SubHeader from "@/components/sub-header";
 import http from "@/helper/axios";
+import { handleApiError } from "@/helper/toast-utils";
 import { useEffect, useState } from "react";
-import { handleApiError } from "@/helper/handle-error";
 
 const FacilitiesPage = () => {
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -19,7 +19,7 @@ const FacilitiesPage = () => {
       } catch (err) {
         handleApiError(
           err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
+
           "Lấy thông tin cơ sở y tế thất bại"
         );
       } finally {

@@ -17,14 +17,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -77,11 +75,8 @@ export default function ResetPasswordPage() {
     if (!validateForm()) return;
 
     if (!token) {
-      toast({
-        title: "Lỗi",
-        description: "Token không hợp lệ hoặc đã hết hạn",
-        variant: "destructive",
-      });
+      handleApiError(null, "Token không hợp lệ hoặc đã hết hạn");
+
       return;
     }
 
@@ -93,19 +88,14 @@ export default function ResetPasswordPage() {
         pass: formData.password,
       });
       console.log(token, formData.password);
-
-      toast({
-        title: "Đặt lại mật khẩu thành công",
-        description: "Mật khẩu của bạn đã được cập nhật",
-      });
+      handleApiSuccess(
+        "Mật khẩu của bạn đã được cập nhật",
+        "Đặt lại mật khẩu thành công"
+      );
 
       router.push("/xac-thuc/dang-nhap");
     } catch (error) {
-      handleApiError(
-        error,
-        "Có lỗi xảy ra, vui lòng thử lại sau",
-        "Đặt lại mật khẩu thất bại"
-      );
+      handleApiError(error, "Đặt lại mật khẩu thất bại");
     } finally {
       setIsLoading(false);
     }

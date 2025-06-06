@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import http from "@/helper/axios";
 import { getIconByName } from "@/helper/icon-map";
 import Link from "next/link";
-import { handleApiError } from "@/helper/handle-error";
 import { useRouter } from "next/navigation";
+import { handleApiError } from "@/helper/toast-utils";
 
 export default function SpecialtyDetailPage() {
   const router = useRouter();
@@ -29,8 +29,8 @@ export default function SpecialtyDetailPage() {
       } catch (err) {
         handleApiError(
           err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin chuyên khoa thất bại"
+
+          "Lấy chi tiết chuyên khoa thất bại"
         );
       } finally {
         setIsLoading(false);

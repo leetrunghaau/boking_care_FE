@@ -16,13 +16,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
 import useAuthStore from "@/store/auth";
 import { loginSchema } from "@/schemas/logInSchema";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 export default function LoginPage() {
-  const { toast } = useToast();
   const { logIn } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -77,19 +75,14 @@ export default function LoginPage() {
 
     try {
       const rs = await http.post<any>("/sig/login", formData);
-      toast({
-        title: "Thành công!",
-        description: "Bạn đã đăng nhập thành công.",
-        variant: "success",
-        duration: 2000,
-      });
+      handleApiSuccess("Bạn đã đăng nhập thành công.");
       logIn({
         id: rs.id,
         token: rs.token,
         role: rs.role,
       });
     } catch (err) {
-      handleApiError(err, "Lỗi không xác định", "Đăng nhập thất bại");
+      handleApiError(err, "Đăng nhập thất bại");
     } finally {
       setIsLoading(false);
     }

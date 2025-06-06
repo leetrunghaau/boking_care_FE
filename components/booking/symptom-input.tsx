@@ -4,17 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import http from "@/helper/axios";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter, useSearchParams } from "next/navigation";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError } from "@/helper/toast-utils";
 
 export default function SymptomInput() {
   const searchParams = useSearchParams();
   const symptomsQuery = searchParams.get("symptoms");
   const [symptoms, setSymptoms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+
   const router = useRouter();
 
   // local state
@@ -33,7 +32,7 @@ export default function SymptomInput() {
 
     debounceTimeout.current = setTimeout(() => {
       fetchData(val);
-    }, 1000); 
+    }, 1000);
   };
   const fetchData = async (newSymptoms: string | string[] | null = null) => {
     setLoading(true);
@@ -45,9 +44,12 @@ export default function SymptomInput() {
       let symptomList: string[] = [];
 
       if (typeof newSymptoms === "string" && newSymptoms.trim()) {
-        symptomList = newSymptoms.split(",").map(s => s.trim()).filter(Boolean);
+        symptomList = newSymptoms
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
       } else if (Array.isArray(newSymptoms)) {
-        symptomList = newSymptoms.map(s => s.trim()).filter(Boolean);
+        symptomList = newSymptoms.map((s) => s.trim()).filter(Boolean);
       }
 
       if (symptomList.length > 0) {
@@ -55,7 +57,7 @@ export default function SymptomInput() {
       }
 
       const queryString = queryParams.toString();
-      console.log( `/booking/symptoms${queryString ? `?${queryString}` : ""}`)
+      console.log(`/booking/symptoms${queryString ? `?${queryString}` : ""}`);
       const rs = await http.get<any | null>(
         `/booking/symptoms${queryString ? `?${queryString}` : ""}`
       );
@@ -64,18 +66,12 @@ export default function SymptomInput() {
         setSymptoms(rs);
       }
     } catch (err) {
-      handleApiError(
-        err,
-        "Có lỗi xảy ra, vui lòng thử lại sau",
-        "Lấy thông tin triệu chứng thất bại"
-      );
+      handleApiError(err, "Lấy thông tin triệu chứng thất bại");
     } finally {
       setLoading(false);
     }
   };
   useEffect(() => {
-
-
     fetchData();
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -92,7 +88,7 @@ export default function SymptomInput() {
 
     const newSymptom = [...normalized, disease].join(", ");
 
-    // setSymptoms((prev) => prev.filter((item) => item !== disease)); 
+    // setSymptoms((prev) => prev.filter((item) => item !== disease));
     fetchData(newSymptom);
     setUserInput(newSymptom);
   };

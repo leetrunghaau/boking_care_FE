@@ -1,17 +1,28 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AvatarUploader } from "@/components/share/avata-upload"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import http from "@/helper/axios"
-import { useToast } from "@/hooks/use-toast"
-import { getFullURL } from "@/helper/url"
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AvatarUploader } from "@/components/share/avata-upload";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import http from "@/helper/axios";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
+import { getFullURL } from "@/helper/url";
 
 export default function EditProfilePage() {
-  const { toast } = useToast()
   const [form, setForm] = useState({
     img: null,
     name: "",
@@ -20,31 +31,31 @@ export default function EditProfilePage() {
     phone: "",
     email: "",
     address: "",
-  })
+  });
   const [relative, setRelative] = useState({
     name: "",
     relationship: "",
     phone: "",
     address: "",
-  })
+  });
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleRelativeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRelative({ ...relative, [e.target.name]: e.target.value })
-  }
+    setRelative({ ...relative, [e.target.name]: e.target.value });
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await http.get<any>("/patient/my-info");
-        console.log("jaf", res)
+        console.log("jaf", res);
         if (res && res.status) {
           setForm(res.info);
-          setRelative(res.relative)
+          setRelative(res.relative);
         }
       } catch (err) {
         console.error(err);
@@ -59,66 +70,51 @@ export default function EditProfilePage() {
     try {
       const info = await http.post<any>("/patient/info", {
         info: form,
-        relative: relative
-      })
+        relative: relative,
+      });
 
       if (info && info.status) {
         setForm(info.info);
-        setRelative(info.relative)
+        setRelative(info.relative);
       } else {
-        toast({
-          title: "Không thành công!",
-          description: info?.mess ?? "Bạn đã cập nhật thông tin thành công.",
-          variant: "error",
-          duration: 2000,
-        })
-        return
+        handleApiError(info?.mess, "Cập nhật thông tin cá nhân thất bại.");
+
+        return;
       }
-      toast({
-        title: "Thành công!",
-        description: "Bạn đã cập nhật thông tin thành công.",
-        variant: "success",
-        duration: 2000,
-      })
+
+      handleApiSuccess("Thông tin tài khoản được cập nhật thành công.");
     } catch (err) {
-      console.log("lỗi", err)
+      handleApiError(err, "Cập nhật thông tin thất bại.");
     } finally {
-
     }
-  }
+  };
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  const Field = ({
+    label,
+    children,
+  }: {
+    label: string;
+    children: React.ReactNode;
+  }) => (
     <div className="space-y-1.5">
       <p className="text-sm font-medium text-gray-700">{label}</p>
       {children}
     </div>
-  )
-
-
+  );
 
   const handleAvatarChange = async (change: any) => {
     if (change.type === "new") {
       try {
-
-        await http.postFile("/patient/avatar", change.value)
+        await http.postFile("/patient/avatar", change.value);
       } catch (err) {
-        toast({
-          title: "Không thành công!",
-          description: "Avata của bạn tải lên không thành công. Vui lòng tải lại.",
-          variant: "error",
-          duration: 2000,
-        })
+        handleApiError(err, "Không thể tải lên ảnh đại diện");
       }
     }
     if (change.type === "remove") {
       try {
         await http.delete("/patient/avatar");
       } catch (err) {
-        toast({
-          title: "Lỗi khi xoá ảnh",
-          description: "Không thể xoá avatar. Vui lòng thử lại.",
-          variant: "error",
-        });
+        handleApiError(err, "Không thể xoá avatar");
       }
     }
   };
@@ -126,8 +122,12 @@ export default function EditProfilePage() {
   return (
     <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">Chỉnh sửa hồ sơ cá nhân</h1>
-        <Button variant="outline" onClick={() => window.history.back()}>Quay lại</Button>
+        <h1 className="text-3xl font-bold text-slate-800">
+          Chỉnh sửa hồ sơ cá nhân
+        </h1>
+        <Button variant="outline" onClick={() => window.history.back()}>
+          Quay lại
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -158,11 +158,20 @@ export default function EditProfilePage() {
               <Input name="name" value={form.name} onChange={handleChange} />
             </Field>
             <Field label="Ngày sinh">
-              <Input name="dob" type="date" value={form.dob} onChange={handleChange} />
+              <Input
+                name="dob"
+                type="date"
+                value={form.dob}
+                onChange={handleChange}
+              />
             </Field>
             <Field label="Giới tính">
-              <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
-                <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
+              <Select
+                value={form.gender}
+                onValueChange={(v) => setForm({ ...form, gender: v })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn giới tính" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="male">Nam</SelectItem>
                   <SelectItem value="female">Nữ</SelectItem>
@@ -177,7 +186,11 @@ export default function EditProfilePage() {
               <Input name="email" value={form.email} onChange={handleChange} />
             </Field>
             <Field label="Địa chỉ">
-              <Input name="address" value={form.address} onChange={handleChange} />
+              <Input
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+              />
             </Field>
           </CardContent>
         </Card>
@@ -190,25 +203,43 @@ export default function EditProfilePage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="Họ và tên người thân">
-            <Input name="name" value={relative?.name ?? ""} onChange={handleRelativeChange} />
+            <Input
+              name="name"
+              value={relative?.name ?? ""}
+              onChange={handleRelativeChange}
+            />
           </Field>
           <Field label="Mối quan hệ">
-            <Input name="relationship" value={relative?.relationship ?? ""} onChange={handleRelativeChange} />
+            <Input
+              name="relationship"
+              value={relative?.relationship ?? ""}
+              onChange={handleRelativeChange}
+            />
           </Field>
           <Field label="Số điện thoại người thân">
-            <Input name="phone" value={relative?.phone ?? ""} onChange={handleRelativeChange} />
+            <Input
+              name="phone"
+              value={relative?.phone ?? ""}
+              onChange={handleRelativeChange}
+            />
           </Field>
           <Field label="Địa chỉ người thân">
-            <Input name="address" value={relative?.address ?? ""} onChange={handleRelativeChange} />
+            <Input
+              name="address"
+              value={relative?.address ?? ""}
+              onChange={handleRelativeChange}
+            />
           </Field>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSubmit} className="bg-teal-600 hover:bg-teal-700 text-white">
+        <Button
+          onClick={handleSubmit}
+          className="bg-teal-600 hover:bg-teal-700 text-white">
           Lưu thay đổi
         </Button>
       </div>
     </main>
-  )
+  );
 }

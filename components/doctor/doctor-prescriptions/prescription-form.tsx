@@ -14,7 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Eye, Plus, Save, Trash } from "lucide-react";
 import http from "@/helper/axios";
-import { useToast } from "@/hooks/use-toast";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 
 interface Medication {
   id: number;
@@ -34,7 +34,6 @@ interface Props {
 export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-  const { toast } = useToast();
   const [medications, setMedications] = useState<any[]>([]);
 
   const [generalInstructions, setGeneralInstructions] = useState("");
@@ -119,18 +118,10 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //  setLoading(true);
-        //  const res = await http.get<any>(
-        //    `/doctor-appointment/prescription/${bookingId}`
-        //  );
-        //  console.log("đơn thuốc khi tải mới", res);
-        //  if (res) {
-        //    setMedications(res.prescriptions);
-        //    setGeneralInstructions(res.generalInstructions);
-        //  }
         setMedications(medicationOptions);
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
+        handleApiError(err, "Lấy thông tin thuốc mẫu thất bại");
       } finally {
         setLoading(false);
       }
@@ -154,6 +145,7 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
         }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);
+        handleApiError(err, "Lấy thông tin lịch hẹn thất bại");
       } finally {
         setLoading(false);
       }
@@ -177,12 +169,7 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
         if (res) {
           setMedications(res.prescriptions);
           setGeneralInstructions(res.generalInstructions);
-          toast({
-            title: "Thành công!",
-            description: "Bạn đã lưu đơn thuốc thành công.",
-            variant: "success",
-            duration: 2000,
-          });
+          handleApiSuccess("Lưu đơn thuốc thành công");
         }
       } catch (err) {
         console.error("Failed to fetch appointment detail:", err);

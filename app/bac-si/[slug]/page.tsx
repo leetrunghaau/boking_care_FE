@@ -5,14 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import DoctorReviews from "@/components/doctor-page/detail/doctor-reviews";
-import DoctorSchedule from "@/components/doctor-page/detail/doctor-schedule";
 import DoctorAbout from "@/components/doctor-page/detail/doctor-about";
 import { useParams } from "next/navigation";
 import DoctorExperience from "@/components/doctor-page/detail/doctor-experience";
-import HospitalInfo from "@/components/doctor-page/detail/hospital-info";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError } from "@/helper/toast-utils";
 
 export default function DoctorDetailPage() {
   const params = useParams();
@@ -29,11 +27,7 @@ export default function DoctorDetailPage() {
         console.log("chi tiết bác sĩ\n", res);
         setDoctor(res);
       } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin bác sĩ thất bại."
-        );
+        handleApiError(err, "Lấy chi tiết bác sĩ thất bại.");
       } finally {
         setLoading(false);
       }
@@ -101,16 +95,14 @@ export default function DoctorDetailPage() {
                       </div>
 
                       <div className="mt-6 flex flex-wrap gap-2 justify-center md:justify-start">
-                        {doctor?.technique
-                          .slice(0, 3)
-                          .map((i: any) => (
-                            <Badge
-                              key={i.id}
-                              variant="outline"
-                              className="bg-teal-50 text-teal-700 hover:bg-teal-100">
-                              {i.name}
-                            </Badge>
-                          ))}
+                        {doctor?.technique.slice(0, 3).map((i: any) => (
+                          <Badge
+                            key={i.id}
+                            variant="outline"
+                            className="bg-teal-50 text-teal-700 hover:bg-teal-100">
+                            {i.name}
+                          </Badge>
+                        ))}
                         {doctor && doctor.technique.length > 3 && (
                           <Badge variant="outline" className="bg-slate-50">
                             +{doctor.technique.length - 3}
@@ -142,7 +134,6 @@ export default function DoctorDetailPage() {
                 <TabsContent value="reviews">
                   <DoctorReviews slug={slug} />
                 </TabsContent>
-
               </Tabs>
 
               {/* Similar Doctors */}

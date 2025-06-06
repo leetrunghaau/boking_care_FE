@@ -22,6 +22,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         confirm:
           "border border-teal-600 bg-teal-600 hover:bg-teal-700 text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black focus:scale-105 transition-transform",
+        confirmSecondary:
+          "border border-teal-600 text-teal-600 bg-white hover:bg-teal-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300 transition-colors",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -1,182 +1,186 @@
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
-import { CalendarDays, MapPin, FileText, Star } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Star,
+  FileText,
+  Pill,
+  Clock,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const medicalHistory = [
+const appointments = [
   {
     id: 1,
-    date: "2025-04-10",
-    time: "10:00",
-    doctor: "TS.BS. Nguyễn Văn A",
+    doctorName: "TS.BS. Nguyễn Văn A",
     specialty: "Tim mạch",
-    facility: "BV Đại học Y Dược TP.HCM",
-    facilityAddress: "215 Hồng Bàng, Quận 5, TP.HCM",
-    resultFile: "/files/ket-qua-kham-1.pdf",
-    prescriptionFile: "/files/don-thuoc-1.pdf",
+    hospital: "BV Đại học Y Dược TP.HCM",
+    address: "215 Hồng Bàng, Quận 5, TP.HCM",
+    date: "10 tháng 4, 2025",
+    time: "10:00",
     status: "Đã khám",
-    reviewStatus: "Chưa đánh giá",
-    doctorAvatar: "/doctors/bs-a.jpg",
+    statusColor: "green",
+    avatar: "NVA",
   },
   {
     id: 2,
-    date: "2025-03-18",
-    time: "15:30",
-    doctor: "ThS.BS. Trần Thị B",
-    specialty: "Thần kinh",
-    facility: "Phòng khám Vinmec",
-    facilityAddress: "458 Minh Khai, Hai Bà Trưng, Hà Nội",
-    resultFile: "/files/ket-qua-kham-2.pdf",
-    prescriptionFile: "/files/don-thuoc-2.pdf",
-    status: "Đã khám",
-    reviewStatus: "Đã đánh giá",
-    doctorAvatar: "/doctors/bs-b.jpg",
+    doctorName: "BS. Trần Thị B",
+    specialty: "Da liễu",
+    hospital: "BV Chợ Rẫy",
+    address: "201B Nguyễn Chí Thanh, Quận 5, TP.HCM",
+    date: "12 tháng 4, 2025",
+    time: "14:30",
+    status: "Sắp tới",
+    statusColor: "blue",
+    avatar: "TTB",
   },
   {
     id: 3,
-    date: "2025-02-25",
-    time: "08:00",
-    doctor: "PGS.TS. Lê Văn C",
-    specialty: "Da liễu",
-    facility: "BV Da Liễu Trung Ương",
-    facilityAddress: "15A Phương Mai, Đống Đa, Hà Nội",
-    resultFile: "/files/ket-qua-kham-3.pdf",
-    prescriptionFile: "/files/don-thuoc-3.pdf",
-    status: "Đã khám",
-    reviewStatus: "Chưa đánh giá",
-    doctorAvatar: "/doctors/bs-c.jpg",
+    doctorName: "PGS.TS. Lê Văn C",
+    specialty: "Nội khoa",
+    hospital: "BV Bình Dân",
+    address: "371 Điện Biên Phủ, Quận 3, TP.HCM",
+    date: "15 tháng 4, 2025",
+    time: "09:15",
+    status: "Đã đặt",
+    statusColor: "orange",
+    avatar: "LVC",
+  },
+  {
+    id: 4,
+    doctorName: "BS. Phạm Thị D",
+    specialty: "Sản phụ khoa",
+    hospital: "BV Từ Dũ",
+    address: "284 Cống Quỳnh, Quận 1, TP.HCM",
+    date: "18 tháng 4, 2025",
+    time: "16:00",
+    status: "Đã hủy",
+    statusColor: "gray",
+    avatar: "PTD",
   },
 ];
 
+const getStatusColor = (color: string) => {
+  switch (color) {
+    case "green":
+      return "bg-green-100 text-green-800 hover:bg-green-100";
+    case "blue":
+      return "bg-blue-100 text-blue-800 hover:bg-blue-100";
+    case "orange":
+      return "bg-orange-100 text-orange-800 hover:bg-orange-100";
+    case "gray":
+      return "bg-gray-100 text-gray-600 hover:bg-gray-100";
+    default:
+      return "bg-gray-100 text-gray-600 hover:bg-gray-100";
+  }
+};
+
 export default function LichSuKhamPage() {
-  const router = useRouter();
   return (
-    <main className="max-w-7xl mx-auto px-8 py-12 space-y-12">
-      <header className="flex items-center justify-between mb-10">
-        <h1 className="text-4xl font-bold text-slate-800 flex items-center gap-3">
-          <CalendarDays className="text-teal-600 w-7 h-7" />
+    <div className="max-w-4xl mx-auto p-4">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
           Lịch sử khám bệnh
         </h1>
-        <Link href="/dat-lich-kham">
-          <Button
-            className="bg-teal-600 text-white hover:bg-teal-700"
-            onClick={() => {
-              router.push("/dat-lich-kham");
-            }}>
-            + Đặt lịch mới
-          </Button>
-        </Link>
-      </header>
+        <p className="text-gray-600">Lịch khám đã hoàn tất</p>
+      </div>
 
-      {medicalHistory.length === 0 ? (
-        <div className="text-center text-muted-foreground text-lg">
-          Bạn chưa có lịch sử khám bệnh nào.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {medicalHistory.map((appt) => (
-            <div
-              key={appt.id}
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-transform duration-300 transform hover:scale-105">
-              {/* Doctor Avatar and Info */}
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-teal-600">
-                  <Image
-                    src={appt.doctorAvatar || "/default-avatar.jpg"}
-                    alt="Ảnh bác sĩ"
-                    layout="fill"
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-800">
-                    {appt.doctor}
-                  </h3>
-                  <p className="text-sm text-teal-500">{appt.specialty}</p>
-                </div>
-              </div>
+      <div className="space-y-4">
+        {appointments.map((appointment) => (
+          <Card
+            key={appointment.id}
+            className="hover:shadow-md transition-shadow duration-200 border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <Avatar className="w-14 h-14 border-2 border-teal-100 flex-shrink-0">
+                  <AvatarImage src="/placeholder.svg" alt="Doctor photo" />
+                  <AvatarFallback className="bg-teal-500 text-white font-semibold">
+                    {appointment.avatar}
+                  </AvatarFallback>
+                </Avatar>
 
-              {/* Appointment Details */}
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <MapPin className="w-4 h-4" /> {appt.facility} -{" "}
-                  {appt.facilityAddress}
-                </p>
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4" /> {appt.date} lúc{" "}
-                  {appt.time}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        {appointment.doctorName}
+                      </h3>
+                      <p className="text-teal-600 font-medium text-sm mb-2">
+                        {appointment.specialty}
+                      </p>
+                    </div>
+                    <Badge className={getStatusColor(appointment.statusColor)}>
+                      <Clock className="w-3 h-3 mr-1" />
+                      {appointment.status}
+                    </Badge>
+                  </div>
 
-                {/* Result and Prescription Links */}
-                <div className="flex space-x-4 mt-4">
-                  {appt.resultFile && (
-                    <Link href={appt.resultFile} target="_blank">
-                      <Button
-                        variant="secondary"
-                        className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" /> Kết quả khám
-                      </Button>
-                    </Link>
-                  )}
-                  {appt.prescriptionFile && (
-                    <Link href={appt.prescriptionFile} target="_blank">
-                      <Button
-                        variant="secondary"
-                        className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" /> Đơn thuốc
-                      </Button>
-                    </Link>
-                  )}
-                </div>
+                  <div className="grid md:grid-cols-2 gap-3 mb-4">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-gray-600 min-w-0">
+                        <p className="font-medium text-gray-900 truncate">
+                          {appointment.hospital}
+                        </p>
+                        <p className="truncate">{appointment.address}</p>
+                      </div>
+                    </div>
 
-                {/* Review Section */}
-                <div className="mt-4">
-                  {appt.reviewStatus === "Chưa đánh giá" ? (
-                    <Link href={`/danh-gia?apptId=${appt.id}`}>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <span className="text-sm font-medium text-gray-900">
+                        {appointment.date} lúc {appointment.time}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex items-center gap-2">
-                        <Star className="w-4 h-4" /> Đánh giá bác sĩ
+                        className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5" />
+                        <span className="text-xs">Kết quả</span>
                       </Button>
-                    </Link>
-                  ) : (
-                    <span className="text-green-600 text-sm font-medium">
-                      Đã đánh giá
-                    </span>
-                  )}
-                </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-1.5">
+                        <Pill className="w-3.5 h-3.5" />
+                        <span className="text-xs">Đơn thuốc</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-1.5 text-teal-600 hover:text-teal-700 hover:bg-teal-50">
+                        <Star className="w-3.5 h-3.5" />
+                        <span className="text-xs">Đánh giá</span>
+                      </Button>
+                    </div>
 
-                {/* Status Badge */}
-                <div className="mt-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${statusBadge(
-                      appt.status
-                    )}`}>
-                    {appt.status}
-                  </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-gray-600">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </main>
-  );
-}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-function statusBadge(status: string) {
-  switch (status) {
-    case "Đã khám":
-      return "bg-green-100 text-green-700";
-    case "Chờ xác nhận":
-      return "bg-yellow-100 text-yellow-700";
-    case "Đã hủy":
-      return "bg-red-100 text-red-700";
-    default:
-      return "bg-slate-100 text-slate-700";
-  }
+      <div className="mt-8 text-center">
+        <Button className="bg-teal-600 hover:bg-teal-700 text-white px-6">
+          Đặt lịch khám mới
+        </Button>
+      </div>
+    </div>
+  );
 }

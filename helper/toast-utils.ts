@@ -1,10 +1,12 @@
 "use client";
+
 import { toast } from "@/hooks/use-toast";
 
+// ✅ Thông báo lỗi API
 export function handleApiError(
   error: unknown,
   fallbackMessage = "Đã xảy ra lỗi",
-  title: string
+  title = "Thất bại"
 ) {
   console.error(error);
 
@@ -17,6 +19,19 @@ export function handleApiError(
     title,
     description: message,
     variant: "destructive",
+    duration: 2000,
+  });
+}
+
+// ✅ Thông báo thành công API
+export function handleApiSuccess(
+  fallbackMessage = "Thao tác thành công!",
+  title = "Thành công"
+) {
+  toast({
+    title,
+    description: fallbackMessage,
+    variant: "success",
     duration: 2000,
   });
 }

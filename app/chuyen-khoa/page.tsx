@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
 import { CardLoading } from "@/components/ui/loading";
-import { useToast } from "@/hooks/use-toast";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError } from "@/helper/toast-utils";
 
 interface Specialty {
   id: number;
@@ -20,7 +19,6 @@ interface Specialty {
 export default function SpecialtyListPage() {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,11 +27,7 @@ export default function SpecialtyListPage() {
         const res = await http.get<Specialty[]>("/specialties");
         setSpecialties(res);
       } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin chuyên khoa thất bại"
-        );
+        handleApiError(err, "Lấy thông tin chuyên khoa thất bại");
       } finally {
         setIsLoading(false);
       }
@@ -51,8 +45,6 @@ export default function SpecialtyListPage() {
           />
         </div>
       </section>
-
-     
 
       <section className="my-10">
         <div className="container mx-auto px-6 max-w-6xl">

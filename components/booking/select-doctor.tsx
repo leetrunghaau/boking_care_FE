@@ -24,7 +24,7 @@ import { SelectTrigger } from "@/components/ui/select";
 import { SelectItem } from "@/components/ui/select";
 import { TestTubeDiagonal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError } from "@/helper/toast-utils";
 export function SelectDoctor() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,11 +63,7 @@ export function SelectDoctor() {
         setAddresses(rsa);
         setSpecialties(rss);
       } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin bác sĩ thất bại"
-        );
+        handleApiError(err, "Lấy thông tin bác sĩ thất bại");
       } finally {
         setLoading(false);
       }

@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import http from "@/helper/axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError } from "@/helper/toast-utils";
 
 export default function PatientInformation() {
   const router = useRouter();
@@ -74,11 +74,7 @@ export default function PatientInformation() {
           router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
         }
       } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin bệnh nhân thất bại"
-        );
+        handleApiError(err, "Lấy thông tin bệnh nhân thất bại");
       } finally {
         setIsLoading(false);
       }

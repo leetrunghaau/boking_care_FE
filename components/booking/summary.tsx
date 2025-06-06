@@ -7,8 +7,8 @@ import { formatCurrencyVND } from "@/helper/customNumView";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { handleApiError } from "@/helper/handle-error";
 import { getIconByName } from "@/helper/icon-map";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 export default function Summary() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,11 +57,7 @@ export default function Summary() {
           setDoctor(rs);
         }
       } catch (err) {
-        handleApiError(
-          err,
-          "Có lỗi xảy ra, vui lòng thử lại sau",
-          "Lấy thông tin bệnh nhân thất bại."
-        );
+        handleApiError(err, "Lấy thông tin bệnh nhân thất bại.");
       } finally {
         setIsLoading(false);
       }
@@ -85,9 +81,10 @@ export default function Summary() {
         if (rs) {
           router.push(`/thanh-cong?action=booking`);
         }
+        handleApiSuccess("Đặt lịch khám thành công!");
       } catch (err) {
         console.log(err);
-        handleApiError(err, "Lỗi kết nối", "Đặt lịch khám thất bại");
+        handleApiError(err, "Đặt lịch khám thất bại");
       } finally {
         setIsLoading(false);
       }
@@ -95,7 +92,7 @@ export default function Summary() {
     postData();
   };
 
-  const Icon = getIconByName(doctor?.specialtyIcon ?? "")
+  const Icon = getIconByName(doctor?.specialtyIcon ?? "");
   return (
     <div className="space-y-6 md:max-w-[600px] lg:max-w-[900px] mx-auto">
       <h2 className="text-xl font-semibold">Xác nhận thông tin đặt lịch</h2>
@@ -117,7 +114,7 @@ export default function Summary() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-start space-x-3">
                   <div className="w-5 h-5 mt-0.5 text-teal-600">
-                    <Icon className="w-5 h-5 mt-0.5 text-teal-600"/>
+                    <Icon className="w-5 h-5 mt-0.5 text-teal-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Chuyên khoa</p>

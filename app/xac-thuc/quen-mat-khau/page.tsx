@@ -16,15 +16,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -50,16 +48,12 @@ export default function ForgotPasswordPage() {
     try {
       const rs = await http.post<any>("/sig/forgot-pass", { email: email });
       setIsSubmitted(true);
-      toast({
-        title: "Yêu cầu đã được gửi",
-        description: "Vui lòng kiểm tra email của bạn để đặt lại mật khẩu",
-      });
-    } catch (error) {
-      handleApiError(
-        error,
-        "Có lỗi xảy ra, vui lòng thử lại sau",
-        "Yêu cầu đặt lại mật khẩu thất bại"
+      handleApiSuccess(
+        "Vui lòng kiểm tra email của bạn để đặt lại mật khẩu",
+        "Yêu cầu đặt lại mật khẩu đã được gửi."
       );
+    } catch (error) {
+      handleApiError(error, "Yêu cầu đặt lại mật khẩu thất bại");
     } finally {
       setIsLoading(false);
     }

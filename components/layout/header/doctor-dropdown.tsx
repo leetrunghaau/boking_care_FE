@@ -9,18 +9,24 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { LogOut, User, Settings, Bell, History, LayoutDashboard } from "lucide-react";
+import {
+  LogOut,
+  User,
+  Settings,
+  Bell,
+  History,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/auth";
-import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 
 export default function DoctorDropdown() {
   const router = useRouter();
   const { logOut } = useAuthStore();
-  const { toast } = useToast();
   const [doctor, setDoctor] = useState<any | null>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -30,11 +36,8 @@ export default function DoctorDropdown() {
         setDoctor(res);
       } catch (err) {
         const e = err as Error;
-        toast({
-          title: "Lỗi",
-          description: e.message,
-          variant: "error",
-        });
+
+        handleApiError(e, "Không thể tải thông tin bác sĩ", "doctor-dropdown");
       } finally {
         setLoading(false);
       }
@@ -44,12 +47,7 @@ export default function DoctorDropdown() {
   }, []);
   const handleLogout = () => {
     logOut();
-    toast({
-      title: "Thành công!",
-      description: "Bạn đã đăng xuất thành công.",
-      variant: "success",
-      duration: 2000,
-    });
+    handleApiSuccess("Đăng xuất thành công");
   };
 
   return (

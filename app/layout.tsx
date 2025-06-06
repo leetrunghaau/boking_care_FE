@@ -4,9 +4,11 @@ import "react-day-picker/style.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ChatProvider } from "@/components/ho-tro/floating-chat/chat-provider";
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.dev",
+  title: "Booking Care",
+  description: "Đặt lịch khám dễ dàng, không cần chờ đợi",
+  generator: "Next.js",
+  applicationName: "Booking Care",
+  keywords: ["Booking Care", "Đặt lịch khám"],
 };
 
 export default function RootLayout({

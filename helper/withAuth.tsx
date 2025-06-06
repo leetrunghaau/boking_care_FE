@@ -1,7 +1,6 @@
 "use client";
 
 import useAuthStore from "@/store/auth";
-import { useToast } from "@/components/ui/use-toast";
 import Forbidden from "@/app/forbidden";
 import Unauthorized from "@/app/unauthorized";
 
@@ -12,7 +11,6 @@ const withAuth = (
   allowedRoles?: Role[]
 ) => {
   const ComponentWithAuth = (props: any) => {
-    const { toast } = useToast();
     const { isLoggedIn, role } = useAuthStore();
 
     if (!isLoggedIn) {

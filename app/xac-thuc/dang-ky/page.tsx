@@ -18,10 +18,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import http from "@/helper/axios";
 import { registerSchema } from "@/schemas/registerSchema";
-import { handleApiError } from "@/helper/handle-error";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +45,6 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState(formErrors);
 
   const router = useRouter();
-  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -95,15 +93,14 @@ export default function RegisterPage() {
 
     try {
       const rs = await http.post<any>("/sig/signup", formData);
-      toast({
-        title: "Đăng ký thành công",
-        description: "Chào mừng bạn đến với BookingCare",
-        variant: "success",
-        duration: 2000,
-      });
+      handleApiSuccess(
+        "Chào mừng bạn đến với BookingCare",
+        "Đăng ký thành công"
+      );
+
       router.push("/thanh-cong?action=register");
     } catch (error) {
-      handleApiError(error, "Lỗi không xác định", "Đăng ký thất bại");
+      handleApiError(error, "Đăng ký thất bại");
     } finally {
       setIsLoading(false);
     }

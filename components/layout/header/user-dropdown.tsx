@@ -20,15 +20,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/auth";
-import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
 import { getFullURL } from "@/helper/url";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 
 export default function UserDropdown() {
   const router = useRouter();
   const { logOut } = useAuthStore();
-  const { toast } = useToast();
   const [user, setUser] = useState<any | null>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -38,11 +37,11 @@ export default function UserDropdown() {
         setUser(res);
       } catch (err) {
         const e = err as Error;
-        toast({
-          title: "Lỗi",
-          description: e.message,
-          variant: "error",
-        });
+        handleApiError(
+          e,
+          "Không thể tải thông tin người dùng",
+          "user-dropdown"
+        );
       } finally {
         setLoading(false);
       }
@@ -52,12 +51,7 @@ export default function UserDropdown() {
   }, []);
   const handleLogout = () => {
     logOut();
-    toast({
-      title: "Thành công!",
-      description: "Bạn đã đăng xuất thành công.",
-      variant: "success",
-      duration: 2000,
-    });
+    handleApiSuccess("Bạn đã đăng xuất thành công.");
   };
 
   return (
@@ -92,7 +86,7 @@ export default function UserDropdown() {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={() => router.push("/benh-nhan")}
+          onClick={() => router.push("/benh-nhan/ho-so")}
           className="hover:cursor-pointer">
           <User className="w-4 h-4 mr-2" />
           Tài khoản
