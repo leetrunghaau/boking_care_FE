@@ -23,6 +23,7 @@ import useAuthStore from "@/store/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
+import { getFullURL } from "@/helper/url";
 
 export default function UserDropdown() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function UserDropdown() {
           className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full">
           {user?.img ? (
             <Image
-              src={user.img}
+              src={getFullURL(user.img)!}
               alt="Avatar"
               width={32}
               height={32}

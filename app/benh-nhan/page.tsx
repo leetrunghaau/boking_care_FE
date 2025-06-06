@@ -18,6 +18,7 @@ import { bookingStatusVN, statusColor } from "./../../helper/status";
 import { cn } from "@/lib/utils";
 import { getNotificationIcon } from "@/helper/noti-patient";
 import { useRouter } from "next/navigation";
+import { getFullURL } from '@/helper/url';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-5">
           <div className="relative w-20 h-20 rounded-full ring-2 ring-teal-500 overflow-hidden">
             <Image
-              src={info?.img ?? "/placeholder.svg"}
+              src={getFullURL(info?.img) ?? "/placeholder.svg"}
               alt="Avatar"
               fill
               className="object-cover"

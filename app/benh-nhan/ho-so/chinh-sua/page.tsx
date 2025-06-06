@@ -1,147 +1,211 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "lucide-react"
-
-import Image from "next/image"
-import { format } from "date-fns"
+import { AvatarUploader } from "@/components/share/avata-upload"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import http from "@/helper/axios"
+import { useToast } from "@/hooks/use-toast"
+import { getFullURL } from "@/helper/url"
 
 export default function EditProfilePage() {
+  const { toast } = useToast()
   const [form, setForm] = useState({
-    avatar: "/avatar-patient.jpg",
-    name: "Nguyễn Văn A",
-    dob: "1990-05-01",
-    gender: "Nam",
-    phone: "0909123456",
-    email: "nguyenvana@gmail.com",
-    address: "123 Nguyễn Trãi, Quận 5, TP.HCM",
-    insuranceCode: "BHYT-0123456789",
-    insuranceProvider: "Bảo hiểm Y tế Quốc gia",
-    insuranceValidUntil: "2026-12-31",
-    bloodType: "O+",
-    height: 172,
-    weight: 68,
-    chronicDiseases: "Tăng huyết áp, Tiểu đường type 2",
-    allergies: "Penicillin",
-    medicalHistory: "Phẫu thuật ruột thừa năm 2015, Mổ khớp gối 2018",
-    vaccinations: "Cúm, Viêm gan B"
+    img: null,
+    name: "",
+    dob: "",
+    gender: "",
+    phone: "",
+    email: "",
+    address: "",
+  })
+  const [relative, setRelative] = useState({
+    name: "",
+    relationship: "",
+    phone: "",
+    address: "",
   })
 
-  const handleChange = (e: any) => {
+  const [loading, setLoading] = useState(false)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = () => {
-    // Call API or save to backend
-    console.log("Saving:", form)
-    alert("Thông tin đã được cập nhật thành công.")
+  const handleRelativeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRelative({ ...relative, [e.target.name]: e.target.value })
   }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await http.get<any>("/patient/my-info");
+        console.log("jaf", res)
+        if (res && res.status) {
+          setForm(res.info);
+          setRelative(res.relative)
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const handleSubmit = async () => {
+    try {
+      const info = await http.post<any>("/patient/info", {
+        info: form,
+        relative: relative
+      })
+
+      if (info && info.status) {
+        setForm(info.info);
+        setRelative(info.relative)
+      } else {
+        toast({
+          title: "Không thành công!",
+          description: info?.mess ?? "Bạn đã cập nhật thông tin thành công.",
+          variant: "error",
+          duration: 2000,
+        })
+        return
+      }
+      toast({
+        title: "Thành công!",
+        description: "Bạn đã cập nhật thông tin thành công.",
+        variant: "success",
+        duration: 2000,
+      })
+    } catch (err) {
+      console.log("lỗi", err)
+    } finally {
+
+    }
+  }
+
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div className="space-y-1.5">
-      <p className="text-sm font-medium text-slate-700">{label}</p>
+      <p className="text-sm font-medium text-gray-700">{label}</p>
       {children}
     </div>
   )
-  return (
-    <main className="max-w-4xl mx-auto px-6 py-10 space-y-10">
-      <header className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-semibold text-slate-800">Chỉnh sửa hồ sơ cá nhân</h1>
-        <Button variant="outline" onClick={() => window.history.back()}>Quay lại</Button>
-      </header>
 
-      {/* Avatar + Basic Info */}
-      <section className="bg-white p-6 rounded-lg shadow space-y-6">
-        <div className="flex gap-6">
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border border-teal-600">
-            <Image src={form.avatar} alt="avatar" fill className="object-cover" />
-          </div>
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+
+  const handleAvatarChange = async (change: any) => {
+    if (change.type === "new") {
+      try {
+
+        await http.postFile("/patient/avatar", change.value)
+      } catch (err) {
+        toast({
+          title: "Không thành công!",
+          description: "Avata của bạn tải lên không thành công. Vui lòng tải lại.",
+          variant: "error",
+          duration: 2000,
+        })
+      }
+    }
+    if (change.type === "remove") {
+      try {
+        await http.delete("/patient/avatar");
+      } catch (err) {
+        toast({
+          title: "Lỗi khi xoá ảnh",
+          description: "Không thể xoá avatar. Vui lòng thử lại.",
+          variant: "error",
+        });
+      }
+    }
+  };
+
+  return (
+    <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-slate-800">Chỉnh sửa hồ sơ cá nhân</h1>
+        <Button variant="outline" onClick={() => window.history.back()}>Quay lại</Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="md:col-span-1">
+          <CardHeader>
+            <CardTitle>Ảnh đại diện</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <AvatarUploader
+              initialAvatar={getFullURL(form.img)}
+              onChange={handleAvatarChange}
+            />
+          </CardContent>
+
+          <CardFooter>
+            <p className="text-sm text-gray-500 text-center w-full">
+              Click hoặt kéo thả để chọn ảnh đại điện.
+            </p>
+          </CardFooter>
+        </Card>
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Thông tin cá nhân</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Họ và tên">
               <Input name="name" value={form.name} onChange={handleChange} />
             </Field>
             <Field label="Ngày sinh">
-              <Input name="dob" value={form.dob} type="date" onChange={handleChange} />
+              <Input name="dob" type="date" value={form.dob} onChange={handleChange} />
             </Field>
             <Field label="Giới tính">
-
               <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Giới tính" />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Chọn giới tính" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Nam">Nam</SelectItem>
-                  <SelectItem value="Nữ">Nữ</SelectItem>
-                  <SelectItem value="Khác">Khác</SelectItem>
+                  <SelectItem value="male">Nam</SelectItem>
+                  <SelectItem value="female">Nữ</SelectItem>
+                  <SelectItem value="other">Khác</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Số điện thoại">
               <Input name="phone" value={form.phone} onChange={handleChange} />
             </Field>
-            <Field label="Email" >
+            <Field label="Email">
               <Input name="email" value={form.email} onChange={handleChange} />
             </Field>
             <Field label="Địa chỉ">
               <Input name="address" value={form.address} onChange={handleChange} />
             </Field>
-          </div>
-        </div>
-      </section>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Bảo hiểm y tế */}
-      <section className="bg-white p-6 rounded-lg shadow space-y-6">
-        <h2 className="text-xl font-semibold text-slate-800">Thông tin bảo hiểm y tế</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Mã thẻ BHYT">
-            <Input name="insuranceCode" value={form.insuranceCode} onChange={handleChange} />
+      {/* Người thân */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Thông tin người thân liên lạc khi cần</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Họ và tên người thân">
+            <Input name="name" value={relative?.name ?? ""} onChange={handleRelativeChange} />
           </Field>
-          <Field label="Nhà cung cấp">
-            <Input name="insuranceProvider" value={form.insuranceProvider} onChange={handleChange} />
+          <Field label="Mối quan hệ">
+            <Input name="relationship" value={relative?.relationship ?? ""} onChange={handleRelativeChange} />
           </Field>
+          <Field label="Số điện thoại người thân">
+            <Input name="phone" value={relative?.phone ?? ""} onChange={handleRelativeChange} />
+          </Field>
+          <Field label="Địa chỉ người thân">
+            <Input name="address" value={relative?.address ?? ""} onChange={handleRelativeChange} />
+          </Field>
+        </CardContent>
+      </Card>
 
-          <Field label="Hạn sử dụng thẻ">
-            <Input name="insuranceValidUntil" type="date" value={form.insuranceValidUntil} onChange={handleChange} />
-          </Field>
-        </div>
-      </section>
-
-      {/* Thông tin y tế */}
-      <section className="bg-white p-6 rounded-lg shadow space-y-6">
-        <h2 className="text-xl font-semibold text-slate-800">Thông tin y tế</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Nhóm máu">
-            <Input name="bloodType" value={form.bloodType} onChange={handleChange} />
-          </Field>
-          <Field label="Chiều cao (cm)">
-            <Input name="height" value={form.height} onChange={handleChange} />
-          </Field>
-          <Field label="Cân nặng (kg)">
-            <Input name="weight" value={form.weight} onChange={handleChange} />
-          </Field>
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          <Field label="Bệnh nền">
-            <Textarea name="chronicDiseases" value={form.chronicDiseases} onChange={handleChange} />
-          </Field>
-          <Field label="Dị ứng">
-            <Textarea name="allergies" value={form.allergies} onChange={handleChange} />
-          </Field>
-          <Field label="Tiền sử bệnh">
-            <Textarea name="medicalHistory" value={form.medicalHistory} onChange={handleChange} />
-          </Field>
-          <Field label="Lịch sử tiêm chủng">
-            <Textarea name="vaccinations" value={form.vaccinations} onChange={handleChange} />
-          </Field>
-        </div>
-      </section>
-
-      {/* Submit */}
       <div className="flex justify-end">
-        <Button onClick={handleSubmit} className="bg-teal-600 text-white hover:bg-teal-700">
+        <Button onClick={handleSubmit} className="bg-teal-600 hover:bg-teal-700 text-white">
           Lưu thay đổi
         </Button>
       </div>
