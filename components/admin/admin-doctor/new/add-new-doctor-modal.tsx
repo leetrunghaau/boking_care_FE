@@ -38,7 +38,8 @@ import {
 } from "lucide-react";
 import { doctorSchema } from "@/schemas/admin-doctor/add-doctor/doctorSchema";
 import http from "@/helper/axios";
-import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
+import { handleApiError, handleApiSuccess, handleErorr } from "@/helper/toast-utils";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface NewDoctorData {
   name: string;
@@ -71,9 +72,12 @@ export function AddDoctorModal({
   onClose,
   onSave,
 }: AddDoctorModalProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [formData, setFormData] = useState<NewDoctorData>(initialDoctorData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileState, setFileState] = useState<File | null>(null)
 
   const handleInputChange = (field: keyof NewDoctorData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -103,13 +107,37 @@ export function AddDoctorModal({
     if (!validateForm()) {
       return;
     }
+    if (!fileState) {
+      handleErorr("Phải tạo hình ảnh cho bác sĩ")
+      return
+    }
     setIsSubmitting(true);
     try {
-      const data = await http.post<any>("/admin-doctor/doctor", formData);
+      const data = await http.post<any>("/admin-doctor/doctor", {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        dob: formData.dob,
+        gender: formData.gender,
+        about: formData.about,
+      });
       onSave(formData);
-      if (data) handleImageUpload;
-      handleClose();
-      handleApiSuccess("Thêm bác sĩ thành công");
+      if (data?.status) {
+        const rs = await http.postFile<any | null>(`/admin-doctor/doctor/${data?.doctor?.id}/avatar`, fileState)
+        if (rs?.status) {
+          handleImageUpload;
+          handleApiSuccess("Thêm bác sĩ thành công");
+          const params = new URLSearchParams(searchParams.toString());
+          params.delete("hospital")
+          params.delete("specialty")
+          params.delete("page")
+          params.set("search", rs?.name)
+          router.push(`/admin/doctors?${params.toString()}`);
+          handleClose();
+        }
+      } else {
+        handleErorr(data?.mess ?? "Tạo bác sĩ thất bại")
+      }
     } catch (error) {
       handleApiError(error, "Thêm bác sĩ thất bại");
     } finally {
@@ -121,6 +149,7 @@ export function AddDoctorModal({
     setFormData(initialDoctorData);
     setErrors({});
     setIsSubmitting(false);
+    setFileState(null)
     onClose();
   };
 
@@ -137,6 +166,7 @@ export function AddDoctorModal({
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setFileState(file)
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -149,6 +179,7 @@ export function AddDoctorModal({
 
   const removeImage = () => {
     handleInputChange("img", "");
+    setFileState(null)
   };
 
   const getGenderLabel = (gender: string) => {
@@ -240,11 +271,10 @@ export function AddDoctorModal({
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   placeholder="VD: BS. Nguyễn Văn An"
-                  className={`focus:ring-teal-500 focus:border-teal-500 ${
-                    errors.name
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : ""
-                  }`}
+                  className={`focus:ring-teal-500 focus:border-teal-500 ${errors.name
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : ""
+                    }`}
                 />
                 {errors.name && (
                   <p className="text-sm text-red-500">{errors.name}</p>
@@ -259,9 +289,8 @@ export function AddDoctorModal({
                   value={formData.gender}
                   onValueChange={(value) => handleInputChange("gender", value)}>
                   <SelectTrigger
-                    className={`focus:ring-teal-500 focus:border-teal-500 ${
-                      errors.gender ? "border-red-500" : ""
-                    }`}>
+                    className={`focus:ring-teal-500 focus:border-teal-500 ${errors.gender ? "border-red-500" : ""
+                      }`}>
                     <SelectValue placeholder="Chọn giới tính" />
                   </SelectTrigger>
                   <SelectContent>
@@ -302,11 +331,10 @@ export function AddDoctorModal({
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   placeholder="VD: 0973286451"
-                  className={`focus:ring-teal-500 focus:border-teal-500 ${
-                    errors.phone
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : ""
-                  }`}
+                  className={`focus:ring-teal-500 focus:border-teal-500 ${errors.phone
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : ""
+                    }`}
                 />
                 {errors.phone && (
                   <p className="text-sm text-red-500">{errors.phone}</p>
@@ -324,11 +352,10 @@ export function AddDoctorModal({
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="VD: doctor@example.com"
-                  className={`focus:ring-teal-500 focus:border-teal-500 ${
-                    errors.email
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : ""
-                  }`}
+                  className={`focus:ring-teal-500 focus:border-teal-500 ${errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : ""
+                    }`}
                 />
                 {errors.email && (
                   <p className="text-sm text-red-500">{errors.email}</p>
@@ -352,11 +379,10 @@ export function AddDoctorModal({
                     .toISOString()
                     .split("T")[0]
                 }
-                className={`focus:ring-teal-500 focus:border-teal-500 ${
-                  errors.dob
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : ""
-                }`}
+                className={`focus:ring-teal-500 focus:border-teal-500 ${errors.dob
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : ""
+                  }`}
               />
               {errors.dob && (
                 <p className="text-sm text-red-500">{errors.dob}</p>
@@ -374,11 +400,10 @@ export function AddDoctorModal({
                 onChange={(e) => handleInputChange("about", e.target.value)}
                 placeholder="Viết giới thiệu về kinh nghiệm, chuyên môn và thành tích của bác sĩ..."
                 rows={4}
-                className={`focus:ring-teal-500 focus:border-teal-500 ${
-                  errors.about
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : ""
-                }`}
+                className={`focus:ring-teal-500 focus:border-teal-500 ${errors.about
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  : ""
+                  }`}
               />
               {errors.about && (
                 <p className="text-sm text-red-500">{errors.about}</p>
