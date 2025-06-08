@@ -66,7 +66,10 @@ export default function LichSuKhamPage() {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <Avatar className="w-14 h-14 border-2 border-teal-100 flex-shrink-0">
-                  <AvatarImage src={getFullURL(appointment.avatar) ||  "/placeholder.svg"} alt="Doctor photo" />
+                  <AvatarImage
+                    src={getFullURL(appointment.avatar) || "/placeholder.svg"}
+                    alt="Doctor photo"
+                  />
                   <AvatarFallback className="bg-teal-500 text-white font-semibold">
                     {appointment.avatar}
                   </AvatarFallback>
@@ -141,7 +144,9 @@ export default function LichSuKhamPage() {
       </div>
 
       <div className="mt-8 text-center">
-        <Button className="bg-teal-600 hover:bg-teal-700 text-white px-6">
+        <Button
+          className="bg-teal-600 hover:bg-teal-700 text-white px-6"
+          onClick={() => router.push("/dat-lich-kham")}>
           Đặt lịch khám mới
         </Button>
       </div>

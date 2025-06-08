@@ -52,6 +52,7 @@ export default function UserDropdown() {
   const handleLogout = () => {
     logOut();
     handleApiSuccess("Bạn đã đăng xuất thành công.");
+    router.push("/");
   };
 
   return (
