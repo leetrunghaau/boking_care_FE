@@ -121,7 +121,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full overflow-hidden">
                     <Image
-                      src={appt.doctorImg}
+                      src={getFullURL(appt.doctorImg) || "/placeholder.svg"}
                       alt={appt.doctor}
                       width={48}
                       height={48}

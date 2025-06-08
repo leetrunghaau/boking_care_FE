@@ -10,6 +10,7 @@ import { getIconByName } from "@/helper/icon-map";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { handleApiError } from "@/helper/toast-utils";
+import { getFullURL } from "@/helper/url";
 
 export default function SpecialtyDetailPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function SpecialtyDetailPage() {
         const res = await http.get<any>(`/specialty/${slug}`);
         console.log("chuyên khoa chi tết\n", res);
         setSpecialty(res);
+        console.log("chuyên khoa chi tiết", getFullURL(res.img));
       } catch (err) {
         handleApiError(
           err,
@@ -59,7 +61,7 @@ export default function SpecialtyDetailPage() {
             <div key={idx} className="text-center">
               <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow">
                 <Image
-                  src={disease.img || "/placeholder.svg"}
+                  src={getFullURL(disease.img) || "/placeholder.svg"}
                   alt={disease.name || "Disease"}
                   fill
                   className="object-cover"
@@ -116,7 +118,7 @@ export default function SpecialtyDetailPage() {
               className="bg-white p-4 rounded-md shadow-md flex gap-4">
               <div className="relative w-28 h-20 shrink-0 rounded-md overflow-hidden">
                 <Image
-                  src={hop.thumbnail}
+                  src={getFullURL(hop.thumbnail) || "/placeholder.svg"}
                   alt={hop.name}
                   fill
                   className="object-cover"
@@ -166,7 +168,7 @@ export default function SpecialtyDetailPage() {
                 className="bg-white rounded-md shadow-md overflow-hidden">
                 <div className="relative w-full h-56">
                   <Image
-                    src={doc.img ?? "/placeholder.svg"}
+                    src={getFullURL(doc.img) || "/placeholder.svg"}
                     alt={doc.name}
                     fill
                     className="object-cover"
@@ -240,7 +242,7 @@ export default function SpecialtyDetailPage() {
       {specialty.img && (
         <div className="relative h-[300px] w-full">
           <Image
-            src={specialty.img}
+            src={getFullURL(specialty.img) || "/placeholder.svg"}
             alt="Banner chuyên khoa"
             fill
             className="object-cover"

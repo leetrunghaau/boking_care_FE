@@ -7,6 +7,7 @@ import UserDropdown from "./user-dropdown";
 import useAuthStore from "@/store/auth";
 import DoctorDropdown from "./doctor-dropdown";
 import { useRouter } from "next/navigation";
+import AdminDropdown from "./admin-dropdown";
 
 export default function MainHeader() {
   const { isLoggedIn, role } = useAuthStore();
@@ -19,7 +20,7 @@ export default function MainHeader() {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
-            <span className="text-xl font-bold text-teal-600">BookingCare</span>
+            <span className="text-xl font-bold text-teal-600">Med+</span>
           </Link>
         </div>
 
@@ -76,9 +77,11 @@ export default function MainHeader() {
             {isLoggedIn ? (
               role === "patient" ? (
                 <UserDropdown />
-              ) : (
+              ) : role === "doctor" ? (
                 <DoctorDropdown />
-              )
+              ) : role === "admin" ? (
+                <AdminDropdown />
+              ) : null
             ) : (
               <>
                 <Button
@@ -98,6 +101,7 @@ export default function MainHeader() {
                 </Button>
               </>
             )}
+
           </>
         </div>
       </div>

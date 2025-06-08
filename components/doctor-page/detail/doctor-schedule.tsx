@@ -24,19 +24,18 @@ export default function DoctorSchedule({ slug }: Pops) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [availableTimes, setAvailableTimes] = useState<any[]>([])
-  const [doctor, setDoctor] = useState<any | null>(null)
+  const [info, setInfo] = useState<any | null>(null)
 
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
-  const { setBooking } = useBookingStore()
 
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(false);
       try {
-        const rs = await http.get(`/doctor-site/doctor/${slug}`)
-        setDoctor(rs)
+        const rs = await http.get(`/doctor-site/doctor/${slug}/schedule/info`)
+        setInfo(rs)
       } catch (err) {
         console.error(err);
       } finally {
@@ -73,17 +72,17 @@ export default function DoctorSchedule({ slug }: Pops) {
         <div className="space-y-4 mb-6">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Giá khám:</span>
-            <span className="font-medium">{doctor?.price ? formatCurrencyVND(doctor.price) : "Không có thông tin"} </span>
+            <span className="font-medium">{info?.price ?? "Không có thông tin"} </span>
           </div>
           <Separator />
           <div className="flex justify-between">
             <span className="text-muted-foreground">Thời gian:</span>
-            <span className="font-medium">{doctor?.duration ? `${doctor.duration} phút` : "Không có thông tin"}</span>
+            <span className="font-medium">{info?.duration ?? "Không có thông tin"}</span>
           </div>
           <Separator />
           <div className="flex justify-between">
             <span className="text-muted-foreground">Địa điểm:</span>
-            <span className="font-medium">{doctor?.hospital?.name ?? "Không có thông tin"}</span>
+            <span className="font-medium">{info?.address ?? "Không có thông tin"}</span>
           </div>
         </div>
 
@@ -154,9 +153,15 @@ export default function DoctorSchedule({ slug }: Pops) {
           <Button className="w-full bg-teal-600 hover:bg-teal-700"
             disabled={!(selectedDate && selectedTime)}
             onClick={() => {
-              console.log({ selectedDate, selectedTime })
-              setBooking({ doctorId: doctor.id, currStep: 3, date: selectedDate, time: selectedTime })
-              router.push("/dat-lich-kham")
+              const queryParams = new URLSearchParams();
+              queryParams.set("curStep", "3");
+             queryParams.set("date", format(selectedDate, "yyyy-MM-dd"));
+              if (selectedTime) {
+                queryParams.set("time", selectedTime.toString());
+              }
+              queryParams.set("doctorId", info.id.toString());
+              const queryString = queryParams.toString();
+              router.push(`/dat-lich-kham${queryString ? `?${queryString}` : ""}`);
             }}
           >Đặt lịch khám</Button>
           <p className="text-xs text-center text-muted-foreground mt-2">

@@ -23,6 +23,7 @@ import useAuthStore from "@/store/auth";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
+import { getFullURL } from '@/helper/url';
 
 export default function DoctorDropdown() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function DoctorDropdown() {
           className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full">
           {doctor?.img ? (
             <Image
-              src={doctor?.img}
+              src={getFullURL(doctor?.img) || `/placeholder.svg?height=32&width=32`}
               alt="Avatar"
               width={32}
               height={32}
@@ -92,19 +93,14 @@ export default function DoctorDropdown() {
           <User className="w-4 h-4 mr-2" />
           Hồ sơ cá nhân
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => router.push("/doctor/appointments")}
-          className="hover:cursor-pointer">
-          <History className="w-4 h-4 mr-2" />
-          Lịch khám
-        </DropdownMenuItem>
 
-        <DropdownMenuItem
+
+        {/* <DropdownMenuItem
           onClick={() => router.push("/doctor/notifications")}
           className="hover:cursor-pointer">
           <Bell className="w-4 h-4 mr-2" />
           Thông báo
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuItem
           onClick={() => router.push("/doctor/settings")}

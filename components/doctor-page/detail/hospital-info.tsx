@@ -8,12 +8,33 @@ import { Clock, Phone } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { getFullURL } from '@/helper/url';
 
 interface Pops {
-    doctor: any
+    slug: string,
 }
 
-export default function HospitalInfo({ doctor }: Pops) {
+export default function HospitalInfo({ slug }: Pops) {
+    const [hospital, setHospital] = useState<any | null>(null)
+    const [loading, setLoading] = useState(false)
+
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(false);
+            try {
+                const rs = await http.get<any | null>(`/doctor-site/doctor/${slug}/hospital`)
+                console.log("Thông tin bệnh viện", rs)
+                setHospital(rs)
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+
+        }
+        loadData()
+    }, [])
 
     return (
 
@@ -24,15 +45,15 @@ export default function HospitalInfo({ doctor }: Pops) {
                 <div className="flex items-start gap-3 mb-4">
                     <div className="w-16 h-16 relative rounded overflow-hidden">
                         <Image
-                            src={doctor?.hospital?.thumbnail ?? "/placeholder.svg?height=100&width=100&text=BV"}
-                            alt={doctor?.hospital?.name ?? "Benh vien"}
+                            src={getFullURL(hospital?.thumbnail) ?? "/placeholder.svg?height=100&width=100&text=BV"}
+                            alt={hospital?.name ?? "Benh vien"}
                             fill
                             className="object-cover"
                         />
                     </div>
                     <div>
-                        <h3 className="font-medium">{doctor?.hospital?.name}</h3>
-                        <p className="text-sm text-muted-foreground">{doctor?.hospital?.address}</p>
+                        <h3 className="font-medium">{hospital?.name}</h3>
+                        <p className="text-sm text-muted-foreground">{hospital?.address}</p>
                     </div>
                 </div>
 
@@ -41,11 +62,9 @@ export default function HospitalInfo({ doctor }: Pops) {
                         <Clock className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="font-medium">Giờ làm việc</p>
-                            {
-                                getReadableTimeRanges(doctor?.hospital?.time ?? []).map((time, i) => (
-                                    <p className="text-sm text-muted-foreground" key={i}>{time}</p>
-                                ))
-                            }
+                            {hospital?.times.map((time: string, i: number) => (
+                                <p className="text-sm text-muted-foreground" key={i}>{time}</p>
+                            ))}
                         </div>
                     </div>
 
@@ -53,13 +72,13 @@ export default function HospitalInfo({ doctor }: Pops) {
                         <Phone className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="font-medium">Liên hệ</p>
-                            <p className="text-sm text-muted-foreground">024.3825.5599</p>
+                            <p className="text-sm text-muted-foreground">{hospital?.phone ?? "Không có thông tin"}</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-4">
-                    <Link href={`/co-so-y-te/${doctor?.hospital?.slug}`}>
+                    <Link href={`/co-so-y-te/${hospital?.slug}`}>
                         <Button variant="outline" className="w-full">
                             Xem thông tin bệnh viện
                         </Button>

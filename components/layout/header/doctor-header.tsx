@@ -13,7 +13,7 @@ export default function DoctorHeader() {
           <Link href="/doctor" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
             <span className="text-xl font-bold text-teal-600">
-              Doctor.BookingCare
+              Doctor.Med+
             </span>
           </Link>
         </div>
@@ -21,7 +21,7 @@ export default function DoctorHeader() {
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-6">
           <Link
-            href="/doctor/dashboard"
+            href="/doctor"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Tổng quan
           </Link>
@@ -30,29 +30,29 @@ export default function DoctorHeader() {
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Lịch hẹn
           </Link>
-
+{/* 
           <Link
             href="/doctor/FAQ"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             FAQ
-          </Link>
-
+          </Link> */}
+{/* 
           <Link
             href="/doctor/ratings"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Đánh giá
-          </Link>
+          </Link> */}
           <Link
             href="/doctor/schedule"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Lịch làm việc
           </Link>
 
-          <Link
+          {/* <Link
             href="/doctor/ratings"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Hổ trợ
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Actions */}

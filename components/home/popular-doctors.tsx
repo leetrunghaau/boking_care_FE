@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getFullURL } from '@/helper/url';
 
 export default function PopularDoctors() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function PopularDoctors() {
             className="overflow-hidden hover:shadow-md transition-shadow">
             <div className="aspect-square relative">
               <Image
-                src={doctor.img ?? "/placeholder.svg"}
+                src={getFullURL(doctor.img) ?? "/placeholder.svg"}
                 alt={`Bác sĩ ${doctor.name}`}
                 fill
                 className="object-cover"

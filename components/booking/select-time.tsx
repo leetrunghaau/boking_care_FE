@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCurrencyVND } from "@/helper/customNumView";
 import { useRouter, useSearchParams } from "next/navigation";
 import { handleApiError } from "@/helper/toast-utils";
+import { getFullURL } from '@/helper/url';
 
 export default function SelectTime() {
   const router = useRouter();
@@ -196,7 +197,7 @@ export default function SelectTime() {
             <>
               <div className="flex items-center space-x-4 mb-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarImage src={doctor.img} alt={doctor.name} />
+                  <AvatarImage src={getFullURL(doctor.img) || "/placeholder.svg"} alt={doctor.name} />
                   <AvatarFallback>T</AvatarFallback>
                 </Avatar>
                 <div>

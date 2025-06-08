@@ -25,6 +25,7 @@ import { SelectItem } from "@/components/ui/select";
 import { TestTubeDiagonal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { handleApiError } from "@/helper/toast-utils";
+import { getFullURL } from "@/helper/url";
 export function SelectDoctor() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -131,7 +132,7 @@ export function SelectDoctor() {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative w-full md:w-32 h-32 rounded-md overflow-hidden">
               <Image
-                src={dt.img || "/placeholder.svg"}
+                src={getFullURL(dt.img) || "/placeholder.svg"}
                 alt={dt.name}
                 fill
                 className="object-cover"

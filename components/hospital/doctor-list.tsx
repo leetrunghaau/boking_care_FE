@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import http from "@/helper/axios"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import { getFullURL } from '@/helper/url';
 
 
 
@@ -39,7 +40,7 @@ export default function DoctorList({ id }: Pops) {
         <Card key={doc.id}>
           <div className="relative h-[200px] w-full">
             <Image
-              src={doc.img ?? "/placeholder.svg"}
+              src={getFullURL(doc.img) || "/placeholder.svg"}
               alt={doc.user.name}
               fill
               className="object-cover"

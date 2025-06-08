@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import http from "@/helper/axios";
 import useAuthStore from "./../../../store/auth";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
+import { getFullURL } from '@/helper/url';
 
 interface Pops {
   slug: string;
@@ -210,7 +211,7 @@ export default function DoctorRating({ slug }: Pops) {
           <div key={item.id} className="border-b pb-4 last:border-b-0">
             <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={item.patient.img} alt={item.patient.name} />
+                <AvatarImage src={getFullURL(item.patient.img) || "/placeholder.svg"} alt={item.patient.name} />
                 <AvatarFallback>
                   {item.patient.name?.charAt(0) ?? "?"}
                 </AvatarFallback>

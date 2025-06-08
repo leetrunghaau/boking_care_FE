@@ -13,6 +13,7 @@ import http from "@/helper/axios";
 import { handleApiError } from "@/helper/toast-utils";
 import DoctorSchedule from "@/components/doctor-page/detail/doctor-schedule";
 import HospitalInfo from "@/components/doctor-page/detail/hospital-info";
+import { getFullURL } from "@/helper/url";
 
 export default function DoctorDetailPage() {
   const params = useParams();
@@ -55,7 +56,7 @@ export default function DoctorDetailPage() {
                       <div className="relative w-40 h-40 mx-auto md:mx-0 rounded-lg overflow-hidden border">
                         <Image
                           src={
-                            doctor?.img ??
+                            getFullURL(doctor?.img) ||
                             `/placeholder.svg?height=300&width=300`
                           }
                           alt={doctor?.name ?? "bac si"}
@@ -141,7 +142,7 @@ export default function DoctorDetailPage() {
             {/* Sidebar */}
             <div className="flex flex-col gap-6">
               <DoctorSchedule slug={slug} />
-              <HospitalInfo doctor={doctor} />
+              <HospitalInfo  slug={slug} />
             </div>
           </div>
         </div>

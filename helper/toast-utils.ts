@@ -35,3 +35,15 @@ export function handleApiSuccess(
     duration: 2000,
   });
 }
+
+export function handleErorr(
+  fallbackMessage = "Thao tác thất bại!",
+  title = "Thất bại"
+) {
+  toast({
+    title,
+    description: fallbackMessage,
+    variant: "error",
+    duration: 2000,
+  });
+}

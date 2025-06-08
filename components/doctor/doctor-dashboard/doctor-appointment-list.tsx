@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { format } from "date-fns"
 import { vi } from "date-fns/locale"
 import { Calendar, Clock, FileText } from "lucide-react"
+import { getFullURL } from '@/helper/url';
 
 export function DoctorAppointmentList() {
   // Dữ liệu mẫu cho lịch hẹn sắp tới
@@ -54,7 +55,7 @@ export function DoctorAppointmentList() {
         <div key={appointment.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-slate-50">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={appointment.patientAvatar || "/placeholder.svg"} />
+              <AvatarImage src={getFullURL(appointment.patientAvatar) || "/placeholder.svg"} />
               <AvatarFallback>{appointment.patientName.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>

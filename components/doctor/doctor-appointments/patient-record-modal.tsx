@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getFullURL } from '@/helper/url';
 
 interface PatientRecord {
   id: string;
@@ -141,7 +142,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                   <div className="flex items-start gap-4">
                     <Avatar className="h-24 w-24">
                       <AvatarImage
-                        src={patientRecord.img || "/placeholder.svg"}
+                        src={getFullURL(patientRecord.img) || "/placeholder.svg"}
                       />
                       <AvatarFallback>
                         {patientRecord.name ? patientRecord.name.charAt(0) : "?"}

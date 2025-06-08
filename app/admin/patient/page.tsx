@@ -1,6 +1,5 @@
 "use client"
-import { AdminDoctorList } from "@/components/admin/admin-doctors/admin-doctor-list";
-import DoctorDetailDialog from "@/components/admin/admin-doctors/doctor-dialog";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,37 +24,25 @@ import { useEffect, useRef, useState } from "react";
 
 
 
-export default function AdminDoctorsPage() {
+export default function AdminPatientsPage() {
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const initParms = new URLSearchParams(searchParams.toString())
 
   const [search, setSearch] = useState(initParms.get('search') ?? '')
-  const [specialties, setSpecialties] = useState<any[]>([])
-  const [specialtySelected, setSpecialtySelected] = useState(initParms.get('specialty') ?? 'all');
-  const [hospitals, setHospials] = useState<any[]>([])
-  const [hospitalSelected, setHopialSelected] = useState(initParms.get('hospital') ?? 'all')
   const [page, setPage] = useState(Math.max(Number(initParms.get('page')) || 1, 1))
   const [total, setTotal] = useState(1)
-  const [loadingDoctor, setLoadingDoctor] = useState(false)
-
-  const [open, setOpen] = useState(false);
-  const [slug, setSlug] = useState<string | null>(null);
+  const [loadingPatient, setLoadingPatient] = useState(false)
 
 
-  const [doctors, setDoctors] = useState<any[]>([])
+  const [patients, setPatients] = useState<any[]>([])
 
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-  const loadDoctor = async (searchInput?: string) => {
+  const loadPatient = async (searchInput?: string) => {
     const params = new URLSearchParams(searchParams.toString());
     const setIfExists = (key: string, value: any) => {
-      if ((key === 'specialty' || key === 'hospital') && value === 'all') {
-        params.delete(key);
-      }
-      else {
-        value ? params.set(key, value.toString()) : params.delete(key);
-      }
+      value ? params.set(key, value.toString()) : params.delete(key);
     };
     setIfExists('page', page);
     if (searchInput) {
@@ -63,50 +50,34 @@ export default function AdminDoctorsPage() {
     } else {
       setIfExists('search', search);
     }
-    setIfExists('specialty', specialtySelected);
-    setIfExists('hospital', hospitalSelected);
     router.push(`?${params.toString()}`);
     const queryString = params.toString()
 
-    setLoadingDoctor(true)
+    setLoadingPatient(true)
     try {
-      const rs = await http.get<any | null>(`/admin-doctor/doctors${queryString ? `?${queryString}` : ""}`)
-      console.log("doctor", rs)
+      const rs = await http.get<any | null>(`/admin-patient/patients${queryString ? `?${queryString}` : ""}`)
+      console.log("Patient", rs)
       if (rs) {
-        setDoctors(rs.doctos)
+        setPatients(rs.patients)
         setTotal(rs.total)
       }
     } catch (err) {
       console.log(err)
       handleErorr()
     } finally {
-      setLoadingDoctor(false)
+      setLoadingPatient(false)
     }
   }
 
 
   useEffect(() => {
-    const loadBase = async () => {
-      try {
-        const base = await http.get<any | null>("/admin-doctor/base")
-        console.log("base", base)
-        if (base) {
-          setSpecialties(base.specialties)
-          setHospials(base.hospitals)
-        }
-      } catch (err) {
-      } finally {
-      }
-    }
-    loadBase()
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
-
   }, [])
   useEffect(() => {
-    loadDoctor()
-  }, [specialtySelected, hospitalSelected, page])
+    loadPatient()
+  }, [ page])
 
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,7 +87,7 @@ export default function AdminDoctorsPage() {
       clearTimeout(debounceTimeout.current);
     }
     debounceTimeout.current = setTimeout(() => {
-      loadDoctor(val);
+      loadPatient(val);
     }, 1000);
   };
 
@@ -140,53 +111,6 @@ export default function AdminDoctorsPage() {
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
-
-          <Select value={specialtySelected} onValueChange={(value) => {
-            setSpecialtySelected(value)
-            setPage(1)
-          }}>
-            <SelectTrigger >
-              <SelectValue placeholder="Chuyên khoa" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                <div className="flex items-center gap-3">
-                  <div><Briefcase className="w-5 h-5 text-teal-600" /></div>
-                  Tất cả chuyên khoa
-                </div>
-              </SelectItem>
-              {specialties?.map((i: any) => {
-                const Icon = getIconByName(i.icon)
-                return (
-                  <SelectItem value={String(i.id)} key={i.id}>
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <Icon className="w-5 h-5 text-teal-600" />
-                      </div>
-                      {i.name}
-                    </div>
-                  </SelectItem>
-                )
-              })}
-            </SelectContent>
-          </Select>
-
-          <Select value={hospitalSelected} onValueChange={(value) => {
-            setHopialSelected(value)
-            setPage(1)
-          }} >
-            <SelectTrigger >
-              <SelectValue placeholder="Cơ sở y tế" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                Tất cả cơ y tế
-              </SelectItem>
-              {hospitals?.map((i: any) => (
-                <SelectItem value={String(i.id)} key={i.id}>{i.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="flex justify-end mt-4">
@@ -200,17 +124,18 @@ export default function AdminDoctorsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">Bác sĩ</TableHead>
-              <TableHead>Chuyên khoa</TableHead>
-              <TableHead>Điện thoại</TableHead>
+              <TableHead className="w-[250px]">Bệnh nhân</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Nơi công tác</TableHead>
+              <TableHead>Điện thoại</TableHead>
+              <TableHead>Ngày sinh</TableHead>
+              <TableHead>Giới tính</TableHead>
+              <TableHead>Địa chỉ</TableHead>
               <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {
-              loadingDoctor ?
+              loadingPatient ?
                 <>
                   <TableRow>
                     <TableCell><Skeleton className="h-12 w-full" /></TableCell>
@@ -232,49 +157,33 @@ export default function AdminDoctorsPage() {
                   </TableRow>
                 </>
                 :
-                doctors?.map((doctor) => {
-                  const Icon = getIconByName(doctor.specialtyIcon)
+                patients?.map((patient) => {
+                  const Icon = getIconByName(patient.specialtyIcon)
                   return (
-                    <TableRow key={doctor.id}>
+                    <TableRow key={patient.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
                             <AvatarImage
-                              src={getFullURL(doctor.img) || "/placeholder.svg"}
-                              alt={doctor.name}
+                              src={getFullURL(patient.img) || "/placeholder.svg"}
+                              alt={patient.name}
                             />
-                            <AvatarFallback>{doctor.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{doctor.name}</p>
-                            <p className="text-sm text-gray-500">{doctor.code}</p>
+                            <p className="font-medium">{patient.name}</p>
+                            <p className="text-sm text-gray-500">{patient.code}</p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <Icon className="w-5 h-5 text-teal-600" />
-                          </div>
-
-                          {doctor.specialty}
-                        </div>
-
-
-                      </TableCell>
-                      <TableCell>{doctor.phone}</TableCell>
-                      <TableCell>{doctor.email}</TableCell>
-                      <TableCell>{doctor.hospital}</TableCell>
+                      <TableCell>{patient.email}</TableCell>
+                      <TableCell>{patient.phone}</TableCell>
+                      <TableCell>{patient.dob}</TableCell>
+                      <TableCell>{patient.gender}</TableCell>
+                      <TableCell>{patient.address}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button 
-                          onClick={()=>{
-                            setSlug(doctor.slug)
-                            setOpen(true)
-                          }}
-                          variant="outline" 
-                          size="icon" 
-                          className="h-8 w-8 text-teal-600">
+                          <Button variant="outline" size="icon" className="h-8 w-8 text-teal-600">
                             <Eye className="h-4 w-4" />
                             <span className="sr-only">Xem hồ sơ</span>
                           </Button>
@@ -335,13 +244,6 @@ export default function AdminDoctorsPage() {
           </Pagination>
 
         </div>
-        <DoctorDetailDialog 
-        open={open} 
-        onClose={() => {
-          setOpen(false)
-          setSlug(null)
-          }} 
-          slug={slug} />
       </div>
     </div>
   );

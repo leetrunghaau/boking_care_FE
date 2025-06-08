@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import http from "@/helper/axios";
 import { Badge } from "@/components/ui/badge";
 import { getIconByName } from "@/helper/icon-map";
+import { getFullURL } from "@/helper/url";
 
 export default function UpcomingAppointmentsPage() {
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -83,7 +84,7 @@ export default function UpcomingAppointmentsPage() {
                 <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-teal-500 mb-4">
                   <Avatar className="h-26 w-26 border-4 border-white shadow-md">
                     <AvatarImage
-                      src={appt.doctorAvatar || "/placeholder.svg"}
+                      src={getFullURL(appt.doctorAvatar) || "/placeholder.svg"}
                       alt={appt.doctor}
                     />
                     <AvatarFallback className="text-3xl">

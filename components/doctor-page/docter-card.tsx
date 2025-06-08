@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useBookingStore } from "@/store/booking";
+import { getFullURL } from '@/helper/url';
 
 
 
@@ -23,7 +24,7 @@ export default function DoctorCard({ doctor }: Pops) {
           <div className="bg-blue-50 p-4 flex items-center">
             <div className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-white">
               <Image
-                src={doctor.img || "/placeholder.svg"}
+                src={getFullURL(doctor.img) || "/placeholder.svg"}
                 alt={doctor.name}
                 fill
                 className="object-cover"

@@ -13,6 +13,7 @@ import { AlertCircle, Plus, X, Upload } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Star } from "lucide-react"
 import Link from "next/link"
+import { getFullURL } from '@/helper/url';
 
 const mockSpecialtyData = {
   id: "1",
@@ -296,7 +297,7 @@ export default function EditSpecialtyPage() {
               <div className="space-y-4">
                 <div className="border rounded-lg p-4 flex flex-col items-center justify-center">
                   <img
-                    src={specialty.banner || "/placeholder.svg"}
+                    src={getFullURL(specialty.banner) || "/placeholder.svg"}
                     alt="Banner chuyên khoa"
                     className="w-full h-48 object-cover rounded-lg mb-4"
                   />
@@ -429,7 +430,7 @@ export default function EditSpecialtyPage() {
                     <div key={index} className="border rounded-md p-4 flex gap-3">
                       <div className="relative w-16 h-16 rounded-full overflow-hidden shrink-0">
                         <img
-                          src={doctor.image || "/placeholder.svg"}
+                          src={getFullURL(doctor.image) || "/placeholder.svg"}
                           alt={doctor.name}
                           className="object-cover w-full h-full"
                         />
@@ -472,7 +473,7 @@ export default function EditSpecialtyPage() {
                     <div key={index} className="border rounded-md p-4 flex gap-3">
                       <div className="relative w-20 h-16 rounded-md overflow-hidden shrink-0">
                         <img
-                          src={facility.image || "/placeholder.svg"}
+                          src={getFullURL(facility.image) || "/placeholder.svg"}
                           alt={facility.name}
                           className="object-cover w-full h-full"
                         />

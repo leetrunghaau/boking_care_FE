@@ -40,7 +40,7 @@ export default function Summary() {
               ...prev,
               name: rs.name,
               phone: rs.phone || "",
-              email: rs.email || "",
+              email: rs.user?.email || rs.email || "",
               gender: rs.gender || "",
               address: rs.address || "",
               dob: rs.dob || "",

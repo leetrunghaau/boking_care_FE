@@ -14,34 +14,31 @@ import {
   User,
   Settings,
   Bell,
-  CalendarClock,
   History,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/auth";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
-import { getFullURL } from "@/helper/url";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
+import { getFullURL } from '@/helper/url';
 
-export default function UserDropdown() {
+export default function AdminDropdown() {
   const router = useRouter();
   const { logOut } = useAuthStore();
-  const [user, setUser] = useState<any | null>();
+  const [doctor, setDoctor] = useState<any | null>();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchAllFacilities = async () => {
       try {
         const res = await http.get<any>(`/sig/info`);
-        setUser(res);
+        setDoctor(res);
       } catch (err) {
         const e = err as Error;
-        handleApiError(
-          e,
-          "Không thể tải thông tin người dùng",
-          "user-dropdown"
-        );
+
+        handleApiError(e, "Không thể tải thông tin bác sĩ", "admin-dropdown");
       } finally {
         setLoading(false);
       }
@@ -51,7 +48,7 @@ export default function UserDropdown() {
   }, []);
   const handleLogout = () => {
     logOut();
-    handleApiSuccess("Bạn đã đăng xuất thành công.");
+    handleApiSuccess("Đăng xuất thành công");
   };
 
   return (
@@ -60,19 +57,19 @@ export default function UserDropdown() {
         <Button
           variant="ghost"
           className="flex items-center gap-2 p-1 pr-5 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-full">
-          {user?.img ? (
+          {doctor?.img ? (
             <Image
-              src={getFullURL(user.img)!}
+              src={getFullURL(doctor?.img) || `/placeholder.svg?height=32&width=32`}
               alt="Avatar"
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full object-cover aspect-square"
+              className="rounded-full object-cover"
             />
           ) : (
             <User className="w-6 h-6 text-slate-600 dark:text-white" />
           )}
           <span className="hidden md:inline font-medium text-sm text-slate-700 dark:text-white">
-            {user?.name ?? ""}
+            {doctor?.name ?? ""}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -80,41 +77,33 @@ export default function UserDropdown() {
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="text-sm">
           <h2 className="text-sm font-bold bg-gradient-to-r from-teal-500 to-indigo-500 bg-clip-text text-transparent">
-            Xin chào, {user?.name ?? ""}
+            Xin chào, Bs.{doctor?.name ?? ""}
           </h2>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-
         <DropdownMenuItem
-          onClick={() => router.push("/benh-nhan/ho-so")}
+          onClick={() => router.push("/doctor")}
+          className="hover:cursor-pointer">
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          Trang làm việc
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => router.push("/doctor/profile")}
           className="hover:cursor-pointer">
           <User className="w-4 h-4 mr-2" />
-          Tài khoản
+          Hồ sơ cá nhân
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => router.push("/benh-nhan/thong-bao")}
+
+        {/* <DropdownMenuItem
+          onClick={() => router.push("/doctor/notifications")}
           className="hover:cursor-pointer">
           <Bell className="w-4 h-4 mr-2" />
           Thông báo
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuItem
-          onClick={() => router.push("/benh-nhan/lich-kham")}
-          className="hover:cursor-pointer">
-          <CalendarClock className="w-4 h-4 mr-2" />
-          Lịch khám
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          onClick={() => router.push("/benh-nhan/lich-su-kham")}
-          className="hover:cursor-pointer">
-          <History className="w-4 h-4 mr-2" />
-          Lịch sử khám
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          onClick={() => router.push("/benh-nhan/tai-khoan")}
+          onClick={() => router.push("/doctor/settings")}
           className="hover:cursor-pointer">
           <Settings className="w-4 h-4 mr-2" />
           Cài đặt

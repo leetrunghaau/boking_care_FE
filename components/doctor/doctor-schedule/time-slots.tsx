@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -10,86 +10,96 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Clock, Copy, Save, Clock3 } from "lucide-react";
+import { Clock, Clock3 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
+import moment from "moment";
+import "moment/locale/vi";
+import http from "@/helper/axios";
+import { AnyARecord } from "dns";
+import { BookingDetailDialog } from "./booking-detail";
 
-interface TimeSlot {
-  time: string;
-  available: boolean;
-  booked: boolean;
-  patient?: string;
-}
-
-interface TimeSlotsProps {
+interface Props {
   selectedDate: Date;
-  timeSlots: TimeSlot[];
-  selectedTime: string | null;
-  onTimeSelect: (time: string) => void;
-  onSaveSchedule: () => void;
-  stats: {
-    available: number;
-    booked: number;
-  };
 }
 
-export function TimeSlots({
-  selectedDate,
-  timeSlots,
-  selectedTime,
-  onTimeSelect,
-  onSaveSchedule,
-  stats,
-}: TimeSlotsProps) {
+export function TimeSlots({ selectedDate }: Props) {
+  const [timeSlots, setTimeSlots] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>({ available: 0, booked: 0 });
+  const [loading, setLoading] = useState(false)
+  const dialogRef = useRef<any>(null);
+
+  const fetchTimeSlots = async () => {
+    setLoading(true);
+    try {
+      const res = await http.get<any[]>(`/doctor-schedule/by-day/${selectedDate}`);
+      setTimeSlots(res);
+      console.log("Fetched time slots:", res);
+      const available = res.filter(slot => slot.available && !slot.booked).length;
+      const booked = res.filter(slot => slot.booked).length;
+      setStats({ available, booked });
+    } catch (error) {
+      console.error("Lỗi khi tải timeslots:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTimeSlots();
+  }, [selectedDate]);
+
+  const toggleAvailability = async (item: any) => {
+    try {
+      await http.post(`/doctor-schedule/time-slots`, {
+        date: moment(selectedDate).format("YYYY-MM-DD"),
+        time: item.start,
+        toggleOff: item.availableId,
+      });
+      await fetchTimeSlots();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái slot:", error);
+    }
+    console.log("Toggle availability for slot:", item);
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
             <Clock className="h-4 w-4 text-teal-600" />
-            Lịch làm việc - {format(selectedDate, "dd/MM/yyyy", { locale: vi })}
+            Lịch làm việc - {moment(selectedDate).locale("vi").format("[ngày] DD, [tháng] MM, [năm] YYYY")}
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <Copy className="h-4 w-4 mr-1" />
-              Sao chép
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-teal-600 hover:bg-teal-700"
-              onClick={onSaveSchedule}>
-              <Save className="h-4 w-4 mr-1" />
-              Lưu lịch
-            </Button>
-          </div>
         </div>
         <CardDescription>
           Nhấp vào ô giờ để bật/tắt trạng thái khả dụng
         </CardDescription>
       </CardHeader>
+
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {timeSlots.map((slot, index) => (
             <button
               key={index}
-              disabled={slot.booked}
-              onClick={() => !slot.booked && onTimeSelect(slot.time)}
+              // disabled={slot.booked}
+              onClick={() => {
+                if (slot.booked) {
+                  dialogRef.current?.openDialogWithBooking(slot.bookedId);
+                } else {
+                  toggleAvailability(slot);
+                }
+              }}
               className={cn(
                 "relative py-3 px-2 text-sm rounded-md border transition-colors",
-                slot.booked && "cursor-not-allowed",
-                !slot.available &&
-                  !slot.booked &&
-                  "bg-slate-50 border-slate-200 text-slate-400",
+                // slot.booked && "cursor-not-allowed",
+                !slot.available && !slot.booked && "bg-slate-50 border-slate-200 text-slate-400",
                 slot.booked
                   ? "bg-blue-50 border-blue-200 text-blue-700"
-                  : selectedTime === slot.time
-                  ? "bg-teal-50 border-teal-200 text-teal-700"
                   : slot.available && !slot.booked
-                  ? "hover:bg-teal-50 hover:border-teal-200"
-                  : ""
-              )}>
+                    ? "bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-100"
+                    : "hover:bg-slate-100"
+              )}
+            >
               <div className="flex items-center justify-center gap-1">
                 <Clock3
                   className={cn(
@@ -97,11 +107,11 @@ export function TimeSlots({
                     slot.booked
                       ? "text-blue-600"
                       : slot.available
-                      ? "text-teal-600"
-                      : "text-slate-400"
+                        ? "text-teal-600"
+                        : "text-slate-400"
                   )}
                 />
-                {slot.time}
+                {slot.start}
               </div>
 
               {slot.booked && slot.patient && (
@@ -111,25 +121,25 @@ export function TimeSlots({
               )}
 
               {slot.booked && (
-                <Badge className="absolute -top-2 -right-2 bg-blue-500">
-                  Đã đặt
-                </Badge>
+                <Badge className="absolute -top-2 -right-2 bg-blue-500">Đã đặt</Badge>
               )}
             </button>
           ))}
         </div>
+        <BookingDetailDialog ref={dialogRef} />
       </CardContent>
+
       <CardFooter className="flex justify-between text-sm text-slate-500 border-t pt-4">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+          <div className="w-3 h-3 rounded-full bg-teal-500" />
           <span>Khả dụng: {stats.available}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+          <div className="w-3 h-3 rounded-full bg-blue-500" />
           <span>Đã đặt: {stats.booked}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-slate-300"></div>
+          <div className="w-3 h-3 rounded-full bg-slate-300" />
           <span>Không khả dụng</span>
         </div>
       </CardFooter>

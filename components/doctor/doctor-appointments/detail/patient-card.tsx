@@ -7,6 +7,7 @@ import { Mail, MapPin, MessageSquare, Phone, User } from "lucide-react";
 import PatientRecordModal from "@/components/doctor/doctor-appointments/patient-record-modal";
 import { useEffect, useState } from "react";
 import http from "@/helper/axios";
+import { getFullURL } from '@/helper/url';
 
 interface Pops {
   bookingId: number | string | null;
@@ -45,7 +46,7 @@ export default function PatientCard({ bookingId }: Pops) {
           <CardContent>
             <div className="flex flex-col items-center text-center mb-4">
               <Avatar className="h-20 w-20 mb-3">
-                <AvatarImage src={patient.img || "/placeholder.svg"} />
+                <AvatarImage src={getFullURL(patient.img) || "/placeholder.svg"} />
                 <AvatarFallback className="bg-slate-100 text-lg">
                   {patient.name ? patient.name.charAt(0) : "?"}
                 </AvatarFallback>

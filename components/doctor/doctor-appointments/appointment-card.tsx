@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import PatientRecordModal from "./patient-record-modal";
+import { getFullURL } from "@/helper/url";
 export function AppointmentCard({ appointment, showActions = true }: any) {
   const statusConfig = {
     confirmed: { label: "Đã xác nhận", color: "bg-blue-100 text-blue-700" },
@@ -36,7 +37,7 @@ export function AppointmentCard({ appointment, showActions = true }: any) {
               <Avatar className="h-12 w-12 border">
                 <AvatarImage
                   src={
-                    appointment?.patient?.img ??
+                    getFullURL(appointment?.patient?.img) ??
                     `/placeholder.svg?height=48&width=48`
                   }
                 />

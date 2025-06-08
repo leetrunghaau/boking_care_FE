@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { UserCircle, LogOut } from "lucide-react"
 import UserDropdown from "./user-dropdown"
+import AdminDropdown from "./admin-dropdown"
 
 export default function AdminHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(true) // Giả sử trạng thái đăng nhập
@@ -28,23 +29,23 @@ export default function AdminHeader() {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
-            <span className="text-xl font-bold text-teal-600">BookingCare</span>
+            <span className="text-xl font-bold text-teal-600">Admin.Med+</span>
           </Link>
         </div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-6">
-          <Link href="/chuyen-khoa" className="text-md font-medium hover:text-teal-600 transition-colors">
-            Chuyên khoa
+          <Link href="/admin" className="text-md font-medium hover:text-teal-600 transition-colors">
+            Tổng quan
           </Link>
-          <Link href="/co-so-y-te" className="text-md font-medium hover:text-teal-600 transition-colors">
+          <Link href="/admin/facilities" className="text-md font-medium hover:text-teal-600 transition-colors">
             Cơ sở y tế
           </Link>
-          <Link href="/bac-si" className="text-md font-medium hover:text-teal-600 transition-colors">
+          <Link href="/admin/doctors" className="text-md font-medium hover:text-teal-600 transition-colors">
             Bác sĩ
           </Link>
-          <Link href="/dat-lich-kham" className="text-md font-medium hover:text-teal-600 transition-colors">
-            Đặt lịch khám
+          <Link href="/admin/patient" className="text-md font-medium hover:text-teal-600 transition-colors">
+            Bệnh nhân
           </Link>
           <Link href="/huong-dan" className="text-md font-medium hover:text-teal-600 transition-colors">
             Hướng dẫn
@@ -53,32 +54,8 @@ export default function AdminHeader() {
 
         {/* Actions */}
         <div className="flex items-center gap-5">
-          <>
-          <Link
-                  href="/benh-nhan"
-                  className="text-sm font-medium hover:text-teal-600 transition-colors hidden sm:inline-flex"
-                >
-                  Hỗ trợ
-                </Link>
-            {isLoggedIn ? (
-              // <UserDropdown user={userInfo} />
-              <></>
-            ) : (
-              <>
-                <Link
-                  href="/xac-thuc/dang-nhap">
-                  <Button variant="outline" className="hidden md:inline-flex">
-                    Đăng nhập
-                  </Button>
-                </Link>
-                <Link
-                  href="/xac-thuc/dang-ky">
-                  <Button className="bg-teal-600 hover:bg-teal-700">Đăng ký</Button>
-                </Link>
-              </>
-            )}
-
-          </>
+          
+          <AdminDropdown/>
         </div>
       </div>
     </header>

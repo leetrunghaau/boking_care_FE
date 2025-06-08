@@ -1,4 +1,5 @@
 // components/Hospital/HospitalList.tsx
+import { getFullURL } from "@/helper/url";
 import { HospitalShort } from "@/types/hospital";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ const HospitalList: React.FC<HospitalListProps> = ({ hospitals }) => {
         <div key={hospital.id} className="border rounded-lg overflow-hidden shadow-sm bg-white">
           <div className="relative h-40 w-full">
             <img
-              src={hospital.thumbnail}
+              src={getFullURL(hospital.thumbnail) || "/placeholder.svg"}
               alt={hospital.name}
               className="w-full h-full object-cover"
             />

@@ -23,6 +23,7 @@ import {
 import { AlertCircle, Plus, X, Trash2, Upload, MapPin } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { getFullURL } from '@/helper/url';
 
 const fakeFacilityData = {
   id: "123",
@@ -100,10 +101,11 @@ export default function EditFacilityPage() {
 
   const handleSave = () => {
     setSaving(true);
+    console.log("data save", facility)
     // Simulate API call
     setTimeout(() => {
       setSaving(false);
-      router.push("/admin/facilities");
+      // router.push("/admin/facilities");
     }, 1000);
   };
 
@@ -186,6 +188,7 @@ export default function EditFacilityPage() {
   }
 
   return (
+
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Chỉnh sửa cơ sở y tế</h1>
@@ -193,20 +196,13 @@ export default function EditFacilityPage() {
           <Button variant="outline" onClick={() => router.back()}>
             Hủy
           </Button>
-          <Button onClick={handleSave} disabled={saving}>
+          <Button onClick={handleSave} disabled={saving} className="bg-teal-600 hover:bg-teal-700">
             {saving ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </div>
       </div>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Lưu ý</AlertTitle>
-        <AlertDescription>
-          Thông tin cơ sở y tế sẽ được hiển thị công khai sau khi được phê
-          duyệt.
-        </AlertDescription>
-      </Alert>
+     
 
       <Tabs defaultValue="basic">
         <TabsList className="grid w-full grid-cols-5">
@@ -326,7 +322,7 @@ export default function EditFacilityPage() {
               <div className="space-y-4">
                 <div className="border rounded-lg p-4 flex flex-col items-center justify-center">
                   <img
-                    src={facility.image || "/placeholder.svg"}
+                    src={getFullURL(facility.image) || "/placeholder.svg"}
                     alt="Hình ảnh đại diện"
                     className="w-full h-48 object-cover rounded-lg mb-4"
                   />
@@ -516,7 +512,7 @@ export default function EditFacilityPage() {
                     <Card key={index}>
                       <div className="relative">
                         <img
-                          src={doctor.image || "/placeholder.svg"}
+                          src={getFullURL(doctor.image) || "/placeholder.svg"}
                           alt={doctor.name}
                           className="w-full h-48 object-cover rounded-t-lg"
                         />
@@ -561,7 +557,7 @@ export default function EditFacilityPage() {
                   {facility.gallery.map((image: string, index: number) => (
                     <div key={index} className="relative group">
                       <img
-                        src={image || "/placeholder.svg"}
+                        src={getFullURL(image) || "/placeholder.svg"}
                         alt={`Gallery ${index}`}
                         className="w-full h-48 object-cover rounded-lg"
                       />
@@ -670,15 +666,6 @@ export default function EditFacilityPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={() => router.back()}>
-          Hủy
-        </Button>
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? "Đang lưu..." : "Lưu thay đổi"}
-        </Button>
-      </div>
     </div>
   );
 }

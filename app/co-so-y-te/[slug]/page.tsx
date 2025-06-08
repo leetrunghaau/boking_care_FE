@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import http from "@/helper/axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { handleApiError } from "@/helper/toast-utils";
+import { getFullURL } from "@/helper/url";
 
 export default function HealthFacilityDetailPage() {
   const { slug } = useParams();
@@ -63,7 +64,7 @@ export default function HealthFacilityDetailPage() {
             <Card key={doc.id}>
               <div className="relative h-[200px] w-full">
                 <Image
-                  src={doc.img ?? "/placeholder.svg"}
+                  src={getFullURL(doc.img) || "/placeholder.svg"}
                   alt={doc.name}
                   fill
                   className="object-cover"
@@ -90,7 +91,7 @@ export default function HealthFacilityDetailPage() {
           {data.imgs.map((item: string, index: number) => (
             <div key={index} className="rounded overflow-hidden shadow">
               <Image
-                src={item}
+                src={getFullURL(item) || "/placeholder.svg"}
                 alt={`Gallery ${item}`}
                 width={400}
                 height={300}
@@ -110,8 +111,8 @@ export default function HealthFacilityDetailPage() {
           <div className="relative h-[300px] w-full rounded-lg overflow-hidden">
             {data?.thumbnail ? (
               <>
-                <Image
-                  src={data.thumbnail}
+                <Image  
+                  src={getFullURL(data.thumbnail) || "/placeholder.svg"}
                   alt={data.name}
                   fill
                   className="object-cover"
