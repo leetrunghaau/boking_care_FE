@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="container ">
           <Link href="/" className="flex items-center gap-2 ml-10">
             <Stethoscope className="h-6 w-6 text-teal-600" />
-            <span className="text-xl font-bold text-teal-600">BookingCare</span>
+            <span className="text-xl font-bold text-teal-600">Med+</span>
           </Link>
         </div>
       </header>
@@ -38,7 +38,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <footer className="py-6 text-center text-sm text-muted-foreground">
         <div className="container">
-          <p>&copy; {new Date().getFullYear()} BookingCare. Tất cả quyền được bảo lưu.</p>
+          <p>&copy; {new Date().getFullYear()} Med+. Tất cả quyền được bảo lưu.</p>
         </div>
       </footer>
     </div>

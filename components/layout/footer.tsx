@@ -12,7 +12,7 @@ export default function Footer() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Stethoscope className="h-6 w-6 text-teal-500" />
-                <span className="text-xl font-bold text-white">BookingCare</span>
+                <span className="text-xl font-bold text-white">Med+</span>
               </div>
               <p className="mb-4">Nền tảng đặt lịch khám bệnh và chăm sóc sức khỏe toàn diện hàng đầu Việt Nam</p>
               <div className="flex gap-4">
@@ -50,7 +50,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="font-bold text-white text-lg mb-4">Về BookingCare</h3>
+              <h3 className="font-bold text-white text-lg mb-4">Về Med+</h3>
               <ul className="space-y-2">
                 <li>
                   <Link href="#" className="hover:text-white">
@@ -176,7 +176,7 @@ export default function Footer() {
           </div>
 
           <div className="border-t border-slate-800 mt-10 pt-6 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} BookingCare. Tất cả quyền được bảo lưu.</p>
+            <p>&copy; {new Date().getFullYear()} Med+. Tất cả quyền được bảo lưu.</p>
           </div>
         </div>
       </footer>

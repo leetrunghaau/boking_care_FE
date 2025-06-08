@@ -12,9 +12,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { formatCurrencyVND } from "@/helper/customNumView"
-import { useBookingStore } from "@/store/booking"
 
+import moment from "moment";
+import "moment/locale/vi";
 
 interface Pops {
   slug: string,
@@ -26,9 +26,14 @@ export default function DoctorSchedule({ slug }: Pops) {
   const [availableTimes, setAvailableTimes] = useState<any[]>([])
   const [info, setInfo] = useState<any | null>(null)
 
+  const [listDates, setListDates] = useState<any[]>([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
+
+  const onDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -43,6 +48,32 @@ export default function DoctorSchedule({ slug }: Pops) {
       }
 
     }
+
+    const fetchWorkingDays = async () => {
+      try {
+        const res = await http.get<string[]>(`/doctor-site/doctor/${slug}/working-days`); // vi dụ: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+        const generatedDates = Array.from({ length: 7 }, (_, i) => {
+          const mDate = moment().add(i, "days").locale("vi");
+          const dayShort = mDate.format("ddd"); // ví dụ: "T2"
+          return {
+            date: mDate.toDate(),
+            disabled: !res.includes(dayShort),
+          };
+        });
+
+        setListDates(generatedDates);
+
+        const firstAvailable = generatedDates.find(d => !d.disabled);
+        if (firstAvailable) {
+          setSelectedDate(firstAvailable.date);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch time slots:", error);
+      } finally {
+      }
+    }
+    fetchWorkingDays()
     loadData()
   }, [])
 
@@ -94,22 +125,33 @@ export default function DoctorSchedule({ slug }: Pops) {
             </div>
 
             <div className="flex overflow-x-auto pb-2 -mx-1">
-              {dates.map((date, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedDate(date)}
-                  className={cn(
-                    "flex flex-col items-center min-w-[4.5rem] mx-1 p-2 rounded-md border transition-colors",
-                    selectedDate.toDateString() === date.toDateString()
-                      ? "bg-teal-50 border-teal-200 text-teal-700"
-                      : "hover:bg-slate-50",
-                  )}
-                >
-                  <span className="text-xs font-medium">{format(date, "EEE", { locale: vi })}</span>
-                  <span className="text-lg font-bold">{format(date, "dd", { locale: vi })}</span>
-                  <span className="text-xs">{format(date, "MM", { locale: vi })}</span>
-                </button>
-              ))}
+              {listDates.map((iDay, index) => {
+                const mDate = moment(iDay.date);
+                return (
+                  <button
+                    disabled={iDay.disabled}
+                    key={index}
+                    onClick={() => onDateSelect(iDay.date)}
+                    className={cn(
+                      "flex flex-col items-center min-w-[4.5rem] mx-1 p-2 rounded-md border transition-colors",
+                      moment(selectedDate).isSame(iDay.date, "day")
+                        ? "bg-teal-50 border-teal-200 text-teal-700"
+                        : "hover:bg-slate-50",
+                      iDay.disabled
+                        ? "border-slate-200 text-slate-400 cursor-not-allowed"
+                        : "border-teal-200"
+                    )}
+                  >
+                    <span className="text-xs font-medium">
+                      {mDate.format("ddd")}
+                    </span>
+                    <span className="text-lg font-bold">
+                      {mDate.format("DD")}
+                    </span>
+                    <span className="text-xs">{mDate.format("MM")}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -155,7 +197,7 @@ export default function DoctorSchedule({ slug }: Pops) {
             onClick={() => {
               const queryParams = new URLSearchParams();
               queryParams.set("curStep", "3");
-             queryParams.set("date", format(selectedDate, "yyyy-MM-dd"));
+              queryParams.set("date", format(selectedDate, "yyyy-MM-dd"));
               if (selectedTime) {
                 queryParams.set("time", selectedTime.toString());
               }

@@ -1,0 +1,10 @@
+id: number
+gender: ('male', 'female', 'other')
+
+  dob:'YYYY-MM-DD'
+
+  phone:string
+
+  email: string
+
+  img: upload hình ảnh

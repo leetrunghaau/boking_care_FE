@@ -1,0 +1,5 @@
+kinh nghiệm từng làm việc
+id: number
+position: string  (vị trí đã làm)
+organization: string (nơi tiwngf làm việc)
+startYear, endYear: thời gian của làm công việc đó

@@ -1,0 +1,12 @@
+mãng học vấn
+id: number
+degree: string
+school: string
+year: number (năm hoàn thành học vấn)
+
+mãng ngôn ngữ sử dụng
+id: number
+name:string
+
+
+

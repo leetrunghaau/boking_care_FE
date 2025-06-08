@@ -1,0 +1,4 @@
+
+interface doctor {
+    id:number[]
+}   

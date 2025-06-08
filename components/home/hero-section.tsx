@@ -105,12 +105,12 @@ export default function HeroSection() {
             </Button>
 
             {/* Secondary CTA */}
-            <div className="pt-2">
+            {/* <div className="pt-2">
               <Button variant="ghost" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-medium">
                 <Search className="mr-2 h-4 w-4" />
                 Tìm bác sĩ theo chuyên khoa
               </Button>
-            </div>
+            </div> */}
           </div>
 
           {/* Trust Indicators */}

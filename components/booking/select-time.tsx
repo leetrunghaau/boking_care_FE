@@ -22,6 +22,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { handleApiError } from "@/helper/toast-utils";
 import { getFullURL } from '@/helper/url';
 
+import moment from "moment";
+import "moment/locale/vi";
+
 export default function SelectTime() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +35,8 @@ export default function SelectTime() {
   const [availableTimes, setAvailableTimes] = useState<any[]>([]);
   const [doctor, setDoctor] = useState<any | null>(null);
 
+  const [listDates, setListDates] = useState<any[]>([]);
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [doctorLoad, setDoctorLoad] = useState<boolean>(false);
 
@@ -41,6 +46,7 @@ export default function SelectTime() {
       setIsLoading(true);
       try {
         const res = await http.get<any[]>(`/booking/doctor/${doctorIdParam}`);
+        console.log("doctor info", res)
         setDoctor(res);
       } catch (err) {
         handleApiError(err, "Lấy thời gian làm việc bác sĩ thất bại.");
@@ -48,6 +54,31 @@ export default function SelectTime() {
         setIsLoading(false);
       }
     };
+    const fetchWorkingDays = async () => {
+      try {
+        const res = await http.get<string[]>(`/booking/doctor/${doctorIdParam}/working-days`); // vi dụ: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+        const generatedDates = Array.from({ length: 7 }, (_, i) => {
+          const mDate = moment().add(i, "days").locale("vi");
+          const dayShort = mDate.format("ddd"); // ví dụ: "T2"
+          return {
+            date: mDate.toDate(),
+            disabled: !res.includes(dayShort),
+          };
+        });
+
+        setListDates(generatedDates);
+
+        const firstAvailable = generatedDates.find(d => !d.disabled);
+        if (firstAvailable) {
+          setSelectedDate(firstAvailable.date);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch time slots:", error);
+      } finally {
+      }
+    }
+    fetchWorkingDays();
     fetchData();
   }, []);
 
@@ -73,6 +104,10 @@ export default function SelectTime() {
     fetchData();
   }, [selectedDate]);
 
+
+  const onDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
   const handleBackStep = () => {
     const currentParams = new URLSearchParams(searchParams.toString());
     currentParams.set("curStep", "1");
@@ -105,30 +140,33 @@ export default function SelectTime() {
         </CardHeader>
 
         <CardContent className="flex justify-center">
-          {dates.map((date, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setSelectedDate(date);
-                setSelectedTime(null);
-              }}
-              className={cn(
-                "flex flex-col items-center min-w-[4.5rem] mx-1 p-2 rounded-md border transition-colors",
-                selectedDate && isSameDay(selectedDate, date)
-                  ? "bg-teal-50 border-teal-200 text-teal-700"
-                  : "hover:bg-slate-50"
-              )}>
-              <span className="text-xs font-medium">
-                {format(date, "EEE", { locale: vi })}
-              </span>
-              <span className="text-lg font-bold">
-                {format(date, "dd", { locale: vi })}
-              </span>
-              <span className="text-xs">
-                {format(date, "MM", { locale: vi })}
-              </span>
-            </button>
-          ))}
+          {listDates.map((iDay, index) => {
+            const mDate = moment(iDay.date);
+            return (
+              <button
+                disabled={iDay.disabled}
+                key={index}
+                onClick={() => onDateSelect(iDay.date)}
+                className={cn(
+                  "flex flex-col items-center min-w-[4.5rem] mx-1 p-2 rounded-md border transition-colors",
+                  moment(selectedDate).isSame(iDay.date, "day")
+                    ? "bg-teal-50 border-teal-200 text-teal-700"
+                    : "hover:bg-slate-50",
+                  iDay.disabled
+                    ? "border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "border-teal-200"
+                )}
+              >
+                <span className="text-xs font-medium">
+                  {mDate.format("ddd")}
+                </span>
+                <span className="text-lg font-bold">
+                  {mDate.format("DD")}
+                </span>
+                <span className="text-xs">{mDate.format("MM")}</span>
+              </button>
+            );
+          })}
         </CardContent>
       </Card>
     );
@@ -159,12 +197,12 @@ export default function SelectTime() {
                     className={cn(
                       "py-2 px-1 text-sm rounded-md border transition-colors",
                       !slot.available &&
-                        "opacity-50 cursor-not-allowed bg-slate-50",
+                      "opacity-50 cursor-not-allowed bg-slate-50",
                       selectedTime === slot.start
                         ? "bg-teal-50 border-teal-200 text-teal-700"
                         : slot.available
-                        ? "hover:bg-slate-50"
-                        : ""
+                          ? "hover:bg-slate-50"
+                          : ""
                     )}>
                     {slot.start}
                   </button>

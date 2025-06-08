@@ -1,5 +1,6 @@
 "use client"
 
+import PatientRecordModal from "@/components/admin/admin-patient/patient-record-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -183,10 +184,7 @@ export default function AdminPatientsPage() {
                       <TableCell>{patient.address}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="outline" size="icon" className="h-8 w-8 text-teal-600">
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">Xem hồ sơ</span>
-                          </Button>
+                          <PatientRecordModal patientId={patient.id} />
                           <Button
                             variant="outline"
                             size="icon"
