@@ -1,9 +1,23 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 export default function Unauthorized() {
   const router = useRouter();
+  const [countdown, setCountdown] = useState(3);
+  useEffect(() => {
+    if (countdown === 0) {
+      router.push("/xac-thuc/dang-nhap");
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   return (
     <main className="min-h-screen ">
@@ -32,6 +46,9 @@ export default function Unauthorized() {
             <p className="text-gray-700">
               Vui lòng đăng nhập để truy cập trang này.
             </p>
+            <p className="text-sm text-gray-500">
+              Tự động chuyển hướng sau {countdown} giây...
+            </p>
           </div>
         </div>
 
@@ -58,8 +75,6 @@ export default function Unauthorized() {
             </Button>
           </div>
         </div>
-
-        {/* Footer */}
       </div>
     </main>
   );

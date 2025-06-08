@@ -1,16 +1,8 @@
+// app/edit-profile/page.tsx (hoặc đường dẫn tương tự của bạn)
 "use client";
 
-import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { AvatarUploader } from "@/components/share/avata-upload";
 import {
   Card,
   CardContent,
@@ -18,9 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AvatarUploader } from "@/components/share/avata-upload";
 import http from "@/helper/axios";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
+
+// Import các component con đã tách ra
+import PersonalInfoCard from "./PersonalInfoCard";
+import RelativeInfoCard from "./RelativeInfoCard";
 
 export default function EditProfilePage() {
   const [form, setForm] = useState({
@@ -38,86 +35,81 @@ export default function EditProfilePage() {
     phone: "",
     address: "",
   });
+  const [loading, setLoading] = useState(true);
+  const fetched = useRef(false);
 
-  const [loading, setLoading] = useState(false);
+  // Sử dụng useCallback để đảm bảo các hàm này không thay đổi khi re-render EditProfilePage
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleRelativeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setRelative((prev) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
 
-  const handleRelativeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRelative({ ...relative, [e.target.name]: e.target.value });
-  };
+  const handleGenderChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, gender: value }));
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await http.get<any>("/patient/my-info");
-        console.log("jaf", res);
-        if (res && res.status) {
-          setForm(res.info);
-          setRelative(res.relative);
+        if (res?.status && !fetched.current) {
+          // Cập nhật state với dữ liệu nhận được
+          setForm((prev) => ({ ...prev, ...res.info }));
+          setRelative((prev) => ({ ...prev, ...res.relative }));
+          fetched.current = true;
         }
       } catch (err) {
-        console.error(err);
+        handleApiError(err, "Không thể tải thông tin cá nhân");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, []); // [] đảm bảo useEffect chỉ chạy một lần khi component mount
+
   const handleSubmit = async () => {
     try {
-      const info = await http.post<any>("/patient/info", {
+      const res = await http.post<any>("/patient/info", {
         info: form,
-        relative: relative,
+        relative,
       });
-
-      if (info && info.status) {
-        setForm(info.info);
-        setRelative(info.relative);
+      if (res?.status) {
+        handleApiSuccess("Thông tin tài khoản được cập nhật thành công.");
       } else {
-        handleApiError(info?.mess, "Cập nhật thông tin cá nhân thất bại.");
-
-        return;
+        handleApiError(res?.mess, "Cập nhật thông tin cá nhân thất bại.");
       }
-
-      handleApiSuccess("Thông tin tài khoản được cập nhật thành công.");
     } catch (err) {
       handleApiError(err, "Cập nhật thông tin thất bại.");
-    } finally {
     }
   };
-
-  const Field = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <div className="space-y-1.5">
-      <p className="text-sm font-medium text-gray-700">{label}</p>
-      {children}
-    </div>
-  );
 
   const handleAvatarChange = async (change: any) => {
-    if (change.type === "new") {
-      try {
+    try {
+      if (change.type === "new") {
         await http.postFile("/patient/avatar", change.value);
-      } catch (err) {
-        handleApiError(err, "Không thể tải lên ảnh đại diện");
-      }
-    }
-    if (change.type === "remove") {
-      try {
+        // Cập nhật đường dẫn ảnh mới vào state form nếu API trả về hoặc bạn có thể xây dựng URL
+        // Ví dụ: setForm(prev => ({ ...prev, img: "new_avatar_url_from_api" }));
+      } else if (change.type === "remove") {
         await http.delete("/patient/avatar");
-      } catch (err) {
-        handleApiError(err, "Không thể xoá avatar");
+        setForm((prev) => ({ ...prev, img: null })); // Xóa ảnh đại diện khỏi state
       }
+    } catch (err) {
+      handleApiError(err, "Không thể xử lý ảnh đại diện");
     }
   };
+
+  if (loading) {
+    return <div className="text-center py-10">Đang tải dữ liệu...</div>;
+  }
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
@@ -131,109 +123,39 @@ export default function EditProfilePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Card Ảnh đại diện */}
         <Card className="md:col-span-1">
           <CardHeader>
             <CardTitle>Ảnh đại diện</CardTitle>
           </CardHeader>
-
           <CardContent>
             <AvatarUploader
               initialAvatar={getFullURL(form.img)}
               onChange={handleAvatarChange}
             />
           </CardContent>
-
           <CardFooter>
             <p className="text-sm text-gray-500 text-center w-full">
-              Click hoặt kéo thả để chọn ảnh đại điện.
+              Click hoặc kéo thả để chọn ảnh đại diện.
             </p>
           </CardFooter>
         </Card>
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Thông tin cá nhân</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Họ và tên">
-              <Input name="name" value={form.name} onChange={handleChange} />
-            </Field>
-            <Field label="Ngày sinh">
-              <Input
-                name="dob"
-                type="date"
-                value={form.dob}
-                onChange={handleChange}
-              />
-            </Field>
-            <Field label="Giới tính">
-              <Select
-                value={form.gender}
-                onValueChange={(v) => setForm({ ...form, gender: v })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn giới tính" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Nam</SelectItem>
-                  <SelectItem value="female">Nữ</SelectItem>
-                  <SelectItem value="other">Khác</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Số điện thoại">
-              <Input name="phone" value={form.phone} onChange={handleChange} />
-            </Field>
-            <Field label="Email">
-              <Input name="email" value={form.email} onChange={handleChange} />
-            </Field>
-            <Field label="Địa chỉ">
-              <Input
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-              />
-            </Field>
-          </CardContent>
-        </Card>
+
+        {/* Component Thông tin cá nhân */}
+        <PersonalInfoCard
+          form={form}
+          handleChange={handleChange}
+          handleGenderChange={handleGenderChange}
+        />
       </div>
 
-      {/* Người thân */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Thông tin người thân liên lạc khi cần</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Họ và tên người thân">
-            <Input
-              name="name"
-              value={relative?.name ?? ""}
-              onChange={handleRelativeChange}
-            />
-          </Field>
-          <Field label="Mối quan hệ">
-            <Input
-              name="relationship"
-              value={relative?.relationship ?? ""}
-              onChange={handleRelativeChange}
-            />
-          </Field>
-          <Field label="Số điện thoại người thân">
-            <Input
-              name="phone"
-              value={relative?.phone ?? ""}
-              onChange={handleRelativeChange}
-            />
-          </Field>
-          <Field label="Địa chỉ người thân">
-            <Input
-              name="address"
-              value={relative?.address ?? ""}
-              onChange={handleRelativeChange}
-            />
-          </Field>
-        </CardContent>
-      </Card>
+      {/* Component Thông tin người thân */}
+      <RelativeInfoCard
+        relative={relative}
+        handleRelativeChange={handleRelativeChange}
+      />
 
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-8">
         <Button
           onClick={handleSubmit}
           className="bg-teal-600 hover:bg-teal-700 text-white">

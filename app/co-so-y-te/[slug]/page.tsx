@@ -8,8 +8,10 @@ import http from "@/helper/axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { handleApiError } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
+import { useRouter } from "next/router";
 
 export default function HealthFacilityDetailPage() {
+  const router = useRouter();
   const { slug } = useParams();
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -111,7 +113,7 @@ export default function HealthFacilityDetailPage() {
           <div className="relative h-[300px] w-full rounded-lg overflow-hidden">
             {data?.thumbnail ? (
               <>
-                <Image  
+                <Image
                   src={getFullURL(data.thumbnail) || "/placeholder.svg"}
                   alt={data.name}
                   fill
@@ -223,7 +225,9 @@ export default function HealthFacilityDetailPage() {
           <p className="text-lg">
             Chúng tôi sẵn sàng hỗ trợ bạn đặt lịch khám nhanh chóng, tiện lợi.
           </p>
-          <Button className="bg-white text-teal-600 hover:bg-slate-100 h-12 px-8 text-base">
+          <Button
+            className="bg-white text-teal-600 hover:bg-slate-100 h-12 px-8 text-base"
+            onClick={() => router.push("/dat-lich-kham")}>
             Đặt lịch khám
           </Button>
         </div>
