@@ -1,43 +1,52 @@
-"use client"
+"use client";
 
 import PatientRecordModal from "@/components/admin/admin-patient/patient-record-modal";
+import ConfirmDeleteModal, {
+  ConfirmDeleteModalHandle,
+} from "@/components/share/confirm-delete-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TableLoading, Skeleton } from "@/components/ui/loading";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/loading";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import http from "@/helper/axios";
 import { getIconByName } from "@/helper/icon-map";
-import { handleErorr } from "@/helper/toast-utils";
+import { handleApiSuccess, handleErorr } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
-import { Briefcase, CheckCircle, Edit, Eye, Search, Stethoscope, XCircle } from "lucide-react";
+import { Key, Search, XCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-
-
-
+import ResetPasswordModal, {
+  ResetPasswordModalHandle,
+} from "@/components/share/reset-password-modal";
 export default function AdminPatientsPage() {
-
   const searchParams = useSearchParams();
   const router = useRouter();
-  const initParms = new URLSearchParams(searchParams.toString())
+  const initParms = new URLSearchParams(searchParams.toString());
 
-  const [search, setSearch] = useState(initParms.get('search') ?? '')
-  const [page, setPage] = useState(Math.max(Number(initParms.get('page')) || 1, 1))
-  const [total, setTotal] = useState(1)
-  const [loadingPatient, setLoadingPatient] = useState(false)
+  const [search, setSearch] = useState(initParms.get("search") ?? "");
+  const [page, setPage] = useState(
+    Math.max(Number(initParms.get("page")) || 1, 1)
+  );
+  const [total, setTotal] = useState(1);
+  const [loadingPatient, setLoadingPatient] = useState(false);
 
-
-  const [patients, setPatients] = useState<any[]>([])
+  const [patients, setPatients] = useState<any[]>([]);
 
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
   const loadPatient = async (searchInput?: string) => {
@@ -45,41 +54,41 @@ export default function AdminPatientsPage() {
     const setIfExists = (key: string, value: any) => {
       value ? params.set(key, value.toString()) : params.delete(key);
     };
-    setIfExists('page', page);
+    setIfExists("page", page);
     if (searchInput) {
-      setIfExists('search', searchInput);
+      setIfExists("search", searchInput);
     } else {
-      setIfExists('search', search);
+      setIfExists("search", search);
     }
     router.push(`?${params.toString()}`);
-    const queryString = params.toString()
+    const queryString = params.toString();
 
-    setLoadingPatient(true)
+    setLoadingPatient(true);
     try {
-      const rs = await http.get<any | null>(`/admin-patient/patients${queryString ? `?${queryString}` : ""}`)
-      console.log("Patient", rs)
+      const rs = await http.get<any | null>(
+        `/admin-patient/patients${queryString ? `?${queryString}` : ""}`
+      );
+      console.log("Patient", rs);
       if (rs) {
-        setPatients(rs.patients)
-        setTotal(rs.total)
+        setPatients(rs.patients);
+        setTotal(rs.total);
       }
     } catch (err) {
-      console.log(err)
-      handleErorr()
+      console.log(err);
+      handleErorr();
     } finally {
-      setLoadingPatient(false)
+      setLoadingPatient(false);
     }
-  }
-
+  };
 
   useEffect(() => {
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
-  }, [])
+  }, []);
   useEffect(() => {
-    loadPatient()
-  }, [ page])
-
+    loadPatient();
+  }, [page]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -92,11 +101,38 @@ export default function AdminPatientsPage() {
     }, 1000);
   };
 
+  const modalRef = useRef<ConfirmDeleteModalHandle>(null);
+
+  const deleteDoctor = async (id: number) => {
+    setLoadingPatient(true);
+    try {
+      const rs = await http.delete<any | null>(
+        `/admin-hospital/hospital/${id}`
+      );
+      if (rs) {
+        handleApiSuccess("Đã xóa cơ sở y tế thành công");
+        setPatients((prevItems) => prevItems.filter((item) => item.id !== id));
+      }
+    } catch (err) {
+      console.log(err);
+      handleErorr();
+    } finally {
+      setLoadingPatient(false);
+    }
+  };
+  const handleDelete = (item: any) => {
+    modalRef.current?.open({
+      title: "Xác nhận xóa ",
+      description: `Bạn có chắc chắn muốn xóa bệnh nhân ${item.name} không?`,
+      onConfirm: () => deleteDoctor(item.id),
+    });
+  };
+  const resetPasswordModalRef = useRef<ResetPasswordModalHandle>(null);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Quản lý bác sĩ</h1>
-
+        <h1 className="text-3xl font-bold tracking-tight">Quản lý bệnh nhân</h1>
       </div>
       <div className="bg-white rounded-lg shadow-md p-4 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -106,20 +142,18 @@ export default function AdminPatientsPage() {
               className="pl-10"
               value={search}
               onChange={(e) => {
-                handleSearch(e)
-                setPage(1)
+                handleSearch(e);
+                setPage(1);
               }}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
         </div>
 
-        <div className="flex justify-end mt-4">
-          <Button className="bg-teal-600 hover:bg-teal-700">Thêm bác sĩ</Button>
-        </div>
+        {/* <div className="flex justify-end mt-4">
+          <Button className="bg-teal-600 hover:bg-teal-700">Thêm bệnh nhân</Button>
+        </div> */}
       </div>
-
-
 
       <div className="rounded-md border">
         <Table>
@@ -135,81 +169,141 @@ export default function AdminPatientsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {
-              loadingPatient ?
-                <>
-                  <TableRow>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-12 w-full" /></TableCell>
-                  </TableRow>
-                </>
-                :
-                patients?.map((patient) => {
-                  const Icon = getIconByName(patient.specialtyIcon)
-                  return (
-                    <TableRow key={patient.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage
-                              src={getFullURL(patient.img) || "/placeholder.svg"}
-                              alt={patient.name}
-                            />
-                            <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{patient.name}</p>
-                            <p className="text-sm text-gray-500">{patient.code}</p>
-                          </div>
+            {loadingPatient ? (
+              <>
+                <TableRow>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-full" />
+                  </TableCell>
+                </TableRow>
+              </>
+            ) : (
+              patients?.map((patient) => {
+                const Icon = getIconByName(patient.specialtyIcon);
+                return (
+                  <TableRow key={patient.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage
+                            src={getFullURL(patient.img) || "/placeholder.svg"}
+                            alt={patient.name}
+                          />
+                          <AvatarFallback>
+                            {patient.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{patient.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {patient.code}
+                          </p>
                         </div>
-                      </TableCell>
-                      <TableCell>{patient.email}</TableCell>
-                      <TableCell>{patient.phone}</TableCell>
-                      <TableCell>{patient.dob}</TableCell>
-                      <TableCell>{patient.gender}</TableCell>
-                      <TableCell>{patient.address}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <PatientRecordModal patientId={patient.id} />
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 text-amber-600">
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Duyệt</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 text-destructive">
-                            <XCircle className="h-4 w-4" />
-                            <span className="sr-only">Từ chối</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-
+                      </div>
+                    </TableCell>
+                    <TableCell>{patient.email}</TableCell>
+                    <TableCell>{patient.phone}</TableCell>
+                    <TableCell>{patient.dob}</TableCell>
+                    <TableCell>{patient.gender}</TableCell>
+                    <TableCell>{patient.address}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <PatientRecordModal patientId={patient.id} />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 text-amber-600"
+                          onClick={() =>
+                            resetPasswordModalRef.current?.open({
+                              userName: patient.name,
+                              userEmail: patient.email,
+                              onConfirm: async (newPassword: string) => {
+                                console.log("New password is:", newPassword);
+                                try {
+                                  const rs = await http.post<any | null>(
+                                    `/admin-patient/patient/${patient.id}/host-re-pass`,
+                                    {
+                                      pass: newPassword,
+                                    }
+                                  );
+                                  if (rs?.status) {
+                                    handleApiSuccess(
+                                      `Đã đặt lại mật khẩu ${patient.email} thành ${newPassword}`
+                                    );
+                                  } else {
+                                    handleErorr(
+                                      rs?.mess ?? "Đặt lại mật khẩu thất bại"
+                                    );
+                                  }
+                                } catch (err) {
+                                  console.log(err);
+                                  handleErorr();
+                                }
+                              },
+                            })
+                          }>
+                          <Key className="h-4 w-4" />
+                          <span className="sr-only">Đặt lại mật khẩu</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={() => {
+                            handleDelete(patient);
+                          }}>
+                          <XCircle className="h-4 w-4" />
+                          <span className="sr-only">Xoá</span>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
         <div className="flex items-center justify-between px-4 py-2">
           <div className="text-sm text-muted-foreground">
-            Hiển thị {(page - 1) * 5 + 1}-{Math.min(page * 5, total)} của {total} bác sĩ
+            Hiển thị {(page - 1) * 5 + 1}-{Math.min(page * 5, total)} của{" "}
+            {total} bệnh nhân
           </div>
           <Pagination>
             <PaginationContent>
@@ -220,12 +314,14 @@ export default function AdminPatientsPage() {
                 />
               </PaginationItem>
 
-              {Array.from({ length: Math.ceil(total / 5) }, (_, i) => i + 1).map((pageNum) => (
+              {Array.from(
+                { length: Math.ceil(total / 5) },
+                (_, i) => i + 1
+              ).map((pageNum) => (
                 <PaginationItem key={pageNum}>
                   <PaginationLink
                     isActive={pageNum === page}
-                    onClick={() => setPage(pageNum)}
-                  >
+                    onClick={() => setPage(pageNum)}>
                     {pageNum}
                   </PaginationLink>
                 </PaginationItem>
@@ -233,15 +329,15 @@ export default function AdminPatientsPage() {
 
               <PaginationItem>
                 <PaginationNext
-
                   onClick={() => setPage(page + 1)}
                   isActive={page === Math.ceil(total / 5)}
                 />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-
         </div>
+        <ConfirmDeleteModal ref={modalRef} />
+        <ResetPasswordModal ref={resetPasswordModalRef} />
       </div>
     </div>
   );

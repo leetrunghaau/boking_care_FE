@@ -51,7 +51,6 @@ export default function ExaminationTab({ bookingId, disabled }: Pops) {
 
   const handleUpload = async (files: File[]) => {
     console.log("Đã upload:", files);
-    // TODO: Gửi files đến server hoặc API tại đây
   };
 
   const hanhdelSaveExamination = async () => {

@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,10 +7,11 @@ import MainHeader from "@/components/layout/header/main-header";
 import Footer from "../components/layout/footer";
 import PopularSpecialties from "@/components/home/popular-specialties";
 import PopularDoctors from "@/components/home/popular-doctors";
-import HeroSection1 from "@/components/home/hero-section1";
 import HeroSection from "@/components/home/hero-section";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
   return (
     <div className="flex min-h-screen flex-col w-full justify-center">
       {/* Header */}
@@ -122,7 +124,9 @@ export default function HomePage() {
               bác sĩ uy tín ngay bây giờ.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-white text-teal-600 hover:bg-slate-100 h-12 px-8 text-base">
+              <Button
+                className="bg-white text-teal-600 hover:bg-slate-100 h-12 px-8 text-base"
+                onClick={() => router.push("/dat-lich-kham")}>
                 Đặt lịch khám
               </Button>
               <Button

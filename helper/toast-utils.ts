@@ -18,7 +18,7 @@ export function handleApiError(
   toast({
     title,
     description: message,
-    variant: "destructive",
+    variant: "error",
     duration: 2000,
   });
 }

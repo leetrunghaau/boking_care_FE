@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Camera, Edit, Save, Upload } from "lucide-react";
 import { getFullURL } from "@/helper/url";
 import http from "@/helper/axios";
 import { handleErorr } from "@/helper/toast-utils";
@@ -27,7 +25,7 @@ export default function DoctorProfilePage() {
         const res = await http.get<any>("/doctor-profile/profile");
         if (res) {
           setInfo(res);
-          console.log("thông tin ", res)
+          console.log("thông tin ", res);
         } else {
           handleErorr(res?.st ?? "Không thể lấy thông tin bác sĩ");
         }
@@ -42,7 +40,6 @@ export default function DoctorProfilePage() {
     fetchUserData();
   }, []);
 
-
   return (
     <div className="container mx-auto py-6 space-y-6 w-11/12">
       {/* Tiêu đề trang */}
@@ -50,7 +47,6 @@ export default function DoctorProfilePage() {
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
           Hồ sơ cá nhân
         </h1>
-
       </div>
 
       {/* Thông tin cá nhân */}
@@ -69,36 +65,27 @@ export default function DoctorProfilePage() {
                     {info?.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-
               </div>
 
-              <h2 className="text-xl font-bold text-slate-800">
-                {info?.name}
-              </h2>
-              <p className="text-sm text-slate-500 mt-1">
-                {info?.specialty}
-              </p>
+              <h2 className="text-xl font-bold text-slate-800">{info?.name}</h2>
+              <p className="text-sm text-slate-500 mt-1">{info?.specialty}</p>
 
               <div className="flex flex-wrap gap-2 mt-3 justify-center">
                 {info?.techniques?.map((t: any) => (
                   <Badge
-                  key={t.id}
+                    key={t.id}
                     className="bg-teal-100 text-teal-800 hover:bg-teal-200">
                     {t.techniqueName}
                   </Badge>
-                ))
-                }
+                ))}
               </div>
 
               <Separator className="my-4" />
 
               <div className="w-full space-y-3">
-
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Giới tính:</span>
-                  <span className="text-sm font-medium">
-                    {info?.gender}
-                  </span>
+                  <span className="text-sm font-medium">{info?.gender}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Ngày sinh:</span>
@@ -114,13 +101,9 @@ export default function DoctorProfilePage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Phí khám bệnh:</span>
-                  <span className="text-sm font-medium">
-                    {info?.price}
-                  </span>
+                  <span className="text-sm font-medium">{info?.price}</span>
                 </div>
               </div>
-
-
             </div>
           </CardContent>
         </Card>
