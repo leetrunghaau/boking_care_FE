@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { CheckCircle } from "lucide-react";
@@ -8,7 +8,6 @@ import http from "@/helper/axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { handleApiError } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
-import { useRouter } from "next/router";
 
 export default function HealthFacilityDetailPage() {
   const router = useRouter();
