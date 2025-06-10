@@ -15,6 +15,7 @@ import { ChatBubble } from "../chat-bubble";
 import { Send, Phone, FileText, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { handleApiError } from "@/helper/toast-utils";
+import { ipconfig } from "@/helper/ip";
 
 export function HealthcareChat() {
   const [messages, setMessages] = useState<
@@ -46,7 +47,7 @@ export function HealthcareChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/query", {
+      const res = await fetch(`${ipconfig.AI}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: text }),
@@ -93,7 +94,7 @@ export function HealthcareChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/query", {
+      const res = await fetch(`${ipconfig.AI}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: input }),

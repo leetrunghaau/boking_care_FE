@@ -47,3 +47,16 @@ export function handleErorr(
     duration: 2000,
   });
 }
+
+export function handleWarning(
+  fallbackMessage = "Lưu ý thao tác!",
+  title = "Cảnh báo"
+) {
+  toast({
+    title,
+    description: fallbackMessage,
+    variant: "warning",
+    duration: 2000,
+  });
+}
+

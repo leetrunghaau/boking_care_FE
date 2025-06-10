@@ -20,10 +20,15 @@ export default function DoctorHeader() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-6">
-          <Link
+          {/* <Link
             href="/doctor"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Tổng quan
+          </Link> */}
+          <Link
+            href="/doctor/schedule"
+            className="text-md font-medium hover:text-teal-600 transition-colors">
+            Lịch làm việc
           </Link>
           <Link
             href="/doctor/appointments"
@@ -42,17 +47,18 @@ export default function DoctorHeader() {
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Đánh giá
           </Link> */}
-          <Link
-            href="/doctor/schedule"
-            className="text-md font-medium hover:text-teal-600 transition-colors">
-            Lịch làm việc
-          </Link>
+          
 
           {/* <Link
             href="/doctor/ratings"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Hổ trợ
           </Link> */}
+          <Link
+            href="/doctor/notifications"
+            className="text-md font-medium hover:text-teal-600 transition-colors">
+            Thông báo
+          </Link>
         </nav>
 
         {/* Actions */}

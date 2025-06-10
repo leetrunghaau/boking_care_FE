@@ -7,6 +7,7 @@ import { vi } from "date-fns/locale";
 import { ArrowLeft, Printer, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 interface PrescriptionPreviewProps {
   bookingId: string | number | null;
   onBack: () => void;
@@ -64,7 +65,24 @@ export function PrescriptionPreview({
     };
     fetchData();
   }, [bookingId]);
-
+  const hanhdleSendPrescription = async () => {
+    try {
+      if (!bookingId) return;
+      setLoading(true);
+      const res = await http.get<any>(
+        `/doctor-appointment/send-to-patient/prescription-info/${bookingId}`
+      );
+      console.log("đơn thuốc khi tải mới", res);
+      if (res) {
+        handleApiSuccess("Đã gửi mail cho bệnh nhân thành công!")
+      }
+    } catch (err) {
+      console.error("Failed to fetch appointment detail:", err);
+      handleApiError(err)
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -73,11 +91,11 @@ export function PrescriptionPreview({
           Quay lại
         </Button>
         <div className="flex gap-2">
-          <Button variant="outline">
+          {/* <Button variant="outline">
             <Printer className="h-4 w-4 mr-1" />
             In đơn thuốc
-          </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700">
+          </Button> */}
+          <Button className="bg-teal-600 hover:bg-teal-700" onClick={hanhdleSendPrescription}>
             <Send className="h-4 w-4 mr-1" />
             Gửi cho bệnh nhân
           </Button>

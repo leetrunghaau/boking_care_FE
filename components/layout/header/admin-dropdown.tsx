@@ -77,12 +77,12 @@ export default function AdminDropdown() {
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="text-sm">
           <h2 className="text-sm font-bold bg-gradient-to-r from-teal-500 to-indigo-500 bg-clip-text text-transparent">
-            Xin chào, Bs.{doctor?.name ?? ""}
+            Xin chào, Ad.{doctor?.name ?? ""}
           </h2>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => router.push("/doctor")}
+          onClick={() => router.push("/admin")}
           className="hover:cursor-pointer">
           <LayoutDashboard className="w-4 h-4 mr-2" />
           Trang làm việc

@@ -11,7 +11,7 @@ const axiosInstance: AxiosInstance = axios.create({
 
 // Gắn token tự động
 axiosInstance.interceptors.request.use((config) => {
-  const { token, isLoggedIn } = useAuthStore.getState(); 
+  const { token, isLoggedIn } = useAuthStore.getState();
 
   if (isLoggedIn && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -74,6 +74,29 @@ const http = {
 
     return handleResponse<T>(res);
   },
+
+  postFiles: async <T>(
+    url: string,
+    files: File[],
+    config?: AxiosRequestConfig
+  ): Promise<T> => {
+    const formData = new FormData();
+    console.log("file thứ i gửi đi:", files)
+    files.forEach(file => {
+      formData.append('files', file); 
+    });
+    console.log("list file gửi đi: ", formData)
+    const res = await axiosInstance.post(url, formData, {
+      ...config,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...(config?.headers || {}),
+      },
+    });
+
+    return handleResponse<T>(res);
+  },
+
 };
 
 export default http;

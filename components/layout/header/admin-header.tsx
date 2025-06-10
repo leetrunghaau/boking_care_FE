@@ -35,9 +35,9 @@ export default function AdminHeader() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-6">
-          <Link href="/admin" className="text-md font-medium hover:text-teal-600 transition-colors">
+          {/* <Link href="/admin" className="text-md font-medium hover:text-teal-600 transition-colors">
             Tổng quan
-          </Link>
+          </Link> */}
           <Link href="/admin/facilities" className="text-md font-medium hover:text-teal-600 transition-colors">
             Cơ sở y tế
           </Link>
@@ -47,9 +47,9 @@ export default function AdminHeader() {
           <Link href="/admin/patient" className="text-md font-medium hover:text-teal-600 transition-colors">
             Bệnh nhân
           </Link>
-          <Link href="/huong-dan" className="text-md font-medium hover:text-teal-600 transition-colors">
+          {/* <Link href="/huong-dan" className="text-md font-medium hover:text-teal-600 transition-colors">
             Hướng dẫn
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Actions */}

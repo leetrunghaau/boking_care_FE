@@ -82,7 +82,7 @@ export default function DoctorDropdown() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => router.push("/doctor")}
+          onClick={() => router.push("/doctor/schedule")}
           className="hover:cursor-pointer">
           <LayoutDashboard className="w-4 h-4 mr-2" />
           Trang làm việc

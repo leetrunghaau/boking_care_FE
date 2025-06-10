@@ -17,7 +17,7 @@ export default function MainHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-[220px]">
           <Link href="/" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
             <span className="text-xl font-bold text-teal-600">Med+</span>
@@ -54,13 +54,13 @@ export default function MainHeader() {
             className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Đặt lịch khám
           </div>
-          <div
+          {/* <div
             onClick={() => {
               router.push("/huong-dan");
             }}
             className="text-md font-medium hover:text-teal-600 transition-colors hover:cursor-pointer">
             Hướng dẫn
-          </div>
+          </div> */}
         </nav>
 
         {/* Actions */}

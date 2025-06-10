@@ -69,7 +69,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="py-16 px-16 ">
+        {/* <section className="py-16 px-16 ">
           <div className="container  mx-auto">
             <h2 className="text-3xl font-bold text-slate-800 text-center mb-12">
               Khách hàng nói gì về chúng tôi
@@ -113,7 +113,7 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
         <section className="py-16 bg-teal-600 text-white">
           <div className="container  mx-auto text-center ">
             <h2 className="text-3xl font-bold mb-4">

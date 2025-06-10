@@ -74,11 +74,11 @@ export default function PatientCard({ bookingId }: Pops) {
               </div>
             </div>
 
-            <div className="flex gap-2 mt-4">
-              <Button variant="outline" size="sm" className="flex-1">
+            <div className="flex gap-2 mt-4 justify-center">
+              {/* <Button variant="outline" size="sm" className="flex-1">
                 <MessageSquare className="h-4 w-4 mr-1" />
                 Nhắn tin
-              </Button>
+              </Button> */}
               <PatientRecordModal patientId={patient.id} />
             </div>
           </CardContent>

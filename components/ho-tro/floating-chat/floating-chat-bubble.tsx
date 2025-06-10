@@ -21,6 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ipconfig } from "@/helper/ip";
 
 interface ChatMessage {
   id: string;
@@ -81,7 +82,7 @@ export function FloatingChatBubble({
 
     try {
       // Gọi API backend trả lời
-      const res = await fetch("http://127.0.0.1:8000/query", {
+      const res = await fetch(`${ipconfig.AI}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: userMessage.content }),

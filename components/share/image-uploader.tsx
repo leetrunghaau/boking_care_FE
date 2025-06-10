@@ -18,7 +18,7 @@ interface UploadedFile {
 }
 
 interface MedicalImageUploaderProps {
-  onUpload?: (files: File[]) => Promise<void>;
+  onUpload?: (files: File[]) => Promise<boolean | void>;
   onFilesChange?: (files: File[]) => void;
   maxFiles?: number;
   maxSizeMB?: number;
@@ -169,7 +169,13 @@ export function ImageUploader({
   };
 
   const removeFile = (fileId: string) => {
-    setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+    const newState = uploadedFiles.filter((f) => f.id !== fileId);;
+    setUploadedFiles(newState);
+
+    if (onFilesChange) {
+      onFilesChange(newState.map(i => i.file));
+    }
+
   };
 
   const getFileIcon = (file: UploadedFile) => {
@@ -351,13 +357,16 @@ export function ImageUploader({
       {uploadedFiles.length > 0 && onUpload && (
         <div className="mt-4 pt-4 border-t">
           <Button
-            onClick={() => {
+            onClick={async () => {
               console.log("file state", uploadedFiles);
               const filesToUpload = uploadedFiles
                 .filter((f) => f.uploaded)
                 .map((f) => f.file);
               if (filesToUpload.length > 0) {
-                onUpload(filesToUpload);
+                const updateDone = (await onUpload(filesToUpload)) === false
+                if (updateDone) {
+                  setUploadedFiles([])
+                }
               }
             }}
             className="w-full bg-teal-600 hover:bg-teal-700"
