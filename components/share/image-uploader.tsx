@@ -18,7 +18,7 @@ interface UploadedFile {
 }
 
 interface MedicalImageUploaderProps {
-  onUpload?: (files: File[]) => Promise<boolean | void>;
+  onUpload?: (files: File[]) => Promise<boolean>;
   onFilesChange?: (files: File[]) => void;
   maxFiles?: number;
   maxSizeMB?: number;
@@ -27,7 +27,7 @@ interface MedicalImageUploaderProps {
 }
 
 export function ImageUploader({
-  onUpload,
+  onUpload = async () => false,
   onFilesChange,
   maxFiles = 10,
   maxSizeMB = 10,
@@ -169,13 +169,12 @@ export function ImageUploader({
   };
 
   const removeFile = (fileId: string) => {
-    const newState = uploadedFiles.filter((f) => f.id !== fileId);;
+    const newState = uploadedFiles.filter((f) => f.id !== fileId);
     setUploadedFiles(newState);
 
     if (onFilesChange) {
-      onFilesChange(newState.map(i => i.file));
+      onFilesChange(newState.map((i) => i.file));
     }
-
   };
 
   const getFileIcon = (file: UploadedFile) => {
@@ -363,9 +362,9 @@ export function ImageUploader({
                 .filter((f) => f.uploaded)
                 .map((f) => f.file);
               if (filesToUpload.length > 0) {
-                const updateDone = (await onUpload(filesToUpload)) === false
+                const updateDone = await onUpload(filesToUpload);
                 if (updateDone) {
-                  setUploadedFiles([])
+                  setUploadedFiles([]);
                 }
               }
             }}
