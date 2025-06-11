@@ -39,7 +39,7 @@ export default function SuccessPage({
       title: "Đăng ký thành công!",
       description: "Tài khoản của bạn đã được tạo thành công.",
       message:
-        "Chúng tôi đã gửi một email xác nhận đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư đến và xác nhận email của bạn để hoàn tất quá trình đăng ký.",
+        "Bạn có thể đăng nhập và bắt đầu sử dụng ngay bây giờ. Nếu cần xác minh tài khoản, chúng tôi sẽ thông báo trong bước tiếp theo.",
       button: "Đăng nhập ngay",
       link: "/xac-thuc/dang-nhap",
     },
