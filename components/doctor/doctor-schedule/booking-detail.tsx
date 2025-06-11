@@ -25,7 +25,7 @@ interface BookingDetailDialogRef {
 const sampleBookingDetail = {
   appointmentDate: "2025-06-10",
   appointmentTime: "14:30",
-  status: "cancelled", 
+  status: "cancelled",
   reason: "Khám tổng quát định kỳ",
   notes: "Bệnh nhân có tiền sử huyết áp cao",
   createdAt: "2025-06-01T09:15:00Z",
@@ -79,6 +79,7 @@ export const BookingDetailDialog = forwardRef<BookingDetailDialogRef>((_, ref) =
     try {
       const res = await http.get<any | null>(`/doctor-schedule/booking/${bookingId}`)
       setDetail(res)
+      console.log(res)
     } catch (err) {
       console.error("Lỗi khi tải chi tiết booking:", err)
       setError("Không thể tải thông tin cuộc hẹn. Vui lòng thử lại.")
@@ -122,7 +123,7 @@ export const BookingDetailDialog = forwardRef<BookingDetailDialogRef>((_, ref) =
     }
   }
 
-  
+
   const handleClose = () => {
     setOpen(false)
     setDetail(null)
@@ -229,7 +230,7 @@ export const BookingDetailDialog = forwardRef<BookingDetailDialogRef>((_, ref) =
                         <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
                           <p className="text-sm text-gray-500 font-medium mb-1">Ngày sinh</p>
                           <p className="font-medium text-gray-900">
-                            {new Date(detail.patient.dateOfBirth).toLocaleDateString("vi-VN")}
+                            {detail.patient.dateOfBirth}
                           </p>
                         </div>
                       </div>
@@ -350,7 +351,7 @@ export const BookingDetailDialog = forwardRef<BookingDetailDialogRef>((_, ref) =
                 </div>
               </div>
 
-             
+
             </div>
           ) : null}
         </div>
