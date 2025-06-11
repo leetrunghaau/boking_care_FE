@@ -10,7 +10,7 @@ export default function DoctorHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link href="/doctor" className="flex items-center gap-2">
+          <Link href="/doctor/schedule" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
             <span className="text-xl font-bold text-teal-600">
               Doctor.Med+
@@ -35,19 +35,19 @@ export default function DoctorHeader() {
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Lịch hẹn
           </Link>
-{/* 
+          {/* 
           <Link
             href="/doctor/FAQ"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             FAQ
           </Link> */}
-{/* 
+          {/* 
           <Link
             href="/doctor/ratings"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Đánh giá
           </Link> */}
-          
+
 
           {/* <Link
             href="/doctor/ratings"

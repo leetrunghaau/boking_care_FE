@@ -8,14 +8,14 @@ import { useRouter } from "next/navigation"
 
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const {  role , hasHydrated} = useAuthStore()
+  const { role, hasHydrated } = useAuthStore()
   const router = useRouter()
   useEffect(() => {
-    if (!hasHydrated) return; 
+    if (!hasHydrated) return;
     if (role == "patient") {
       router.push("/");
     } else if (role == "doctor") {
-      router.push("/doctor");
+      router.push("/doctor/schedule");
     } else if (role == "admin") {
       router.push("/admin");
     }
