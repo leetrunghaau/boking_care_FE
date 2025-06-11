@@ -19,10 +19,7 @@ import moment from "moment";
 import { Divider } from "@/components/ui/divider";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { handleApiError, handleApiSuccess, handleWarning } from "@/helper/toast-utils";
-import { getFullURL } from "@/helper/url";
-import Link from "next/link";
-import Image from "next/image";
+import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 import ImageGallery from "./image-gallery";
 
 interface Pops {
@@ -47,7 +44,7 @@ export default function ExaminationTab({ bookingId, disabled }: Pops) {
   });
 
   const [fileStore, setFileStore] = useState<any[]>([]);
-  const [localFile, setLocalFile] = useState<File[]>([])
+  const [localFile, setLocalFile] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [schedule, setSchedule] = useState<any[]>([]);
 
@@ -57,32 +54,32 @@ export default function ExaminationTab({ bookingId, disabled }: Pops) {
 
   const updateFileToBE = async () => {
     try {
-      if (localFile.length == 0) return
-
+      if (localFile.length == 0) return;
       setLoading(true);
-
       const res = await http.postFiles<any[]>(
         `/doctor-appointment/upload-files/${bookingId}`,
         localFile
       );
       console.warn("Lưu thông tin khám bệnh", res);
       if (res?.length > 0) {
+        console.log("uleqw", res);
+        handleApiSuccess("Đã lưu file thành công!");
+        setLocalFile([]);
         setFileStore(res);
-        handleApiSuccess("Đã lưu file thành công!")
       }
     } catch (err) {
       console.error("Failed to fetch appointment detail:", err);
     } finally {
       setLoading(false);
     }
-  }
+  };
   const handleFileChange = async (files: File[]) => {
-    setLocalFile(files)
+    setLocalFile(files);
   };
 
   const handleUpload = async (files: File[]) => {
-    updateFileToBE()
-
+    updateFileToBE();
+    return true;
   };
 
   const hanhdelSaveExamination = async () => {
@@ -91,9 +88,9 @@ export default function ExaminationTab({ bookingId, disabled }: Pops) {
     try {
       setLoading(true);
 
-      //lưu file 
+      //lưu file
 
-      updateFileToBE()
+      updateFileToBE();
       const res = await http.post<any>(
         `/doctor-appointment/examination/${bookingId}`,
         examination
@@ -120,7 +117,7 @@ export default function ExaminationTab({ bookingId, disabled }: Pops) {
         );
         console.log("get chi tiết thông tin khám bệnh", res);
         if (res) {
-          console.log("test", res)
+          console.log("test", res);
           setExamination(res.examination);
           setFileStore(res.fileStore);
         }
@@ -134,21 +131,20 @@ export default function ExaminationTab({ bookingId, disabled }: Pops) {
   }, [bookingId]);
 
   const handleDeleteFile = async (id: number | null) => {
-    if (!id) return
+    if (!id) return;
 
     try {
-      const rs = await http.delete<any[] | null>(`/doctor-appointment/booking/${bookingId}/file/${id}`)
+      const rs = await http.delete<any[] | null>(
+        `/doctor-appointment/booking/${bookingId}/file/${id}`
+      );
       if (rs) {
-        handleApiSuccess("Bạn đã xóa file thành công")
-        setFileStore(rs)
+        handleApiSuccess("Bạn đã xóa file thành công");
+        setFileStore((prev) => prev.filter((file) => file.id !== id));
       }
-
-
     } catch (err) {
-      handleApiError(err, "Xóa file không thành công")
+      handleApiError(err, "Xóa file không thành công");
     }
-
-  }
+  };
 
   // cập nhật thời gian khi chọn ngày
   //   const handleDatePicker = async (date: string) => {
