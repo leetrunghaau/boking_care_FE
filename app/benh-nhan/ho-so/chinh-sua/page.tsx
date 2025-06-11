@@ -21,7 +21,7 @@ import RelativeInfoCard from "./RelativeInfoCard";
 
 export default function EditProfilePage() {
   const [form, setForm] = useState({
-    img: null,
+    img: "",
     name: "",
     dob: "",
     gender: "",
@@ -95,12 +95,13 @@ export default function EditProfilePage() {
   const handleAvatarChange = async (change: any) => {
     try {
       if (change.type === "new") {
-        await http.postFile("/patient/avatar", change.value);
-        // Cập nhật đường dẫn ảnh mới vào state form nếu API trả về hoặc bạn có thể xây dựng URL
-        // Ví dụ: setForm(prev => ({ ...prev, img: "new_avatar_url_from_api" }));
+        const rs = await http.postFile<string | null>("/patient/avatar", change.value);
+        if (rs) {
+          setForm(prev => ({ ...prev, img: rs }));
+        }
       } else if (change.type === "remove") {
         await http.delete("/patient/avatar");
-        setForm((prev) => ({ ...prev, img: null })); // Xóa ảnh đại diện khỏi state
+        setForm((prev) => ({ ...prev, img: "" }));
       }
     } catch (err) {
       handleApiError(err, "Không thể xử lý ảnh đại diện");

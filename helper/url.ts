@@ -2,6 +2,6 @@ import appConfig from "@/config/config"
 import { ipconfig } from "./ip"
 
 export function getFullURL(uri: string | null | undefined): string {
-    if (!uri) return "/placeholder.svg"
+    if (!uri || uri == "") return "/placeholder.svg"
     return `${ipconfig.BE_CDN}${uri}`
 }
