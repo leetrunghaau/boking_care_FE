@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import useAuthStore from "@/store/auth";
 
 interface SuccessPageProps {
   title?: string;
@@ -31,6 +32,7 @@ export default function SuccessPage({
   const searchParams = useSearchParams();
   const action = searchParams.get("action") || "booking";
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore()
 
   const defaultMessages = {
     register: {
@@ -45,7 +47,7 @@ export default function SuccessPage({
       title: "Đặt lịch khám thành công",
       description: "Lịch khám của bạn đã được tạo thành công.",
       message:
-        "Chúng tôi đã gửi một email xác nhận đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư đến và xác nhận email của bạn để hoàn tất quá trình đăng ký.",
+        "Chúng tôi đã gửi một email xác nhận đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư đến để xem chi tiết cuộc hẹn.",
       button: "Xem lịch khám",
       link: "/benh-nhan/lich-kham",
     },
@@ -66,7 +68,7 @@ export default function SuccessPage({
   const displayDescription = description || current.description;
   const displayMessage = message || current.message;
   const displayButtonText = buttonText || current.button;
-  const displayLink = link || current.link;
+  const displayLink = current.link;
 
   return (
     <Card className="w-full  shadow-lg">
@@ -82,11 +84,13 @@ export default function SuccessPage({
         <div className="flex flex-col items-center space-y-4 text-center">
           <CheckCircle className="h-16 w-16 text-green-600" />
           <p className="text-muted-foreground max-w-md">{displayMessage}</p>
-          <Button
-            onClick={() => router.push(displayLink)}
-            className="mt-4 bg-teal-600 hover:bg-teal-700">
-            {displayButtonText}
-          </Button>
+          {displayLink &&
+            <Button
+              onClick={() => router.push(displayLink)}
+              className="mt-4 bg-teal-600 hover:bg-teal-700">
+              {displayButtonText}
+            </Button>
+          }
         </div>
       </CardContent>
       <CardFooter className="flex justify-center">

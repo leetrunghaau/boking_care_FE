@@ -1,6 +1,7 @@
 import appConfig from "@/config/config"
+import { ipconfig } from "./ip"
 
-export function getFullURL(uri: string | null | undefined): string  {
+export function getFullURL(uri: string | null | undefined): string {
     if (!uri) return "/placeholder.svg"
-    return `${appConfig.CDN_URL}${uri}`
+    return `${ipconfig.BE_CDN}${uri}`
 }

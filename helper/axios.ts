@@ -1,9 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import useAuthStore from '@/store/auth';
+import { ipconfig } from './ip';
 
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API}`,
+  baseURL: ipconfig.BE_API,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -83,7 +84,7 @@ const http = {
     const formData = new FormData();
     console.log("file thứ i gửi đi:", files)
     files.forEach(file => {
-      formData.append('files', file); 
+      formData.append('files', file);
     });
     console.log("list file gửi đi: ", formData)
     const res = await axiosInstance.post(url, formData, {
