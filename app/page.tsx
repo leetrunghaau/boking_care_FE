@@ -90,7 +90,7 @@ export default function HomePage() {
                     </div>
                     <p className="mb-6 text-muted-foreground">
                       "Tôi rất hài lòng với dịch vụ đặt lịch khám của
-                      BookingCare. Tiết kiệm thời gian và rất thuận tiện."
+                      MedPluds. Tiết kiệm thời gian và rất thuận tiện."
                     </p>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-slate-200 overflow-hidden relative">

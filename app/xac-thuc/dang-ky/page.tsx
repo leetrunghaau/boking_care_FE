@@ -94,7 +94,7 @@ export default function RegisterPage() {
     try {
       const rs = await http.post<any>("/sig/signup", formData);
       handleApiSuccess(
-        "Chào mừng bạn đến với BookingCare",
+        "Chào mừng bạn đến với MedPlus",
         "Đăng ký thành công"
       );
 

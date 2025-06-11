@@ -144,7 +144,7 @@ export function HealthcareChat() {
           <div className="text-center py-8">
             <div className="bg-blue-50 rounded-lg p-6 max-w-md mx-auto">
               <h3 className="font-semibold text-gray-800 mb-2">
-                Chào mừng đến với Booking Care AI. Tôi là Medly!
+                Chào mừng đến với Med Plus. Tôi là Medly!
               </h3>
               <p className="text-sm text-gray-600 mb-4">
                 Tôi ở đây để hỗ trợ bạn với các câu hỏi sức khỏe chung và hướng
@@ -179,7 +179,7 @@ export function HealthcareChat() {
             }
             priority={
               message.text.toLowerCase().includes("urgent") ||
-              message.text.toLowerCase().includes("emergency")
+                message.text.toLowerCase().includes("emergency")
                 ? "high"
                 : "low"
             }
@@ -217,10 +217,10 @@ export function HealthcareChat() {
                 messageType === "symptom"
                   ? "Describe your symptoms..."
                   : messageType === "medication"
-                  ? "Ask about medication..."
-                  : messageType === "appointment"
-                  ? "What type of appointment do you need?"
-                  : "Type your health question..."
+                    ? "Ask about medication..."
+                    : messageType === "appointment"
+                      ? "What type of appointment do you need?"
+                      : "Type your health question..."
               }
               className="flex-1"
               disabled={isLoading}
@@ -243,9 +243,9 @@ export function HealthcareChat() {
                 className={cn(
                   "text-xs h-8",
                   messageType ===
-                    (action.label.toLowerCase().includes("appointment")
-                      ? "appointment"
-                      : action.label.toLowerCase().includes("symptom")
+                  (action.label.toLowerCase().includes("appointment")
+                    ? "appointment"
+                    : action.label.toLowerCase().includes("symptom")
                       ? "symptom"
                       : "medication") && "bg-blue-100 text-blue-700"
                 )}>
