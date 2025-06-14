@@ -85,7 +85,7 @@ export default function HealthFacilityDetailDialog({ slug, open, onClose }: Prop
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogTitle>Thông tin cơ sở y tế</DialogTitle>
+            <DialogTitle></DialogTitle>
             <DialogContent className="max-w-[90vh] h-[90vh] overflow-y-auto">
                 {isLoading || !data ? (
                     <p className="text-center py-10">Đang tải dữ liệu...</p>

@@ -22,7 +22,7 @@ export default function RootLayout({
         <ChatProvider
           position="bottom-right"
           primaryColor="bg-teal-600"
-          title="AI Helper"
+          title="Trò chuyện cùng Medly"
           placeholder="Hãy hỏi tôi bất cứ điều gì..."
           welcomeMessage="Xin chào! Tôi ở đây để hỗ trợ bạn. Bạn cần tôi giúp gì?">
           {children}

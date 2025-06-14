@@ -25,6 +25,7 @@ import {
 import http from "@/helper/axios";
 import { handleApiSuccess, handleErorr } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
+import { cn } from "@/lib/utils";
 import { Edit, Eye, Search, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -134,8 +135,8 @@ export default function AdminHospitalPage() {
         </h1>
       </div>
       <div className="bg-white rounded-lg shadow-md p-4 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
+        <div className="flex gap-4 flex-wrap">
+          <div className="relative grow">
             <Input
               placeholder="Tìm kiếm theo tên"
               className="pl-10"
@@ -147,15 +148,14 @@ export default function AdminHospitalPage() {
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
-        </div>
-
-        <div className="flex justify-end mt-4">
           <Link href={"/admin/facilities/new"}>
             <Button className="bg-teal-600 hover:bg-teal-700">
               Thêm cơ sở y tế
             </Button>
           </Link>
         </div>
+
+
       </div>
       <div className="rounded-md border">
         <Table>
@@ -268,11 +268,17 @@ export default function AdminHospitalPage() {
             Hiển thị {(page - 1) * 5 + 1}-{Math.min(page * 5, total)} của{" "}
             {total} cơ sở y tế
           </div>
-          <Pagination>
+          <Pagination className="pt-6">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => setPage(page - 1)}
+                  className={cn(
+                    page === 1 ? "cursor-not-allowed" : "cursor-pointer"
+                  )}
+                  onClick={() => {
+                    if (page > 1)
+                      setPage(page - 1)
+                  }}
                   isActive={page === 1}
                 />
               </PaginationItem>
@@ -283,6 +289,9 @@ export default function AdminHospitalPage() {
               ).map((pageNum) => (
                 <PaginationItem key={pageNum}>
                   <PaginationLink
+                    className={cn(
+                      pageNum === page ? "cursor-not-allowed" : "cursor-pointer"
+                    )}
                     isActive={pageNum === page}
                     onClick={() => setPage(pageNum)}>
                     {pageNum}
@@ -292,7 +301,14 @@ export default function AdminHospitalPage() {
 
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => setPage(page + 1)}
+                  className={cn(
+                    page === Math.ceil(total / 5) ? "cursor-not-allowed" : "cursor-pointer"
+                  )}
+                  onClick={() => {
+                    if (page < Math.ceil(total / 5))
+                      setPage(page + 1)
+
+                  }}
                   isActive={page === Math.ceil(total / 5)}
                 />
               </PaginationItem>

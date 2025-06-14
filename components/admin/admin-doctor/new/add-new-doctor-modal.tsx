@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type React from "react";
 import {
   Dialog,
@@ -45,7 +45,7 @@ interface NewDoctorData {
   name: string;
   phone: string;
   email: string;
-  dob: string; // "YYYY-MM-DD"
+  dob: string
   gender: "male" | "female" | "other" | "";
   img: string;
   about: string;
@@ -54,7 +54,7 @@ interface NewDoctorData {
 interface AddDoctorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (doctor: NewDoctorData) => void;
+  onSave: (doctorName: string) => void;
 }
 
 const initialDoctorData: NewDoctorData = {
@@ -72,8 +72,6 @@ export function AddDoctorModal({
   onClose,
   onSave,
 }: AddDoctorModalProps) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
   const [formData, setFormData] = useState<NewDoctorData>(initialDoctorData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,6 +101,7 @@ export function AddDoctorModal({
     return true;
   };
 
+
   const handleSave = async () => {
     if (!validateForm()) {
       return;
@@ -111,8 +110,8 @@ export function AddDoctorModal({
       handleErorr("Phải tạo hình ảnh cho bác sĩ")
       return
     }
-    setIsSubmitting(true);
     try {
+      setIsSubmitting(true);
       const data = await http.post<any>("/admin-doctor/doctor", {
         name: formData.name,
         phone: formData.phone,
@@ -121,28 +120,28 @@ export function AddDoctorModal({
         gender: formData.gender,
         about: formData.about,
       });
-      onSave(formData);
-      if (data?.status) {
-        const rs = await http.postFile<any | null>(`/admin-doctor/doctor/${data?.doctor?.id}/avatar`, fileState)
-        if (rs?.status) {
-          handleImageUpload;
-          handleApiSuccess("Thêm bác sĩ thành công");
-          const params = new URLSearchParams(searchParams.toString());
-          params.delete("hospital")
-          params.delete("specialty")
-          params.delete("page")
-          params.set("search", rs?.name)
-          router.push(`/admin/doctors?${params.toString()}`);
-          handleClose();
-        }
-      } else {
-        handleErorr(data?.mess ?? "Tạo bác sĩ thất bại")
+      if (!data?.status) {
+        handleErorr(data?.mess ?? "Dã có lỗi xảy ra")
+        //delete user
+        return
       }
+      const rs = await http.postFile<any | null>(`/admin-doctor/doctor/${data.id}/avatar`, fileState)
+      if (rs) {
+        handleApiSuccess("Thêm bác sĩ thành công");
+        onSave(formData.name)
+        onClose()
+      }else if (data.id){
+        //delete user
+      }
+
+
     } catch (error) {
       handleApiError(error, "Thêm bác sĩ thất bại");
     } finally {
       setIsSubmitting(false);
     }
+
+
   };
 
   const handleClose = () => {
@@ -152,6 +151,7 @@ export function AddDoctorModal({
     setFileState(null)
     onClose();
   };
+
 
   const getInitials = (name: string) => {
     if (!name) return "BS";
@@ -163,7 +163,7 @@ export function AddDoctorModal({
       .toUpperCase();
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileState(file)
@@ -171,7 +171,6 @@ export function AddDoctorModal({
       reader.onload = (e) => {
         const result = e.target?.result as string;
         handleInputChange("img", result);
-        console.log("IMG" + result);
       };
       reader.readAsDataURL(file);
     }
@@ -182,18 +181,13 @@ export function AddDoctorModal({
     setFileState(null)
   };
 
-  const getGenderLabel = (gender: string) => {
-    switch (gender) {
-      case "male":
-        return "Nam";
-      case "female":
-        return "Nữ";
-      case "other":
-        return "Khác";
-      default:
-        return "Chọn giới tính";
-    }
-  };
+  useEffect(() => {
+    if (isOpen == false) return
+    setFormData(initialDoctorData);
+    setErrors({});
+    setIsSubmitting(false);
+    setFileState(null)
+  }, [isOpen])
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -252,7 +246,7 @@ export function AddDoctorModal({
                     id="avatar-upload"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={handleImageChange}
                     className="hidden"
                   />
                 </div>

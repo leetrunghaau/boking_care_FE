@@ -3,13 +3,18 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import { AddDoctorModal } from "./add-new-doctor-modal";
+import http from "@/helper/axios";
+import { handleApiError, handleApiSuccess, handleErorr } from "@/helper/toast-utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddDoctor() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSave = (newDoctor: any) => {
-    console.log("New doctor added:", newDoctor);
-    // You can add logic here if needed
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const handleSave = async (newDoctor: any, file: File) => {
+    
   };
 
   return (

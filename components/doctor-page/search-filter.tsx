@@ -55,7 +55,7 @@ export default function DoctorSearchFilter({ onSearch }: Props) {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tên bác sĩ, chuyên khoa..."
+              placeholder="Tên bác sĩ"
               className="pl-10"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -113,9 +113,7 @@ export default function DoctorSearchFilter({ onSearch }: Props) {
           </Select>
         </div>
 
-        <div className="flex justify-end mt-4">
-          <Button onClick={handleSearchClick}>Tìm kiếm</Button>
-        </div>
+       
       </div>
     </div>
   );

@@ -128,10 +128,10 @@ export function HealthcareChat() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold text-gray-800">
-                Medly - HealthCare AI Assistant
+                Medly - Trợ lý MedPlus
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Get instant health guidance and support
+                Tư vấn sức khỏe thông minh, hỗ trợ mọi lúc
               </p>
             </div>
           </div>

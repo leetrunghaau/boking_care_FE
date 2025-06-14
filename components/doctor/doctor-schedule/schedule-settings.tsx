@@ -1,4 +1,3 @@
-// 👇 imports vẫn giữ nguyên
 "use client"
 
 import { useEffect, useState } from "react"
@@ -10,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Clock, Coffee, Copy, Save, Trash } from "lucide-react"
 import http from "@/helper/axios"
-import { Textarea } from "@/components/ui/textarea" // 👈 đảm bảo có Textarea
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from '@/hooks/use-toast';
 import { handleApiSuccess } from "@/helper/toast-utils"
 
@@ -95,7 +94,7 @@ export function ScheduleSettings() {
         setSettings(res)
       }
       const temp = await http.get<any>(`/doctor-schedule/templates`)
-      if (res) {
+      if (temp) {
         setTeamplate(temp)
       }
     } catch (err) {

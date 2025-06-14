@@ -50,11 +50,9 @@ export default function SpecialtyListPage() {
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
             {isLoading ? (
-              <>
-                <CardLoading />
-                <CardLoading />
-                <CardLoading />
-              </>
+              [1, 2, 3].map((i) => (
+                <CardLoading key={i} />
+              ))
             ) : (
               specialties.map((item) => (
                 <SpecialtyCard key={item.slug} {...item} />

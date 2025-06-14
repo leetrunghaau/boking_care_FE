@@ -14,14 +14,7 @@ import {
 import FieldWrapper from "./FieldWrapper"; // Import component FieldWrapper
 
 interface PersonalInfoCardProps {
-  form: {
-    name: string;
-    dob: string;
-    gender: string;
-    phone: string;
-    email: string;
-    address: string;
-  };
+  form: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleGenderChange: (value: string) => void;
 }
@@ -48,7 +41,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = React.memo(
             />
           </FieldWrapper>
           <FieldWrapper label="Giới tính">
-            <Select value={form.gender} onValueChange={handleGenderChange}>
+            <Select value={form.genderEN} onValueChange={handleGenderChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Chọn giới tính" />
               </SelectTrigger>

@@ -18,7 +18,6 @@ import { getFullURL } from "@/helper/url";
 export default function DoctorDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
-  // https://localhost:3000/bac-si/nguyen-van-an-000001?rating=1
   const [doctor, setDoctor] = useState<any | null>();
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -68,7 +67,7 @@ export default function DoctorDetailPage() {
 
                     <div className="flex-1 text-center md:text-left">
                       <h1 className="text-2xl font-bold">{doctor?.name}</h1>
-                      <p className="text-muted-foreground">{}</p>
+                      <p className="text-muted-foreground">{ }</p>
 
                       <div className="flex items-center gap-1 mt-2 justify-center md:justify-start">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
@@ -142,7 +141,7 @@ export default function DoctorDetailPage() {
             {/* Sidebar */}
             <div className="flex flex-col gap-6">
               <DoctorSchedule slug={slug} />
-              <HospitalInfo  slug={slug} />
+              <HospitalInfo slug={slug} />
             </div>
           </div>
         </div>

@@ -38,7 +38,6 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState(true);
   const fetched = useRef(false);
 
-  // Sử dụng useCallback để đảm bảo các hàm này không thay đổi khi re-render EditProfilePage
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -61,7 +60,6 @@ export default function EditProfilePage() {
       try {
         const res = await http.get<any>("/patient/my-info");
         if (res?.status && !fetched.current) {
-          // Cập nhật state với dữ liệu nhận được
           setForm((prev) => ({ ...prev, ...res.info }));
           setRelative((prev) => ({ ...prev, ...res.relative }));
           fetched.current = true;
@@ -74,7 +72,7 @@ export default function EditProfilePage() {
     };
 
     fetchData();
-  }, []); // [] đảm bảo useEffect chỉ chạy một lần khi component mount
+  }, []); 
 
   const handleSubmit = async () => {
     try {

@@ -90,13 +90,12 @@ export default function HealthFacilityDetailPage() {
         <h2 className="text-2xl font-semibold mb-4">Hình ảnh cơ sở</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {data.imgs.map((item: string, index: number) => (
-            <div key={index} className="rounded overflow-hidden shadow">
+            <div key={index} className="relative rounded overflow-hidden shadow w-72 h-36">
               <Image
                 src={getFullURL(item) || "/placeholder.svg"}
                 alt={`Gallery ${item}`}
-                width={400}
-                height={300}
-                className="object-cover w-full h-auto"
+                fill
+                className="object-cover "
               />
             </div>
           ))}

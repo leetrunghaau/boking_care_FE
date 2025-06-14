@@ -87,12 +87,12 @@ export default function AdminDropdown() {
           <LayoutDashboard className="w-4 h-4 mr-2" />
           Trang làm việc
         </DropdownMenuItem>
-        <DropdownMenuItem
+        {/* <DropdownMenuItem
           onClick={() => router.push("/doctor/profile")}
           className="hover:cursor-pointer">
           <User className="w-4 h-4 mr-2" />
           Hồ sơ cá nhân
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
 
         {/* <DropdownMenuItem
@@ -101,13 +101,13 @@ export default function AdminDropdown() {
           <Bell className="w-4 h-4 mr-2" />
           Thông báo
         </DropdownMenuItem> */}
-
+{/* 
         <DropdownMenuItem
           onClick={() => router.push("/doctor/settings")}
           className="hover:cursor-pointer">
           <Settings className="w-4 h-4 mr-2" />
           Cài đặt
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuSeparator />
 

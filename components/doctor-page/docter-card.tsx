@@ -62,7 +62,9 @@ export default function DoctorCard({ doctor }: Pops) {
               <Link href={`/bac-si/${doctor.slug}`}>
               <Button variant="outline" size="sm" className="mr-2">Xem hồ sơ</Button>
               </Link>
-              <Button size="sm" onClick={()=>{
+              <Button 
+              className="bg-teal-600 hover:bg-teal-700"
+                size="sm" onClick={()=>{
                 setBooking({doctorId: doctor.id, currStep: 2})
                 router.push("/dat-lich-kham")
               }}>

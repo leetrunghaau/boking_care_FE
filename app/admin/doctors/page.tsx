@@ -1,5 +1,6 @@
 "use client";
 import AddDoctor from "@/components/admin/admin-doctor/new/add-new-doctor";
+import { AddDoctorModal } from "@/components/admin/admin-doctor/new/add-new-doctor-modal";
 import DoctorDetailDialog from "@/components/admin/admin-doctors/doctor-dialog";
 import ConfirmDeleteModal, {
   ConfirmDeleteModalHandle,
@@ -39,32 +40,38 @@ import {
   handleErorr,
 } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
-import { Briefcase, Edit, Eye, Search, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Briefcase, Edit, Eye, Search, UserPlus, XCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function AdminDoctorsPage() {
+
+  //params
   const searchParams = useSearchParams();
   const router = useRouter();
   const initParms = new URLSearchParams(searchParams.toString());
+
+  //page state
   const [search, setSearch] = useState(initParms.get("search") ?? "");
   const [specialties, setSpecialties] = useState<any[]>([]);
-  const [specialtySelected, setSpecialtySelected] = useState(
-    initParms.get("specialty") ?? "all"
-  );
+  const [specialtySelected, setSpecialtySelected] = useState(initParms.get("specialty") ?? "all");
   const [hospitals, setHospials] = useState<any[]>([]);
-  const [hospitalSelected, setHopialSelected] = useState(
-    initParms.get("hospital") ?? "all"
-  );
-  const [page, setPage] = useState(
-    Math.max(Number(initParms.get("page")) || 1, 1)
-  );
+  const [hospitalSelected, setHopialSelected] = useState(initParms.get("hospital") ?? "all");
+  const [page, setPage] = useState(Math.max(Number(initParms.get("page")) || 1, 1));
   const [total, setTotal] = useState(1);
-  const [loadingDoctor, setLoadingDoctor] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [slug, setSlug] = useState<string | null>(null);
-  const [doctors, setDoctors] = useState<any[]>([]);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  //dialog state
+  const modalRef = useRef<ConfirmDeleteModalHandle>(null);
+  const [slug, setSlug] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [newDialog, setNewDialog] = useState(false);
+
+
+  //main state
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [loadingDoctor, setLoadingDoctor] = useState(false);
 
   const loadDoctor = async (searchInput?: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -125,8 +132,7 @@ export default function AdminDoctorsPage() {
     loadDoctor();
   }, [specialtySelected, hospitalSelected, page]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
+  const handleSearch = (val: string) => {
     setSearch(val);
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
@@ -135,8 +141,6 @@ export default function AdminDoctorsPage() {
       loadDoctor(val);
     }, 1000);
   };
-
-  const modalRef = useRef<ConfirmDeleteModalHandle>(null);
 
   const deleteDoctor = async (id: number) => {
     setLoadingDoctor(true);
@@ -174,7 +178,7 @@ export default function AdminDoctorsPage() {
               className="pl-10"
               value={search}
               onChange={(e) => {
-                handleSearch(e);
+                handleSearch(e.target.value);
                 setPage(1);
               }}
             />
@@ -236,7 +240,12 @@ export default function AdminDoctorsPage() {
         </div>
       </div>
       <div className="flex justify-end ">
-        <AddDoctor />
+        <Button
+          onClick={() => setNewDialog(true)}
+          className="bg-teal-600 hover:bg-teal-700">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Thêm bác sĩ
+        </Button>
         {/* <Button className="bg-teal-600 hover:bg-teal-700">Thêm bác sĩ</Button> */}
       </div>
       <div className="rounded-md border">
@@ -347,6 +356,9 @@ export default function AdminDoctorsPage() {
                         <Button
                           variant="outline"
                           size="icon"
+                          onClick={()=>{
+                            router.push(`/admin/doctors/${doctor.id}/edit`);
+                          }}
                           className="h-8 w-8 text-amber-600">
                           <Edit className="h-4 w-4" />
                           <span className="sr-only">Chỉnh sửa</span>
@@ -374,11 +386,17 @@ export default function AdminDoctorsPage() {
             Hiển thị {(page - 1) * 5 + 1}-{Math.min(page * 5, total)} của{" "}
             {total} bác sĩ
           </div>
-          <Pagination>
+          <Pagination className="pt-6">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => setPage(page - 1)}
+                  className={cn(
+                    page === 1 ? "cursor-not-allowed" : "cursor-pointer"
+                  )}
+                  onClick={() => {
+                    if (page > 1)
+                      setPage(page - 1)
+                  }}
                   isActive={page === 1}
                 />
               </PaginationItem>
@@ -389,6 +407,9 @@ export default function AdminDoctorsPage() {
               ).map((pageNum) => (
                 <PaginationItem key={pageNum}>
                   <PaginationLink
+                    className={cn(
+                      pageNum === page ? "cursor-not-allowed" : "cursor-pointer"
+                    )}
                     isActive={pageNum === page}
                     onClick={() => setPage(pageNum)}>
                     {pageNum}
@@ -398,7 +419,14 @@ export default function AdminDoctorsPage() {
 
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => setPage(page + 1)}
+                  className={cn(
+                    page === Math.ceil(total / 5) ? "cursor-not-allowed" : "cursor-pointer"
+                  )}
+                  onClick={() => {
+                    if (page < Math.ceil(total / 5))
+                      setPage(page + 1)
+
+                  }}
                   isActive={page === Math.ceil(total / 5)}
                 />
               </PaginationItem>
@@ -414,6 +442,14 @@ export default function AdminDoctorsPage() {
             setSlug(null);
           }}
           slug={slug}
+        />
+
+        <AddDoctorModal
+          isOpen={newDialog}
+          onClose={() => setNewDialog(false)}
+          onSave={(doctorName) => {
+            handleSearch(doctorName)
+          }}
         />
       </div>
     </div>
