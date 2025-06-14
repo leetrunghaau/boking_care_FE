@@ -61,7 +61,7 @@ export default function SpecialtyDetailPage() {
             <div key={idx} className="text-center">
               <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow">
                 <Image
-                  src={getFullURL(disease.img) || "/placeholder.svg"}
+                  src={disease.img || "/placeholder.svg"}
                   alt={disease.name || "Disease"}
                   fill
                   className="object-cover"
