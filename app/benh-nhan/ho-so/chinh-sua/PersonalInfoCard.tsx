@@ -41,7 +41,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = React.memo(
             />
           </FieldWrapper>
           <FieldWrapper label="Giới tính">
-            <Select value={form.genderEN} onValueChange={handleGenderChange}>
+            <Select value={form.gender} onValueChange={handleGenderChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Chọn giới tính" />
               </SelectTrigger>

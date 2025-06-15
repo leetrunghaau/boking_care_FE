@@ -18,6 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { getFullURL } from "@/helper/url"
+import { downloadFile } from "@/helper/my-file"
 
 interface FileItem {
   id: number | null
@@ -88,15 +89,13 @@ export default function ImageGallery({ fileStore = [], onDeleteFile }: ImageGall
                       <span className="text-xs text-gray-600 text-center font-medium truncate w-full">
                         {file.name || "File"}
                       </span>
-                      <Link
-                        href={getFullURL(file.uri || file.url) || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <div
+                        onClick={() => downloadFile(getFullURL(file.uri), file.name)}
                         className="text-teal-600 hover:text-teal-700 text-xs mt-1 flex items-center gap-1"
                       >
                         <Download className="h-3 w-3" />
                         Tải về
-                      </Link>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -178,17 +177,13 @@ export default function ImageGallery({ fileStore = [], onDeleteFile }: ImageGall
                     variant="outline"
                     size="sm"
                     asChild
-                    className="border-teal-200 text-teal-600 hover:bg-teal-50"
+                    className="border-teal-200 text-teal-600 hover:bg-teal-50 flex items-center gap-2"
+                    onClick={() => { downloadFile(getFullURL(selectedImage.url), selectedImage.name) }}
                   >
-                    <Link
-                      href={getFullURL(selectedImage.url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2"
-                    >
+                    <span>
                       <Download className="h-4 w-4" />
                       Tải về
-                    </Link>
+                    </span>
                   </Button>
 
                   <AlertDialog>

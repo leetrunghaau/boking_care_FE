@@ -44,7 +44,7 @@ export function RecordHistoryCard({ record }: RecordHistoryCardProps) {
           <h4 className="font-medium mb-2">Sức khoẻ tổng quát:</h4>
           <div className="grid grid-cols-3 md:grid-cols-5 gap-2 text-sm">
             <div>
-              <span className="text-gray-500">HA:</span> {record.bloodPressure}
+              <span className="text-gray-500">Huyết áp:</span> {record.bloodPressure}
             </div>
             <div>
               <span className="text-gray-500">Nhiệt độ:</span>{" "}

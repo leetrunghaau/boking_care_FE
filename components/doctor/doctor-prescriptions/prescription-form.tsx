@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Eye, Plus, Save, Trash } from "lucide-react";
 import http from "@/helper/axios";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
+import QuickSuggest from "@/components/share/quick-search-suggestion";
 
 interface Medication {
   id: number;
@@ -38,6 +39,7 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
 
   const [generalInstructions, setGeneralInstructions] = useState("");
 
+
   // Thêm thuốc mới
   const handleAddMedication = () => {
     setMedications([
@@ -53,6 +55,7 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
     ]);
   };
 
+  useEffect(() => { console.log("medications", medications) }, [medications])
   // Xóa thuốc
   const handleRemoveMedication = (id: number) => {
     if (medications.length > 1) {
@@ -61,7 +64,7 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
   };
 
   // Cập nhật thông tin thuốc
-  const handleMedicationChange = (
+  const handleMedicationChange = async (
     id: number,
     field: keyof Medication,
     value: string
@@ -74,21 +77,26 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
         return med;
       })
     );
+    if (field === "name") {
+      try {
+        const rs = await http.get<any|null>(
+          `/medicine-details?search=${encodeURIComponent(value)}`
+        );
+        if (rs) {
+
+          setMedications((prev) =>
+            prev.map((med) =>
+              med.id === id ? { ...med, suggestions: rs.data ?? [] } : med
+            )
+          );
+        }
+      } catch (err) {
+        console.error("Gợi ý thuốc thất bại", err);
+      }
+    }
   };
 
-  // Danh sách thuốc mẫu
-  const medicationOptions = [
-    "Paracetamol 500mg",
-    "Amoxicillin 500mg",
-    "Omeprazole 20mg",
-    "Loratadine 10mg",
-    "Ibuprofen 400mg",
-    "Cetirizine 10mg",
-    "Metformin 500mg",
-    "Atorvastatin 10mg",
-    "Losartan 50mg",
-    "Metoprolol 25mg",
-  ];
+
 
   // Danh sách tần suất
   const frequencyOptions = [
@@ -113,21 +121,6 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
     { label: "2 tháng", value: 60 },
     { label: "3 tháng", value: 90 },
   ];
-
-  // lấy thuốc mẫu
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setMedications(medicationOptions);
-      } catch (err) {
-        console.error("Failed to fetch appointment detail:", err);
-        handleApiError(err, "Lấy thông tin thuốc mẫu thất bại");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [bookingId]);
 
   // lấy thông tin thuốc cũ
   useEffect(() => {
@@ -200,7 +193,7 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
 
       {/* Danh sách thuốc */}
       <div className="space-y-6">
-        {medications.map((medication, index) => (
+        {medications?.map((medication, index) => (
           <div key={index} className="p-4 border rounded-md bg-slate-50">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium">Thuốc {index + 1}</h4>
@@ -218,22 +211,25 @@ export function PrescriptionForm({ bookingId, onPreview, disabled }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor={`med-name-${medication.id}`}>Tên thuốc</Label>
-                <Select
+                <QuickSuggest
                   value={medication.name}
-                  onValueChange={(value) =>
-                    handleMedicationChange(medication.id, "name", value)
-                  }>
-                  <SelectTrigger id={`med-name-${medication.id}`}>
-                    <SelectValue placeholder="Chọn hoặc nhập tên thuốc" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {medicationOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  list={medication.suggestions ?? []}
+                  onInputChange={(val) => {
+                    handleMedicationChange(medication.id, "name", val);
+                  }}
+                  onSelectItem={(val)=>{
+                    setMedications((prev) =>
+                      prev.map((med) =>
+                        med.id === medication.id ? { ...med, name: val } : med
+                      )
+                    );
+                  }}
+                  getValue={(item) => item.name}
+                  renderItem={(item) => (
+                    <div className="">{item.name}</div>
+                  )}
+                  placeholder="Tìm thuốc..."
+                />
               </div>
 
               <div className="space-y-2">

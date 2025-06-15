@@ -30,7 +30,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getFullURL } from '@/helper/url';
+import { getFullURL, getImageSrc, isImg } from '@/helper/url';
+import { ImgDialogView } from "@/components/share/img-dialog-view";
+import Link from "next/link";
+import { downloadFile } from "@/helper/my-file";
+import  Image  from 'next/image';
 
 interface PatientRecord {
   id: string;
@@ -91,6 +95,11 @@ export default function PatientRecordModal({ patientId }: Pops) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [patientRecord, setPatientRecord] = useState<any | null>(null);
+
+
+
+  const [imgView, setImgView] = useState<string | null>(null)
+  const [imgViewOpen, setImgViewOpen] = useState(false)
   useEffect(() => {
     if (!patientId) return
     if (!open) return
@@ -245,7 +254,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                 </TabsList>
 
                 <TabsContent value="history" className="space-y-4">
-                  {patientRecord.records.map((visit:any) => (
+                  {patientRecord.records.map((visit: any) => (
                     <Card key={visit.id}>
                       <CardHeader>
                         <div className="flex justify-between items-start">
@@ -284,7 +293,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                           <h4 className="font-medium mb-2">Chỉ số sinh hiệu:</h4>
                           <div className="grid grid-cols-3 md:grid-cols-5 gap-2 text-sm">
                             <div>
-                              <span className="text-gray-500">HA:</span>{" "}
+                              <span className="text-gray-500">Huyết áp:</span>{" "}
                               {visit.bloodPressure}
                             </div>
                             <div>
@@ -311,7 +320,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                 </TabsContent>
 
                 <TabsContent value="medications" className="space-y-4">
-                  {patientRecord.prescriptions.map((medication:any) => (
+                  {patientRecord.prescriptions.map((medication: any) => (
                     <Card key={medication.id}>
                       <CardContent className="pt-6">
                         <div className="flex justify-between items-start">
@@ -343,7 +352,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                           {
                             medication.isUser && <Badge variant="secondary">Đang sử dụng</Badge>
                           }
-                          
+
                         </div>
                       </CardContent>
                     </Card>
@@ -376,7 +385,19 @@ export default function PatientRecordModal({ patientId }: Pops) {
                       <CardContent className="pt-6">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-3">
-                            <FileText className="w-8 h-8 text-blue-500" />
+                            {
+                              isImg(document.type) ?
+                                <div className="relative w-8 h-8 bg-gray-50 rounded-lg overflow-hidden">
+                                  <Image
+                                    src={getImageSrc(document.uri)}
+                                    alt={document.name || "image"}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                                :
+                                <FileText className="w-8 h-8 text-blue-500" />
+                            }
                             <div>
                               <h4 className="font-medium">{document.name}</h4>
                               <p className="text-sm text-gray-600">
@@ -385,13 +406,31 @@ export default function PatientRecordModal({ patientId }: Pops) {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4 mr-1" />
-                              Xem
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Download className="w-4 h-4 mr-1" />
-                              Tải về
+                            {
+                              isImg(document.type) && (
+                                <Button
+                                  onClick={() => {
+                                    setImgView(document.uri)
+                                    setImgViewOpen(true)
+                                    console.log(document)
+                                  }}
+                                  size="sm"
+                                  variant="outline"
+                                >
+                                  <Eye className="w-4 h-4 mr-1" />
+                                  Xem
+                                </Button>
+                              )
+                            }
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => downloadFile(getFullURL(document.uri), document.name)}
+                            >
+                              <span>
+                                <Download className="h-4 w-4" />
+                                Tải về
+                              </span>
                             </Button>
                           </div>
                         </div>
@@ -403,6 +442,11 @@ export default function PatientRecordModal({ patientId }: Pops) {
             </div>
           }
         </ScrollArea>
+        <ImgDialogView
+          isOpen={imgViewOpen}
+          setOpen={setImgViewOpen}
+          uri={imgView}
+        />
       </DialogContent>
     </Dialog>
   );

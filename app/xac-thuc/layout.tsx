@@ -17,7 +17,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     } else if (role == "doctor") {
       router.push("/doctor/schedule");
     } else if (role == "admin") {
-      router.push("/admin");
+      router.push("/admin/facilities");
     }
   }, [role, hasHydrated])
 

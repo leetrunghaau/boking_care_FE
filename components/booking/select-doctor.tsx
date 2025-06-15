@@ -258,9 +258,10 @@ export function SelectDoctor() {
           <h3 className="text-lg font-semibold text-slate-800">{spt.name}</h3>
           <p className="text-sm text-gray-600 mb-2">{spt.title}</p>
 
-          <div className="flex items-center w-full mx-auto gap-1 text-teal-600 text-sm mt-2 group-hover:underline">
+          <Link href={`/chuyen-khoa/${spt.slug}`} className="flex items-center w-full mx-auto gap-1 text-teal-600 text-sm mt-2 group-hover:underline">
+            Link
             Xem chi tiết <ChevronRight className="w-4 h-4" />
-          </div>
+          </Link>
         </div>
       </div>
     );

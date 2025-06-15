@@ -284,7 +284,7 @@ export default function PatientRecordModal({ patientId }: Pops) {
                           <h4 className="font-medium mb-2">Chỉ số sinh hiệu:</h4>
                           <div className="grid grid-cols-3 md:grid-cols-5 gap-2 text-sm">
                             <div>
-                              <span className="text-gray-500">HA:</span>{" "}
+                              <span className="text-gray-500">Huyết áp:</span>{" "}
                               {visit.bloodPressure}
                             </div>
                             <div>
@@ -390,8 +390,10 @@ export default function PatientRecordModal({ patientId }: Pops) {
                               Xem
                             </Button>
                             <Button size="sm" variant="outline">
-                              <Download className="w-4 h-4 mr-1" />
-                              Tải về
+                              <span>
+                                <Download className="h-4 w-4" />
+                                Tải về
+                              </span>
                             </Button>
                           </div>
                         </div>

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import http from "@/helper/axios";
+import { downloadFile } from "@/helper/my-file";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
 import { Download, Eye, FileText, ImageIcon, Trash2, X } from "lucide-react";
@@ -50,8 +51,8 @@ export default function Gallery() {
   const handleDeteleImg = async (imgId: number) => {
     try {
       const rs = await http.delete(`/admin-hospital/basic-hospital/${imgId}/img`)
-      if (rs){
-        setServerFile(serverFile.filter(i=>i.id != imgId))
+      if (rs) {
+        setServerFile(serverFile.filter(i => i.id != imgId))
         handleApiSuccess("Bạn đã xóa thành công 1 hình ảnh của bệnh viện")
       }
     } catch (err) {
@@ -59,7 +60,7 @@ export default function Gallery() {
     } finally {
     }
   }
-  
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -198,17 +199,13 @@ export default function Gallery() {
                       variant="outline"
                       size="sm"
                       asChild
-                      className="border-teal-200 text-teal-600 hover:bg-teal-50"
+                      className="border-teal-200 text-teal-600 hover:bg-teal-50 flex items-center gap-2"
+                      onClick={() => { downloadFile(getFullURL(selectedImage.imageUrl), selectedImage.name) }}
                     >
-                      <Link
-                        href={getFullURL(selectedImage.imageUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2"
-                      >
+                      <span>
                         <Download className="h-4 w-4" />
                         Tải về
-                      </Link>
+                      </span>
                     </Button>
 
                     <AlertDialog>

@@ -56,8 +56,9 @@ export default function SpecialtyDetailPage() {
         <h2 className="text-2xl font-semibold text-slate-800 mb-6">
           Bệnh lý phổ biến
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {specialty.disease.map((disease: any, idx: number) => (
+        {/* <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"> */}
+        <div className="flex flex-wrap gap-3">
+          {/* {specialty.disease.map((disease: any, idx: number) => (
             <div key={idx} className="text-center">
               <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow">
                 <Image
@@ -69,6 +70,13 @@ export default function SpecialtyDetailPage() {
               </div>
               <p className="mt-2 font-medium">{disease.name}</p>
             </div>
+          ))} */}
+          {specialty.disease.map((disease: any, idx: number) => (
+            <span
+              key={idx}
+              className="bg-teal-100 text-teal-800 px-4 py-2 rounded-full text-sm font-medium">
+              {disease.name}
+            </span>
           ))}
         </div>
       </section>

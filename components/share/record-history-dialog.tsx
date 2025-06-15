@@ -65,7 +65,7 @@ export function RecordHistoryDialog({ record }: RecordHistoryDialogProps) {
             <h4 className="font-medium mb-2">Chỉ số sức khỏe:</h4>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-2 text-sm">
               <div>
-                <span className="text-gray-500">HA:</span>{" "}
+                <span className="text-gray-500">Huyết áp:</span>{" "}
                 {record.bloodPressure}
               </div>
               <div>

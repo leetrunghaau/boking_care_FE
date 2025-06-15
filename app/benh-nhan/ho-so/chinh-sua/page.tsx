@@ -15,7 +15,6 @@ import http from "@/helper/axios";
 import { handleApiError, handleApiSuccess } from "@/helper/toast-utils";
 import { getFullURL } from "@/helper/url";
 
-// Import các component con đã tách ra
 import PersonalInfoCard from "./PersonalInfoCard";
 import RelativeInfoCard from "./RelativeInfoCard";
 
@@ -60,7 +59,7 @@ export default function EditProfilePage() {
       try {
         const res = await http.get<any>("/patient/my-info");
         if (res?.status && !fetched.current) {
-          setForm((prev) => ({ ...prev, ...res.info }));
+          setForm((prev) => ({ ...prev, ...res.info, gender: res.info.genderEN }));
           setRelative((prev) => ({ ...prev, ...res.relative }));
           fetched.current = true;
         }

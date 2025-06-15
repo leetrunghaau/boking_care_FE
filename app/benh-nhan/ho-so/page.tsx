@@ -59,7 +59,7 @@ export default function ViewProfilePage() {
     <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-slate-800">Hồ sơ cá nhân</h1>
-        <Button onClick={() => router.push("/benh-nhan/ho-so/chinh-sua")}>
+        <Button onClick={() => router.push("/benh-nhan/ho-so/chinh-sua")} className="bg-teal-600 hover:bg-teal-700 ">
           Chỉnh sửa hồ sơ
         </Button>
       </div>

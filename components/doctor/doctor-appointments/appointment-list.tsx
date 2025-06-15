@@ -1,12 +1,13 @@
-import { AppointmentCard, type AppointmentData } from "./appointment-card";
+import { AppointmentCard } from "./appointment-card";
 import { EmptyState } from "./empty-state";
+import { types } from "@/app/doctor/appointments/page";
 
 export function AppointmentList({
   appointments,
-  filterType,
+  currentType,
 }: AppointmentListProps) {
   if (!appointments || appointments.length === 0) {
-    return <EmptyState filterType={filterType} />;
+    return <EmptyState filterType={currentType} />;
   }
 
   return (
@@ -17,8 +18,7 @@ export function AppointmentList({
     </div>
   );
 }
-
 interface AppointmentListProps {
-  appointments: AppointmentData[];
-  filterType: string;
+  appointments: any[];
+  currentType:  keyof typeof types;
 }

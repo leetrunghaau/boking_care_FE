@@ -11,6 +11,7 @@ import { PrescriptionPreviewStatic } from "@/components/share/prescription-previ
 import { RecordHistoryDialog } from "@/components/share/record-history-dialog";
 import { useRouter } from "next/navigation";
 import { getFullURL } from "@/helper/url";
+import { RecordFileDialog } from "@/components/share/record-file-dialog";
 
 export default function LichSuKhamPage() {
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -122,6 +123,10 @@ export default function LichSuKhamPage() {
                       {appointment.result && (
                         <RecordHistoryDialog record={appointment.result} />
                       )}
+                      {appointment.files && (
+                        <RecordFileDialog files={appointment.files} />
+                      )}
+                      
 
                       <Button
                         variant="confirmSecondary"
