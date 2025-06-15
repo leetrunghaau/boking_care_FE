@@ -239,8 +239,6 @@ export default function EditDoctorPage() {
                     <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
                         <TabsTrigger value="general">Thông tin chung</TabsTrigger>
                         <TabsTrigger value="schedule">Lịch biểu</TabsTrigger>
-                        <TabsTrigger value="qualifications">Chuyên môn & Ngôn ngữ</TabsTrigger>
-                        <TabsTrigger value="experience">Kinh nghiệm & Học vấn</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="general">
@@ -259,7 +257,7 @@ export default function EditDoctorPage() {
                         /> */}
                     </TabsContent>
 
-                    <TabsContent value="qualifications">
+                    {/* <TabsContent value="qualifications">
                         <ScheduleSettings/>
                     </TabsContent>
 
@@ -277,7 +275,7 @@ export default function EditDoctorPage() {
                             }}
                             onNotification={showNotification}
                         />
-                    </TabsContent>
+                    </TabsContent> */}
                 </Tabs>
             </div>
         </div>

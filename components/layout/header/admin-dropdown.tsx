@@ -82,7 +82,7 @@ export default function AdminDropdown() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => router.push("/admin")}
+          onClick={() => router.push("/admin/facilities")}
           className="hover:cursor-pointer">
           <LayoutDashboard className="w-4 h-4 mr-2" />
           Trang làm việc

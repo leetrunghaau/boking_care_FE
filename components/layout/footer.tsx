@@ -135,7 +135,7 @@ export default function Footer() {
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <span>01, Võ Văn Ngân, p. Linh Chiễu, tp. Thủ Đức, tp. HCM</span>
+                  <span>01, Võ Văn Ngân, P. Linh Chiễu, TP. Thủ Đức, TP. HCM</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <svg

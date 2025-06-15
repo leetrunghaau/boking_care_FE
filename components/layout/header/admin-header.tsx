@@ -27,7 +27,7 @@ export default function AdminHeader() {
 
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/admin/facilities" className="flex items-center gap-2">
             <Stethoscope className="h-6 w-6 text-teal-600" />
             <span className="text-xl font-bold text-teal-600">Admin.Med+</span>
           </Link>
