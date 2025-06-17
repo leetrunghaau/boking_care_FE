@@ -93,12 +93,12 @@ export default function UserDropdown() {
           Tài khoản
         </DropdownMenuItem>
 
-        <DropdownMenuItem
+        {/* <DropdownMenuItem
           onClick={() => router.push("/benh-nhan/thong-bao")}
           className="hover:cursor-pointer">
           <Bell className="w-4 h-4 mr-2" />
           Thông báo
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuItem
           onClick={() => router.push("/benh-nhan/lich-kham")}

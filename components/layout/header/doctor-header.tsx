@@ -54,11 +54,11 @@ export default function DoctorHeader() {
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Hổ trợ
           </Link> */}
-          <Link
+          {/* <Link
             href="/doctor/notifications"
             className="text-md font-medium hover:text-teal-600 transition-colors">
             Thông báo
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Actions */}
