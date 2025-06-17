@@ -87,7 +87,7 @@ export function FloatingChatBubble({
       { id: assistantMessageId, content: "", role: "assistant", timestamp: new Date() },
     ]);
     try {
-      const res = await fetch(`${ipconfig.AI}/AI/chat`, {
+      const res = await fetch(`${ipconfig.AI}AI/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage.content }),

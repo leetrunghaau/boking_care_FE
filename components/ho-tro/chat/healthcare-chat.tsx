@@ -47,7 +47,7 @@ export function HealthcareChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${ipconfig.AI}/query`, {
+      const res = await fetch(`${ipconfig.AI}query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: text }),
@@ -94,7 +94,7 @@ export function HealthcareChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${ipconfig.AI}/query`, {
+      const res = await fetch(`${ipconfig.AI}query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: input }),
