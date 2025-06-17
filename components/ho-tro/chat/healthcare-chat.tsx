@@ -15,7 +15,7 @@ import { ChatBubble } from "../chat-bubble";
 import { Send, Phone, FileText, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { handleApiError } from "@/helper/toast-utils";
-import { ipconfig } from "@/helper/ip";
+import { ipconfig } from './../../../helper/ip';
 
 export function HealthcareChat() {
   const [messages, setMessages] = useState<
@@ -47,7 +47,7 @@ export function HealthcareChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${ipconfig.AI}`, {
+      const res = await fetch(`${ipconfig.AI}/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: text }),
@@ -94,7 +94,7 @@ export function HealthcareChat() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${ipconfig.AI}`, {
+      const res = await fetch(`${ipconfig.AI}/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: input }),
@@ -128,10 +128,10 @@ export function HealthcareChat() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold text-gray-800">
-                Medly - Trợ lý MedPlus
+                Medly - HealthCare AI Assistant
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Tư vấn sức khỏe thông minh, hỗ trợ mọi lúc
+                Get instant health guidance and support
               </p>
             </div>
           </div>
@@ -144,7 +144,7 @@ export function HealthcareChat() {
           <div className="text-center py-8">
             <div className="bg-blue-50 rounded-lg p-6 max-w-md mx-auto">
               <h3 className="font-semibold text-gray-800 mb-2">
-                Chào mừng đến với Med Plus. Tôi là Medly!
+                Chào mừng đến với Booking Care AI. Tôi là Medly!
               </h3>
               <p className="text-sm text-gray-600 mb-4">
                 Tôi ở đây để hỗ trợ bạn với các câu hỏi sức khỏe chung và hướng
@@ -179,7 +179,7 @@ export function HealthcareChat() {
             }
             priority={
               message.text.toLowerCase().includes("urgent") ||
-                message.text.toLowerCase().includes("emergency")
+              message.text.toLowerCase().includes("emergency")
                 ? "high"
                 : "low"
             }
@@ -217,10 +217,10 @@ export function HealthcareChat() {
                 messageType === "symptom"
                   ? "Describe your symptoms..."
                   : messageType === "medication"
-                    ? "Ask about medication..."
-                    : messageType === "appointment"
-                      ? "What type of appointment do you need?"
-                      : "Type your health question..."
+                  ? "Ask about medication..."
+                  : messageType === "appointment"
+                  ? "What type of appointment do you need?"
+                  : "Type your health question..."
               }
               className="flex-1"
               disabled={isLoading}
@@ -243,9 +243,9 @@ export function HealthcareChat() {
                 className={cn(
                   "text-xs h-8",
                   messageType ===
-                  (action.label.toLowerCase().includes("appointment")
-                    ? "appointment"
-                    : action.label.toLowerCase().includes("symptom")
+                    (action.label.toLowerCase().includes("appointment")
+                      ? "appointment"
+                      : action.label.toLowerCase().includes("symptom")
                       ? "symptom"
                       : "medication") && "bg-blue-100 text-blue-700"
                 )}>

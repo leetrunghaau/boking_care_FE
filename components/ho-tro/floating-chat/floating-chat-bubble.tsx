@@ -21,7 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ipconfig } from "@/helper/ip";
+import { ipconfig } from './../../../helper/ip';
 
 interface ChatMessage {
   id: string;
@@ -75,50 +75,66 @@ export function FloatingChatBubble({
       timestamp: new Date(),
     };
 
-    // Thêm message người dùng vào list ngay lập tức (giao diện phản hồi nhanh)
+    // Thêm message người dùng ngay lập tức
     setMessages((prev) => [...prev, userMessage]);
-    setInput(""); // Xóa input sau khi gửi
-    setIsLoading(true); // Bật loading để hiện "Typing..."
+    setInput("");
+    setIsLoading(true);
 
+    // Tạo một message assistant rỗng để cập nhật dần
+    const assistantMessageId = crypto.randomUUID();
+    setMessages((prev) => [
+      ...prev,
+      { id: assistantMessageId, content: "", role: "assistant", timestamp: new Date() },
+    ]);
     try {
-      // Gọi API backend trả lời
-      const res = await fetch(`${ipconfig.AI}`, {
+      const res = await fetch(`${ipconfig.AI}/AI/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: userMessage.content }),
+        body: JSON.stringify({ message: userMessage.content }),
       });
 
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
+      if (!res.body) throw new Error("No response body");
+      console.log(res.body)
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+
+      let done = false;
+      let accumulatedText = "";
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedText += chunk;
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: accumulatedText }
+              : msg
+          )
+        );
+
       }
 
-      const data = await res.json();
-
-      // Tạo message trả lời từ AI
-      const assistantMessage: ChatMessage = {
-        id: crypto.randomUUID(),
-        content:
-          data.final_response_vi ??
-          "Xin lỗi, tôi không tìm thấy câu trả lời phù hợp.",
-        role: "assistant",
-        timestamp: new Date(),
-      };
-
-      // Thêm message AI vào list
-      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      // Nếu lỗi, thêm message báo lỗi
-      const errorMessage: ChatMessage = {
-        id: crypto.randomUUID(),
-        content: "Oops! Something went wrong. Please try again later.",
-        role: "assistant",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      console.error("❌ Error khi stream:", error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.role === "assistant" && msg.content === ""
+            ? {
+              ...msg,
+              content: "Oops! Something went wrong. Please try again later.",
+            }
+            : msg
+        )
+      );
     } finally {
-      setIsLoading(false); // Tắt loading
+      setIsLoading(false);
     }
+
   };
+
 
   const getPositionClasses = () => {
     switch (position) {
@@ -160,7 +176,7 @@ export function FloatingChatBubble({
       <div className={cn("max-w-[80%]", isUser ? "order-1" : "order-2")}>
         <div
           className={cn(
-            "rounded-2xl px-3 py-2 text-sm",
+            "rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap",
             isUser
               ? cn("text-white ml-auto", primaryColor)
               : "bg-gray-100 text-gray-800"
