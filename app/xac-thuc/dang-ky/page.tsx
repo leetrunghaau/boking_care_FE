@@ -270,13 +270,13 @@ export default function RegisterPage() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500">
+            {/* <span className="bg-white px-2 text-gray-500">
               Hoặc đăng ký với
-            </span>
+            </span> */}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* <div className="grid grid-cols-2 gap-4">
           <Button variant="outline" className="w-full" disabled={isLoading}>
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -308,7 +308,7 @@ export default function RegisterPage() {
             </svg>
             Facebook
           </Button>
-        </div>
+        </div> */}
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">

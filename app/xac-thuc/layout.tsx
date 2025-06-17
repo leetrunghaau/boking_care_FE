@@ -36,7 +36,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="w-full max-w-md">{children}</div>
       </main>
 
-      <footer className="py-6 text-center text-sm text-muted-foreground">
+      <footer className="py-6 text-center text-sm text-muted-foreground mx-auto">
         <div className="container">
           <p>&copy; {new Date().getFullYear()} Med+. Tất cả quyền được bảo lưu.</p>
         </div>
