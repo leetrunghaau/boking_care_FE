@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChatBubble } from "../chat-bubble";
-import { Send, Phone, FileText, AlertTriangle } from "lucide-react";
+import { Send, Phone, FileText, AlertTriangle, Thermometer, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { handleApiError } from "@/helper/toast-utils";
 import { ipconfig } from './../../../helper/ip';
@@ -24,6 +24,7 @@ export function HealthcareChat() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false)
+  
   const [messageType, setMessageType] = useState<
     "general" | "symptom" | "medication" | "appointment"
   >("general");
@@ -111,22 +112,21 @@ export function HealthcareChat() {
     setIsTyping(false);
   };
   
-
   const quickActions = [
     {
-      label: "Làm sao để đặt lịch hẹn với bác sĩ",
-      icon: <FileText className="w-4 h-4" />,
-      action: () => sendQuickQuestion("Làm sao để đặt lịch hẹn với bác sĩ?"),
+      label: "Tôi nên làm gì khi bị sốt nhẹ?",
+      icon: <Thermometer className="w-4 h-4" />,
+      action: () => sendQuickQuestion("Tôi nên làm gì khi bị sốt nhẹ?"),
     },
     {
-      label: "Chuẩn đoán dựa trên triệu chứng",
+      label: "Triệu chứng ho kéo dài có đáng lo không?",
       icon: <AlertTriangle className="w-4 h-4" />,
-      action: () => sendQuickQuestion("Chuẩn đoán dựa trên triệu chứng"),
+      action: () => sendQuickQuestion("Triệu chứng ho kéo dài có đáng lo không?"),
     },
     {
-      label: "Thông tin về thuốc",
-      icon: <Phone className="w-4 h-4" />,
-      action: () => sendQuickQuestion("Thông tin về thuốc"),
+      label: "Làm sao để giảm stress hiệu quả?",
+      icon: <Heart className="w-4 h-4" />,
+      action: () => sendQuickQuestion("Làm sao để giảm stress hiệu quả?"),
     },
   ];
   const sendMessage = async () => {
@@ -213,10 +213,10 @@ export function HealthcareChat() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold text-gray-800">
-                Medly - HealthCare AI Assistant
+                Medly - Trợ lý sức khỏe của bạn
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Get instant health guidance and support
+                Tận tâm đồng hành, mang đến sự an tâm cho sức khỏe của bạn.
               </p>
             </div>
           </div>
@@ -231,7 +231,7 @@ export function HealthcareChat() {
           <div className="text-center py-8">
             <div className="bg-blue-50 rounded-lg p-6 max-w-md mx-auto">
               <h3 className="font-semibold text-gray-800 mb-2">
-                Chào mừng đến với Booking Care AI. Tôi là Medly!
+                Chào mừng đến với MedPlus. Tôi là Medly!
               </h3>
               <p className="text-sm text-gray-600 mb-4">
                 Tôi ở đây để hỗ trợ bạn với các câu hỏi sức khỏe chung và hướng
@@ -347,8 +347,7 @@ export function HealthcareChat() {
       {/* Disclaimer */}
       <div className="bg-yellow-50 border-t border-yellow-200 p-3">
         <p className="text-xs text-yellow-800 text-center">
-          ⚠️ This AI assistant provides general health information only. Always
-          consult healthcare professionals for medical advice.
+          ⚠️ Medly giúp bạn hiểu thêm về sức khỏe, nhưng đừng quên hỏi ý kiến bác sĩ để được tư vấn chính xác nhé!.
         </p>
       </div>
     </div>

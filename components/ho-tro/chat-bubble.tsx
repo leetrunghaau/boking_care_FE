@@ -100,7 +100,7 @@ export function ChatBubble({
                 />
               </div>
               <span className="text-sm text-gray-500 ml-2">
-                Medly is typing...
+                Medly đang trả lời...
               </span>
             </div>
           ) : (
@@ -124,9 +124,8 @@ export function ChatBubble({
 
       {isUser && (
         <Avatar className="w-8 h-8 mt-1">
-          <AvatarImage src="/placeholder.svg?height=32&width=32" />
-          <AvatarFallback className="bg-green-500 text-white">
-            <User className="w-4 h-4" />
+          <AvatarFallback className="bg-teal-100 text-white">
+            <User className="w-4 h-4 text-gray-600" />
           </AvatarFallback>
         </Avatar>
       )}

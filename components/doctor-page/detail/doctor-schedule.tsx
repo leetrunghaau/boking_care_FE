@@ -222,9 +222,7 @@ export default function DoctorSchedule({ slug }: Pops) {
             }}>
             Đặt lịch khám
           </Button>
-          <p className="text-xs text-center text-muted-foreground mt-2">
-            Miễn phí đặt lịch, không mất phí khi hủy trước 24 giờ
-          </p>
+          
         </div>
       </CardContent>
     </Card>
