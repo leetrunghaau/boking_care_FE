@@ -3,25 +3,10 @@
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  MessageCircle,
-  X,
-  Send,
-  Minimize2,
-  Bot,
-  User,
-  Sparkles,
-} from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { MessageCircle, X, Send, Bot, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ipconfig } from './../../../helper/ip';
+import { ipconfig } from "../../../helper/ip";
 
 interface ChatMessage {
   id: string;
@@ -30,302 +15,175 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-interface FloatingChatBubbleProps {
-  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
-  primaryColor?: string;
-  title?: string;
-  placeholder?: string;
-  welcomeMessage?: string;
-}
+const formatTime = (date: Date) =>
+  date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-export function FloatingChatBubble({
-  position = "bottom-right",
-  primaryColor = "bg-teal-600",
-  title = "AI Assistant",
-  placeholder = "Type your message...",
-  welcomeMessage = "Hi! I'm your AI assistant. How can I help you today?",
-}: FloatingChatBubbleProps) {
+const Bubble = ({ msg }: { msg: ChatMessage }) => (
+  <div className={cn("flex gap-2 mb-3", msg.role === "user" ? "justify-end" : "justify-start")}>
+    <div className={cn("max-w-[80%]", msg.role === "user" ? "order-1" : "order-2")}>
+      {
+        msg.content.length > 0 ?
+          <div
+            className={cn(
+              "rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap",
+              msg.role === "user" ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-800"
+            )}
+          >
+            {msg.content}
+          </div> :
+          <TypingIndicator />
+      }
+
+      <div className={cn("text-xs text-gray-500 mt-1", msg.role === "user" ? "text-right" : "text-left")}>
+        {formatTime(msg.timestamp)}
+      </div>
+    </div>
+  </div>
+)
+
+const TypingIndicator = () => (
+  <div className="flex gap-2 mb-3">
+    <div className="bg-gray-100 rounded-2xl px-3 py-2 flex gap-1">
+      {[0, 150, 300].map((delay) => (
+        <div
+          key={delay}
+          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+          style={{ animationDelay: `${delay}ms` }}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+export function FloatingChatBubble() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll chat to bottom on messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  // Send message & fetch AI response
-  // Send message & fetch AI response
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const sendMessage = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
+    const userMsg: ChatMessage = {
+      id: String(new Date()),
       content: input.trim(),
       role: "user",
       timestamp: new Date(),
     };
 
-    // Thêm message người dùng ngay lập tức
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
 
-    // Tạo một message assistant rỗng để cập nhật dần
-    const assistantMessageId = crypto.randomUUID();
+    const assistantId = String(new Date());
     setMessages((prev) => [
       ...prev,
-      { id: assistantMessageId, content: "", role: "assistant", timestamp: new Date() },
+      { id: assistantId, content: "", role: "assistant", timestamp: new Date() },
     ]);
+
     try {
       const res = await fetch(`${ipconfig.AI}AI/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage.content }),
+        body: JSON.stringify({ message: userMsg.content }),
       });
 
       if (!res.body) throw new Error("No response body");
-      console.log(res.body)
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      let text = "";
 
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        if (value) {
+          text += decoder.decode(value, { stream: true });
 
-      let done = false;
-      let accumulatedText = "";
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunk = decoder.decode(value, { stream: true });
-        accumulatedText += chunk;
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantMessageId
-              ? { ...msg, content: accumulatedText }
-              : msg
-          )
-        );
-
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, content: text } : m))
+          );
+        }
       }
-
-    } catch (error) {
-      console.error("❌ Error khi stream:", error);
+    } catch (err) {
+      console.error("❌ Stream error:", err);
       setMessages((prev) =>
-        prev.map((msg) =>
-          msg.role === "assistant" && msg.content === ""
-            ? {
-              ...msg,
-              content: "Oops! Something went wrong. Please try again later.",
-            }
-            : msg
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, content: "Oops! Something went wrong. Please try again later." }
+            : m
         )
       );
     } finally {
       setIsLoading(false);
     }
-
   };
 
-
-  const getPositionClasses = () => {
-    switch (position) {
-      case "bottom-left":
-        return "bottom-4 left-4";
-      case "top-right":
-        return "top-4 right-4";
-      case "top-left":
-        return "top-4 left-4";
-      default:
-        return "bottom-4 right-4";
-    }
-  };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
-  const ChatBubbleMessage = ({
-    message,
-    isUser,
-  }: {
-    message: ChatMessage;
-    isUser: boolean;
-  }) => (
-    <div
-      className={cn(
-        "flex gap-2 mb-3",
-        isUser ? "justify-end" : "justify-start"
-      )}>
-      {!isUser && (
-        <Avatar className="w-6 h-6 mt-1">
-          <AvatarFallback className={cn("text-white text-xs", primaryColor)}>
-            <Bot className="w-3 h-3" />
-          </AvatarFallback>
-        </Avatar>
-      )}
-
-      <div className={cn("max-w-[80%]", isUser ? "order-1" : "order-2")}>
-        <div
-          className={cn(
-            "rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap",
-            isUser
-              ? cn("text-white ml-auto", primaryColor)
-              : "bg-gray-100 text-gray-800"
-          )}>
-          {message.content}
-        </div>
-        <div
-          className={cn(
-            "text-xs text-gray-500 mt-1",
-            isUser ? "text-right" : "text-left"
-          )}>
-          {formatTime(message.timestamp)}
-        </div>
-      </div>
-
-      {isUser && (
-        <Avatar className="w-6 h-6 mt-1 order-2">
-          <AvatarFallback className="bg-gray-500 text-white text-xs">
-            <User className="w-3 h-3" />
-          </AvatarFallback>
-        </Avatar>
-      )}
-    </div>
-  );
-
-  const TypingIndicator = () => (
-    <div className="flex gap-2 mb-3">
-      <Avatar className="w-6 h-6 mt-1">
-        <AvatarImage src="/Medly.jpg" />
-        <AvatarFallback className={cn("text-white text-xs", primaryColor)}>
-          <Bot className="w-3 h-3" />
-        </AvatarFallback>
-      </Avatar>
-      <div className="bg-gray-100 rounded-2xl px-3 py-2">
-        <div className="flex gap-1">
-          <div
-            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-            style={{ animationDelay: "0ms" }}
-          />
-          <div
-            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-            style={{ animationDelay: "150ms" }}
-          />
-          <div
-            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-            style={{ animationDelay: "300ms" }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  if (!isOpen) {
-    return (
-      <div className={cn("fixed z-50", getPositionClasses())}>
-        <Button
-          onClick={() => setIsOpen(true)}
-          className={cn(
-            "rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110",
-            primaryColor
-          )}>
-          <MessageCircle className="w-6 h-6" />
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className={cn("fixed z-50", getPositionClasses())}>
-      <Card
-        className={cn(
-          "w-80 h-96 shadow-2xl transition-all duration-300",
-          isMinimized ? "h-12" : "h-96"
-        )}>
-        <CardHeader className={cn("pb-2", primaryColor, "text-white")}>
-          <div className="flex items-center justify-between">
+  return isOpen ? (
+    <div className="fixed bottom-4 right-4 z-50">
+      <Card className="w-80 h-96 shadow-2xl">
+        <CardHeader className="pb-2 bg-teal-600 text-white">
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
-              <CardTitle className="text-sm font-medium">{title}</CardTitle>
+              <CardTitle className="text-sm">Trò chuyện cùng Medly</CardTitle>
             </div>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMinimized(!isMinimized)}
-                className="h-6 w-6 p-0 text-white hover:bg-white/20">
-                <Minimize2 className="w-3 h-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsOpen(false)}
-                className="h-6 w-6 p-0 text-white hover:bg-white/20">
-                <X className="w-3 h-3" />
-              </Button>
-            </div>
+            <Button onClick={() => setIsOpen(false)} size="sm" variant="ghost" className="h-6 w-6 p-0 text-white">
+              <X className="w-3 h-3" />
+            </Button>
           </div>
         </CardHeader>
 
-        {!isMinimized && (
-          <>
-            <CardContent className="flex-1 overflow-y-auto p-3 h-64">
-              {messages.length === 0 && (
-                <div className="flex gap-2 mb-3">
-                  <Avatar className="w-6 h-6 mt-1">
-                    <AvatarFallback
-                      className={cn("text-white text-xs", primaryColor)}>
-                      <Bot className="w-3 h-3" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="bg-gray-100 rounded-2xl px-3 py-2 text-sm">
-                    {welcomeMessage}
-                  </div>
-                </div>
-              )}
+        <CardContent className="flex-1 overflow-y-auto p-3 h-64">
+          {messages.length === 0 && (
+            <Bubble
+              msg={{
+                id: "initial",
+                content: "Hi! I'm your AI assistant. How can I help you today?",
+                role: "assistant",
+                timestamp: new Date(),
+              }}
+            />
+          )}
+          {messages.map((msg) => (
+            <Bubble key={msg.id} msg={msg} />
+          ))}
+          {/* {isLoading && <TypingIndicator />} */}
+          <div ref={messagesEndRef} />
+        </CardContent>
 
-              {messages.map((message) => (
-                <ChatBubbleMessage
-                  key={message.id}
-                  message={message}
-                  isUser={message.role === "user"}
-                />
-              ))}
-
-              {isLoading && <TypingIndicator />}
-              <div ref={messagesEndRef} />
-            </CardContent>
-
-            <CardFooter className="p-3 pt-0">
-              <form onSubmit={handleSubmit} className="flex gap-2 w-full">
-                <Input
-                  value={input}
-                  onChange={handleInputChange}
-                  placeholder={placeholder}
-                  className="flex-1 h-8 text-sm"
-                  disabled={isLoading}
-                />
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={isLoading || !input.trim()}
-                  className={cn("h-8 w-8 p-0", primaryColor)}>
-                  <Send className="w-3 h-3" />
-                </Button>
-              </form>
-            </CardFooter>
-          </>
-        )}
+        <CardFooter className="p-3 pt-0">
+          <form onSubmit={sendMessage} className="flex gap-2 w-full">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 h-8 text-sm"
+              disabled={isLoading}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="h-8 w-8 p-0 bg-teal-600 text-white"
+              disabled={isLoading || !input.trim()}
+            >
+              <Send className="w-3 h-3" />
+            </Button>
+          </form>
+        </CardFooter>
       </Card>
+    </div>
+  ) : (
+    <div className="fixed bottom-4 right-4 z-50">
+      <Button onClick={() => setIsOpen(true)} className="rounded-full w-14 h-14 bg-teal-600 text-white">
+        <MessageCircle className="w-6 h-6" />
+      </Button>
     </div>
   );
 }
