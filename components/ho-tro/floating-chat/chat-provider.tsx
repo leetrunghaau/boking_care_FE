@@ -25,6 +25,11 @@ export function ChatProvider({
     <>
       {children}
       <FloatingChatBubble
+        position={position}
+        primaryColor={primaryColor}
+        title={title}
+        placeholder={placeholder}
+        welcomeMessage={welcomeMessage}
       />
     </>
   );

@@ -23,14 +23,18 @@ export function HealthcareChat() {
   >([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false)
   const [messageType, setMessageType] = useState<
     "general" | "symptom" | "medication" | "appointment"
   >("general");
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messageContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -40,33 +44,73 @@ export function HealthcareChat() {
   const formatTimestamp = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
-
   const sendQuickQuestion = async (text: string) => {
     const userMessage = { role: "user" as const, text };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+    setIsTyping(true); // Hiển thị typing ngay sau khi user gửi
+    setMessageType("general");
 
     try {
-      const res = await fetch(`${ipconfig.AI}query`, {
+      const res = await fetch(`${ipconfig.AI}AI/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: text }),
+        body: JSON.stringify({ message: text }),
       });
 
-      const data = await res.json();
-      const aiMessage = { role: "ai" as const, text: data.final_response_vi };
-      setMessages((prev) => [...prev, aiMessage]);
+      if (!res.body) throw new Error("No response body from AI");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let accumulatedText = "";
+      let hasPushedAssistantMessage = false;
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        accumulatedText += chunk;
+
+        if (!hasPushedAssistantMessage) {
+          // Thêm assistant message lần đầu
+          setMessages((prev) => [
+            ...prev,
+            { role: "ai", text: accumulatedText },
+          ]);
+          hasPushedAssistantMessage = true;
+          setIsTyping(false); // Ẩn typing ngay sau khi có chunk đầu
+        } else {
+          // Cập nhật nội dung assistant
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastIndex = updated.findLastIndex((m) => m.role === "ai");
+            if (lastIndex !== -1) {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                text: accumulatedText,
+              };
+            }
+            return updated;
+          });
+        }
+      }
     } catch (error) {
+      console.error("AI stream error:", error);
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: "Lỗi kết nối tới máy chủ AI." },
+        { role: "ai", text: "❌ Lỗi kết nối tới máy chủ AI." },
       ]);
       handleApiError(error, "Không kết nối được với AI Service.");
+      setIsTyping(false);
     }
 
     setIsLoading(false);
-    setMessageType("general");
+    setIsTyping(false);
   };
+  
 
   const quickActions = [
     {
@@ -85,36 +129,77 @@ export function HealthcareChat() {
       action: () => sendQuickQuestion("Thông tin về thuốc"),
     },
   ];
-
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = { role: "user" as const, text: input };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+    setIsTyping(true);
+    setInput("");
 
     try {
-      const res = await fetch(`${ipconfig.AI}query`, {
+      const res = await fetch(`${ipconfig.AI}AI/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: input }),
+        body: JSON.stringify({ message: input }),
       });
 
-      const data = await res.json();
-      const aiMessage = { role: "ai" as const, text: data.final_response_vi };
-      setMessages((prev) => [...prev, aiMessage]);
+      if (!res.body) throw new Error("No response body from AI");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let accumulatedText = "";
+      let hasPushedAssistantMessage = false;
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        accumulatedText += chunk;
+
+        // Khi có nội dung đầu tiên từ AI, thêm message
+        if (!hasPushedAssistantMessage) {
+          setMessages((prev) => [
+            ...prev,
+            { role: "ai", text: accumulatedText },
+          ]);
+          hasPushedAssistantMessage = true;
+          setIsTyping(false); // Ẩn typing ngay sau khi có chunk đầu tiên
+        } else {
+          // Update nội dung assistant
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastIndex = updated.findLastIndex((m) => m.role === "ai");
+            if (lastIndex !== -1) {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                text: accumulatedText,
+              };
+            }
+            return updated;
+          });
+        }
+      }
     } catch (error) {
+      console.error("AI stream error:", error);
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: "Lỗi kết nối tới máy chủ AI." },
+        { role: "ai", text: "❌ Đã có lỗi xảy ra. Vui lòng thử lại." },
       ]);
+      setIsTyping(false);
     }
 
     setIsLoading(false);
-    setInput("");
+    setIsTyping(false);
     setMessageType("general");
   };
-
+  
+  
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     sendMessage();
@@ -139,7 +224,9 @@ export function HealthcareChat() {
       </Card>
 
       {/* Messages */}
-      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+      <CardContent
+        ref={messageContainerRef}
+         className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center py-8">
             <div className="bg-blue-50 rounded-lg p-6 max-w-md mx-auto">
@@ -186,9 +273,9 @@ export function HealthcareChat() {
           />
         ))}
 
-        {isLoading && <ChatBubble message="" isUser={false} isTyping={true} />}
+        {isTyping && <ChatBubble message="" isUser={false} isTyping={true} />}
 
-        <div ref={messagesEndRef} />
+        {/* <div ref={messagesEndRef} /> */}
       </CardContent>
 
       {/* Input */}
