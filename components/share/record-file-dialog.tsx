@@ -106,7 +106,7 @@ function FileGridItem({ file, index }: { file: FileItem; index: number }) {
             size="sm"
             variant="ghost"
             className="h-8 px-2 text-emerald-600 hover:text-emerald-700"
-            onClick={() => downloadFile(file.url, file.name || `file-${index + 1}`)}
+            onClick={() => downloadFile(getFullURL(file.url), file.name || `file-${index + 1}`)}
           >
             <Download className="w-3 h-3 mr-1" />
             Tải
@@ -159,7 +159,7 @@ function FileListItem({ file, index }: { file: FileItem; index: number }) {
           size="sm"
           variant="ghost"
           className="h-8 px-2 text-emerald-600 hover:text-emerald-700"
-          onClick={() => downloadFile(file.url, file.name || `file-${index + 1}`)}
+          onClick={() => downloadFile(getFullURL(file.url), file.name || `file-${index + 1}`)}
         >
           <Download className="w-3 h-3 mr-1" />
           Tải
