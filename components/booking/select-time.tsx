@@ -178,7 +178,7 @@ export default function SelectTime() {
         <CardHeader>
           <div className="flex items-center gap-2 mb-3">
             <Clock className="h-6 w-6 text-teal-600" />
-            <h2 className="text-xl font-semibold">Chọn ngày khám</h2>
+            <h2 className="text-xl font-semibold">Chọn giờ khám</h2>
           </div>
         </CardHeader>
         <CardContent>
